@@ -46,7 +46,7 @@ fi
 #=================================================
 
 # Remove metapackage and its dependencies
-ynh_remove_app_dependencies
+#ynh_remove_app_dependencies
 
 
 #=================================================
@@ -61,7 +61,7 @@ ynh_secure_remove "$final_path"
 #=================================================
 
 # Remove the dedicated nginx config
-ynh_remove_nginx_config
+#ynh_remove_nginx_config
 
 #=================================================
 # REMOVE LOGROTATE CONFIGURATION
@@ -87,13 +87,13 @@ fi
 #=================================================
 
 # Remove a cron file
-ynh_secure_remove "/etc/cron.d/$app"
+#ynh_secure_remove "/etc/cron.d/$app"
 
 # Remove a directory securely
-ynh_secure_remove "/etc/$app/"
+#ynh_secure_remove "/etc/$app/"
 
 # Remove the log files
-ynh_secure_remove "/var/log/$app/"
+#ynh_secure_remove "/var/log/$app/"
 
 #=================================================
 # GENERIC FINALIZATION
