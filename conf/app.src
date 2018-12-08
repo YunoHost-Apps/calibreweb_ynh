@@ -1,2 +1,3 @@
 SOURCE_URL=https://github.com/janeczku/calibre-web/archive/master.zip
+SOURCE_SUM=ee272e4b2efadcd45543b80a81511b147a2cf3863a9000396fc3d80217f8824e
 SOURCE_FORMAT=zip
