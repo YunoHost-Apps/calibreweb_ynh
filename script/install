@@ -53,7 +53,6 @@ ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
 ynh_app_setting_set $app admin $admin
 ynh_app_setting_set $app is_public $is_public
-#ynh_app_setting_set $app language $language
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -97,7 +96,7 @@ ynh_setup_source "$final_path"
 ###		- And the section "UPGRADE DEPENDENCIES" in the upgrade script
 
 #ynh_install_app_dependencies deb1 deb2
-pip install --target vendor -r $final_pathrequirements.txt
+#pip install --target vendor -r $final_path requirements.txt
 
 
 
@@ -142,34 +141,6 @@ ynh_system_user_create $app
 # Create a dedicated systemd config
 #ynh_add_systemd_config
 
-#=================================================
-# SETUP APPLICATION WITH CURL
-#=================================================
-
-### Use these lines only if the app installation needs to be finalized through
-### web forms. We generally don't want to ask the final user,
-### so we're going to use curl to automatically fill the fields and submit the
-### forms.
-
-# Set right permissions for curl install
-chown -R $app: $final_path
-
-# Set the app as temporarily public for curl call
-ynh_app_setting_set $app skipped_uris "/"
-# Reload SSOwat config
-yunohost app ssowatconf
-
-# Reload Nginx
-systemctl reload nginx
-
-# Installation with curl
-ynh_local_curl "/INSTALL_PATH" "key1=value1" "key2=value2" "key3=value3"
-
-# Remove the public access
-if [ $is_public -eq 0 ]
-then
-	ynh_app_setting_delete $app skipped_uris
-fi
 
 #=================================================
 # MODIFY A CONFIG FILE
@@ -178,7 +149,7 @@ fi
 ### `ynh_replace_string` is used to replace a string in a file.
 ### (It's compatible with sed regular expressions syntax)
 
-ynh_replace_string "match_string" "replace_string" "$final_path/CONFIG_FILE"
+#ynh_replace_string "match_string" "replace_string" "$final_path/CONFIG_FILE"
 
 #=================================================
 # STORE THE CONFIG FILE CHECKSUM
@@ -231,7 +202,7 @@ ynh_use_logrotate
 ###		- Remove the section "REMOVE SERVICE FROM ADMIN PANEL" in the remove script
 ###		- As well as the section ADVERTISE SERVICE IN ADMIN PANEL" in the restore script
 
-yunohost service add NAME_INIT.D --log "/var/log/FILE.log"
+#yunohost service add NAME_INIT.D --log "/var/log/FILE.log"
 
 #=================================================
 # SETUP SSOWAT
