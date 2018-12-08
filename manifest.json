@@ -1,27 +1,24 @@
 {
-    "name": "EmailPoubelle",
-    "id": "emailpoubelle",
+    "name": "Calibre-web",
+    "id": "calibreweb",
     "packaging_format": 1,
     "description": {
-        "en": "Create throwable email address redirected to your real one",
-        "fr": "Créez des adresses email jetables qui redirigent les mails vers votre adresse réelle"
+        "en": "Calibre-web for Yunohost",
+        "fr": "Calibre-web pour Yunohost."
     },
-    "url": "https://framagit.org/kepon/emailPoubellePhp/",
-    "version": "2.0~ynh3",
-    "license": "Beerware",
+    "version": "1.0~ynh1",
+    "url": "https://github.com/janeczku/calibre-web",
+    "license": "free",
     "maintainer": {
-        "name": "krakinou",
+        "name": "Krakinou",
         "email": "misterl56@hotmail.com"
     },
-        "requirements": {
-        "yunohost": ">= 3.0.0"
+    "requirements": {
+        "yunohost": ">= 2.7.14"
     },
     "multi_instance": false,
     "services": [
-        "nginx",
-        "mysql",
-        "dovecot",
-        "postfix"
+        "nginx"
     ],
     "arguments": {
         "install" : [
@@ -29,47 +26,51 @@
                 "name": "domain",
                 "type": "domain",
                 "ask": {
-                    "en": "Choose a domain for emailpoubelle",
-                    "fr": "Choisissez un domaine pour emailpoubelle"
+                    "en": "Choose a domain name for Calibre-web",
+                    "fr": "Choisissez un nom de domaine pour Calibre-web"
                 },
-                "example": "domain.org"
+                "example": "example.com"
             },
             {
                 "name": "path",
                 "type": "path",
                 "ask": {
-                    "en": "Choose a path for emailpoubelle",
-                    "fr": "Choisissez un chemin pour emailpoubelle"
+                    "en": "Choose a path for Calibre-web",
+                    "fr": "Choisissez un chemin pour Calibre-web"
                 },
-                "example": "/poubelle",
-                "default": "/poubelle"
+                "example": "/calibre",
+                "default": "/calibre"
             },
             {
                 "name": "admin",
                 "type": "user",
                 "ask": {
-                    "en": "Choose an admin user for emailpoubelle",
-                    "fr": "Choisissez un administrateur pour emailpoubelle"
+                    "en": "Choose an admin user",
+                    "fr": "Choisissez l’administrateur"
                 },
-                "example": "homer"
+                "example": "johndoe"
+            },
+            {
+                "name": "is_public",
+                "type": "boolean",
+                "ask": {
+                    "en": "Is it a public application?",
+                    "fr": "Est-ce une application publique ?"
+                },
+                "default": false
             },
             {
                 "name": "password",
                 "type": "password",
                 "ask": {
-                    "en": "Enter a password to access the admin panel",
-                    "fr": "Entrer un mot de passe pour accéder au tableau d'administration"
+                    "en": "Set the administrator password",
+                    "fr": "Définissez le mot de passe administrateur"
                 },
-                "example": "AveryStrongPassword"
-            },
-            {
-                "name": "public_site",
-                "ask": {
-                    "en": "Should this application be public ?",
-                    "fr": "Est-ce que cette application doit être visible publiquement ?"
+                "help": {
+                    "en": "Use the help field to add an information for the admin about this question.",
+                    "fr": "Utilisez le champ aide pour ajouter une information à l'intention de l'administrateur à propos de cette question."
                 },
-                "choices": ["Yes", "No"],
-                "default": "No"
+                "example": "Choose a password"
             }
         ]
     }
