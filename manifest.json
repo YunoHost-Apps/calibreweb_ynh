@@ -1,24 +1,27 @@
 {
-    "name": "Calibre-web",
-    "id": "calibreweb",
+    "name": "EmailPoubelle",
+    "id": "emailpoubelle",
     "packaging_format": 1,
     "description": {
-        "en": "Calibre-web for Yunohost",
-        "fr": "Calibre-web pour Yunohost."
+        "en": "Create throwable email address redirected to your real one",
+        "fr": "Créez des adresses email jetables qui redirigent les mails vers votre adresse réelle"
     },
-    "version": "1.0~ynh1",
-    "url": "https://github.com/janeczku/calibre-web",
-    "license": "free",
+    "url": "https://framagit.org/kepon/emailPoubellePhp/",
+    "version": "2.0~ynh3",
+    "license": "Beerware",
     "maintainer": {
-        "name": "Krakinou",
+        "name": "krakinou",
         "email": "misterl56@hotmail.com"
     },
-    "requirements": {
-        "yunohost": ">= 2.7.14"
+        "requirements": {
+        "yunohost": ">= 3.0.0"
     },
     "multi_instance": false,
     "services": [
-        "nginx"
+        "nginx",
+        "mysql",
+        "dovecot",
+        "postfix"
     ],
     "arguments": {
         "install" : [
@@ -26,51 +29,47 @@
                 "name": "domain",
                 "type": "domain",
                 "ask": {
-                    "en": "Choose a domain name for Calibre-web",
-                    "fr": "Choisissez un nom de domaine pour Calibre-web"
+                    "en": "Choose a domain for emailpoubelle",
+                    "fr": "Choisissez un domaine pour emailpoubelle"
                 },
-                "example": "example.com"
+                "example": "domain.org"
             },
             {
                 "name": "path",
                 "type": "path",
                 "ask": {
-                    "en": "Choose a path for Calibre-web",
-                    "fr": "Choisissez un chemin pour Calibre-web"
+                    "en": "Choose a path for emailpoubelle",
+                    "fr": "Choisissez un chemin pour emailpoubelle"
                 },
-                "example": "/calibre",
-                "default": "/calibre"
+                "example": "/poubelle",
+                "default": "/poubelle"
             },
             {
                 "name": "admin",
                 "type": "user",
                 "ask": {
-                    "en": "Choose an admin user",
-                    "fr": "Choisissez l’administrateur"
+                    "en": "Choose an admin user for emailpoubelle",
+                    "fr": "Choisissez un administrateur pour emailpoubelle"
                 },
-                "example": "johndoe"
-            },
-            {
-                "name": "is_public",
-                "type": "boolean",
-                "ask": {
-                    "en": "Is it a public application?",
-                    "fr": "Est-ce une application publique ?"
-                },
-                "default": false
+                "example": "homer"
             },
             {
                 "name": "password",
                 "type": "password",
                 "ask": {
-                    "en": "Set the administrator password",
-                    "fr": "Définissez le mot de passe administrateur"
+                    "en": "Enter a password to access the admin panel",
+                    "fr": "Entrer un mot de passe pour accéder au tableau d'administration"
                 },
-                "help": {
-                    "en": "Use the help field to add an information for the admin about this question.",
-                    "fr": "Utilisez le champ aide pour ajouter une information à l'intention de l'administrateur à propos de cette question."
+                "example": "AveryStrongPassword"
+            },
+            {
+                "name": "public_site",
+                "ask": {
+                    "en": "Should this application be public ?",
+                    "fr": "Est-ce que cette application doit être visible publiquement ?"
                 },
-                "example": "Choose a password"
+                "choices": ["Yes", "No"],
+                "default": "No"
             }
         ]
     }
