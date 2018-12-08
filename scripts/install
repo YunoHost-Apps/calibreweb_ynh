@@ -96,7 +96,7 @@ ynh_setup_source "$final_path"
 ###		- And the section "UPGRADE DEPENDENCIES" in the upgrade script
 
 #ynh_install_app_dependencies deb1 deb2
-#pip install --target vendor -r $final_path requirements.txt
+pip install --target vendor -r $final_path requirements.txt
 
 
 
