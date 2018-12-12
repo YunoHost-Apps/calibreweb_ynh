@@ -41,6 +41,18 @@
                 "example": "/calibre",
                 "default": "/calibre"
             },
+	    {
+                "name": "calibre_path",
+                "ask": {
+                    "en": "Select the folder containing the library",
+                    "fr": "Choisissez le répertoire contenant la bibliothèque"
+                },
+                "help": {
+                    "en": "This folder should have read write access. It will be created if it does not exist.",
+                    "fr": "Le répertoire doit être accesible en lecture écriture, il sera créé s'il n'existe pas.."
+                },
+                "example": "/home/johndoe/calibre"
+            },
             {
                 "name": "admin",
                 "type": "user",
@@ -49,6 +61,15 @@
                     "fr": "Choisissez l’administrateur"
                 },
                 "example": "johndoe"
+            },
+            {
+                "name": "language",
+                "ask": {
+                    "en": "Select a default language (you may change it later in the app",
+                    "fr": "Choisissez une langue par défaur (vous pourre la changer ultérieurement dans l'application"
+                },
+		"choices": [ "fr", "en", "es", "de"],
+                "default": "fr"
             },
             {
                 "name": "is_public",
