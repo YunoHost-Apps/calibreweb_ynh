@@ -74,8 +74,10 @@ ynh_app_setting_set $app port $port
 
 ynh_app_setting_set $app final_path $final_path
 # Download, check integrity, uncompress and patch the source from app.src
-ynh_setup_source "$final_path"
-
+#as long as v1 is not reach, sha256sum will change without notice so not usable.
+#source are directly in the app so far
+#ynh_setup_source "$final_path"
+cp -a ../src/. $final_path
 
 #=================================================
 # INSTALL DEPENDENCIES

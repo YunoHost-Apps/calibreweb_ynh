@@ -1,3 +1,4 @@
-SOURCE_SUM=ee272e4b2efadcd45543b80a81511b147a2cf3863a9000396fc3d80217f8824e
+#useless as long as V1.0 not issued
+SOURCE_URL=https://github.com/janeczku/calibre-web/archive/master.zip
+SOURCE_SUM=82d6633464fc60d198a671ba973a837f769296c9c5e2ac58537ba20c1e48c563
 SOURCE_FORMAT=zip
-SOURCE_FILENAME=calibre-web-master.zip
