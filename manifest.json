@@ -64,6 +64,7 @@
             },
             {
                 "name": "language",
+		"type":"language",
                 "ask": {
                     "en": "Select a default language (you may change it later in the app",
                     "fr": "Choisissez une langue par défaut (vous pourrez la changer ultérieurement dans l'application"

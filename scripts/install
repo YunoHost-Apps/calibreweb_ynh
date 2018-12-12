@@ -24,11 +24,10 @@ domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
 admin=$YNH_APP_ARG_ADMIN
 is_public=$YNH_APP_ARG_IS_PUBLIC
-#language=$YNH_APP_ARG_LANGUAGE
-#password=$YNH_APP_ARG_PASSWORD
+language=$YNH_APP_ARG_LANGUAGE
+password=$YNH_APP_ARG_PASSWORD
 app=$YNH_APP_INSTANCE_NAME
 calibre_dir=$3
-lang=$5
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
@@ -143,7 +142,7 @@ systemctl stop $app
 sqlite3 $final_path/app.db "UPDATE settings SET config_calibre_dir=\"$calibre_dir\" WHERE ID=1"
 sqlite3 $final_path/app.db "UPDATE settings SET config_port=$port WHERE ID=1"
 sqlite3 $final_path/app.db "UPDATE user SET nickname=\"$admin\" WHERE ID=1"
-sqlite3 $final_path/app.db "UPDATE user SET default_language=\"$lang\" WHERE ID=1"
+sqlite3 $final_path/app.db "UPDATE user SET default_language=\"$language\" WHERE ID=1"
 sqlite3 $final_path/app.db "UPDATE user SET password='$(python ../conf/generate_password_hash.py $password $final_path/vendor)' WHERE ID=1"
 
 
