@@ -138,6 +138,7 @@ chown -R $app:$app /var/log/$app
 #=================================================
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
 systemctl start $app
+sleep 5s
 systemctl stop $app
 sqlite3 $final_path/app.db "UPDATE settings SET config_calibre_dir=\"$calibre_dir\" WHERE ID=1"
 sqlite3 $final_path/app.db "UPDATE settings SET config_port=$port WHERE ID=1"
