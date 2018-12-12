@@ -101,18 +101,6 @@ ynh_add_nginx_config
 # Create a system user
 ynh_system_user_create $app
 
-
-#=================================================
-# SPECIFIC SETUP
-#=================================================
-# SET SQLITE DATABASE SETTINGS
-#=================================================
-sqlite3 $final_path/app.db "UPDATE settings SET config_calibre_dir=\"$calibre_dir\" WHERE ID=1"
-sqlite3 $final_path/app.db "UPDATE settings SET config_port=$port WHERE ID=1"
-sqlite3 $final_path/app.db "UPDATE user SET nickname=\"$admin\" WHERE ID=1"
-sqlite3 $final_path/app.db "UPDATE user SET default_language=\"$lang\" WHERE ID=1"
-sqlite3 $final_path/app.db "UPDATE user SET password='$(python ../conf/generate_password_hash.py $password $final_path/vendor)' WHERE ID=1"
-
 #=================================================
 # SETUP SYSTEMD
 #=================================================
@@ -144,10 +132,26 @@ chown -R $app:$app /var/log/$app
 
 
 #=================================================
+# SPECIFIC SETUP
+#=================================================
+# SET SQLITE DATABASE SETTINGS
+#=================================================
+#we need to start and stop the service so that initial app.db file is created and that we can set default data
+systemctl start $app
+systemctl stop $app
+sqlite3 $final_path/app.db "UPDATE settings SET config_calibre_dir=\"$calibre_dir\" WHERE ID=1"
+sqlite3 $final_path/app.db "UPDATE settings SET config_port=$port WHERE ID=1"
+sqlite3 $final_path/app.db "UPDATE user SET nickname=\"$admin\" WHERE ID=1"
+sqlite3 $final_path/app.db "UPDATE user SET default_language=\"$lang\" WHERE ID=1"
+sqlite3 $final_path/app.db "UPDATE user SET password='$(python ../conf/generate_password_hash.py $password $final_path/vendor)' WHERE ID=1"
+
+
+#=================================================
 # ADVERTISE SERVICE IN ADMIN PANEL
 #=================================================
 
 yunohost service add $app --log "/var/log/$app/$app.log"
+
 
 #=================================================
 # SETUP SSOWAT
