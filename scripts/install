@@ -107,7 +107,7 @@ ynh_system_user_create $app
 #=================================================
 # SET SQLITE DATABASE SETTINGS
 #=================================================
-sqlite3 $final_path/app.db "UPDATE settings SET config_calibre_dir=\"$calibre_path\" WHERE ID=1"
+sqlite3 $final_path/app.db "UPDATE settings SET config_calibre_dir=\"$calibre_dir\" WHERE ID=1"
 sqlite3 $final_path/app.db "UPDATE settings SET config_port=$port WHERE ID=1"
 sqlite3 $final_path/app.db "UPDATE user SET nickname=\"$admin\" WHERE ID=1"
 sqlite3 $final_path/app.db "UPDATE user SET default_language=\"$lang\" WHERE ID=1"
