@@ -8,11 +8,4 @@
 	</buildSpec>
 	<natures>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>src/calibre-web-master.zip</name>
-			<type>1</type>
-			<location>/home/nicolas/Bureau/calibre-web-master.zip</location>
-		</link>
-	</linkedResources>
 </projectDescription>
