@@ -66,7 +66,7 @@
                 "name": "language",
                 "ask": {
                     "en": "Select a default language (you may change it later in the app",
-                    "fr": "Choisissez une langue par défaur (vous pourre la changer ultérieurement dans l'application"
+                    "fr": "Choisissez une langue par défaut (vous pourrez la changer ultérieurement dans l'application"
                 },
 		"choices": [ "fr", "en", "es", "de"],
                 "default": "fr"
