@@ -139,13 +139,16 @@ chown -R $app:$app /var/log/$app
 systemctl start $app
 sleep 5s
 systemctl stop $app
-for i in $(cat ../conf/init_calibre_db)
-	sqlite3 $final_path/app.db "UPDATE settings SET $i WHERE ID=1"
-done
 
-for i in $(cat ../conf/init_calibre_db_user)
-	sqlite3 $final_path/app.db "UPDATE user SET $i WHERE ID=1"
-done
+#set database settings as per conf file
+while IFS='' read -r line || [[ -n "$i" ]]; do
+    sqlite3 $final_path/app.db "UPDATE settings SET $i WHERE ID=1"
+done < $(cat ../conf/init_calibre_db)
+
+while IFS='' read -r line || [[ -n "$i" ]]; do
+    sqlite3 $final_path/app.db "UPDATE user SET $i WHERE ID=1"
+done < $(cat ../conf/init_calibre_db_user)
+
 
 
 #=================================================
