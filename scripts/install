@@ -141,13 +141,13 @@ sleep 5s
 systemctl stop $app
 
 #set database settings as per conf file
-while IFS='' read -r line || [[ -n "$i" ]]; do
+while IFS='' read -r i || [[ -n "$i" ]]; do
     sqlite3 $final_path/app.db "UPDATE settings SET $i WHERE ID=1"
-done < <($(cat ../conf/init_calibre_db))
+done < ../conf/init_calibre_db_settings))
 
-while IFS='' read -r line || [[ -n "$i" ]]; do
+while IFS='' read -r i || [[ -n "$i" ]]; do
     sqlite3 $final_path/app.db "UPDATE user SET $i WHERE ID=1"
-done < <($(cat ../conf/init_calibre_db_user))
+done < ../conf/init_calibre_db_user))
 
 
 

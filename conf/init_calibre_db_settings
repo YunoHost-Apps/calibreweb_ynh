@@ -1,0 +1,10 @@
+config_calibre_dir=\"$calibre_dir\"
+config_port=$port
+config_certfile=''
+config_keyfile=''
+config_use_google_drive=0
+config_remote_login=0
+config_use_goodreads=0
+config_logfile=''
+config_converterpath=''
+config_calibre=''
