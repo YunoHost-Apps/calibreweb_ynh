@@ -139,11 +139,13 @@ chown -R $app:$app /var/log/$app
 systemctl start $app
 sleep 5s
 systemctl stop $app
-sqlite3 $final_path/app.db "UPDATE settings SET config_calibre_dir=\"$calibre_dir\" WHERE ID=1"
-sqlite3 $final_path/app.db "UPDATE settings SET config_port=$port WHERE ID=1"
-sqlite3 $final_path/app.db "UPDATE user SET nickname=\"$admin\" WHERE ID=1"
-sqlite3 $final_path/app.db "UPDATE user SET default_language=\"$language\" WHERE ID=1"
-sqlite3 $final_path/app.db "UPDATE user SET password='$(python ../conf/generate_password_hash.py $password $final_path/vendor)' WHERE ID=1"
+for i in $(cat ../conf/init_calibre_db)
+	sqlite3 $final_path/app.db "UPDATE settings SET $i WHERE ID=1"
+done
+
+for i in $(cat ../conf/init_calibre_db_user)
+	sqlite3 $final_path/app.db "UPDATE user SET $i WHERE ID=1"
+done
 
 
 #=================================================
