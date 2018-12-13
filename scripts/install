@@ -73,7 +73,7 @@ ynh_app_setting_set $app port $port
 
 ynh_app_setting_set $app final_path $final_path
 # Download, check integrity, uncompress and patch the source from app.src
-#as long as v1 is not reach, sha256sum will change without notice so not usable.
+#as long as v1 is not reached, sha256sum will change without notice so not usable.
 #source are directly in the app so far
 #ynh_setup_source "$final_path"
 cp -a ../src/. $final_path
@@ -137,17 +137,18 @@ chown -R $app:$app /var/log/$app
 #=================================================
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
 systemctl start $app
+#sleep required on low spec like raspberryPi
 sleep 5s
 systemctl stop $app
 
 #set database settings as per conf file
 while IFS='' read -r i || [[ -n "$i" ]]; do
     sqlite3 $final_path/app.db "UPDATE settings SET $i WHERE ID=1"
-done < ../conf/init_calibre_db_settings))
+done < ../conf/init_calibre_db_settings
 
 while IFS='' read -r i || [[ -n "$i" ]]; do
     sqlite3 $final_path/app.db "UPDATE user SET $i WHERE ID=1"
-done < ../conf/init_calibre_db_user))
+done < ../conf/init_calibre_db_user
 
 
 
