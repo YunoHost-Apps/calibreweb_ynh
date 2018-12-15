@@ -25,7 +25,7 @@ path_url=$YNH_APP_ARG_PATH
 admin=$YNH_APP_ARG_ADMIN
 is_public=$YNH_APP_ARG_IS_PUBLIC
 language=$YNH_APP_ARG_LANGUAGE
-password=$YNH_APP_ARG_PASSWORD
+pass=$YNH_APP_ARG_PASSWORD
 app=$YNH_APP_INSTANCE_NAME
 calibre_dir=$3
 
@@ -142,7 +142,7 @@ sleep 5s
 systemctl stop $app
 
 #set database settings as per conf file
-pass_hash=$(python ../conf/generate_password_hash.py $password $final_path/vendor)
+pass_hash=$(python ../conf/generate_password_hash.py $pass $final_path/vendor)
 
 conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) WHERE ID=1\""
 eval sqlite3 $final_path/app.db "$conf"
@@ -151,8 +151,7 @@ conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WH
 sleep 1s
 eval sqlite3 $final_path/app.db "$conf"
 sleep 1s
-conf="\"UPDATE user SET password='$pass_hash' WHERE ID=1\""
-#eval sqlite3 $final_path/app.db "$conf"
+sqlite3 $final_path/app.db \"UPDATE user SET password='$pass_hash' WHERE ID=1\"
 
 
 
