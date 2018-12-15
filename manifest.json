@@ -77,17 +77,17 @@
             },
             {
                 "name": "language",
-		"type":"language",
+				"type":"language",
                 "ask": {
                     "en": "Select a default language (you may change it later in the app)",
                     "fr": "Choisissez une langue par défaut (vous pourrez la changer ultérieurement dans l'application)"
                 },
-		"choices": [ "fr", "en", "es", "de"],
+				"choices": [ "fr", "en", "es", "de"],
                 "default": "fr"
             },
             {
                 "name": "upload",
-		"type":"boolean",
+				"type":"boolean",
                 "ask": {
                     "en": "Do you want to allow uploading of books (you may change it later in the app)?",
                     "fr": "Voulez vous autoriser l'upload de livres (vous pourrez la changer ultérieurement dans l'application)?"
