@@ -150,6 +150,7 @@ eval sqlite3 $final_path/app.db "$conf"
 conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""
 sleep 1s
 eval sqlite3 $final_path/app.db "$conf"
+sleep 1s
 sqlite3 $final_path/app.db "UDPATE user SET password=$pass_hash WHERE ID=1"
 
 
