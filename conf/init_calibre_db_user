@@ -1,3 +1,2 @@
 nickname=\'$admin\',
-default_language=\'$language\',
-password=\'$pass_hash\'
+default_language=\'$language\'
