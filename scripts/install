@@ -152,7 +152,7 @@ sleep 1s
 eval sqlite3 $final_path/app.db "$conf"
 sleep 1s
 conf="\"UPDATE user SET password='$pass_hash'WHERE ID=1\""
-sqlite3 $final_path/app.db "$conf"
+eval sqlite3 $final_path/app.db "$conf"
 
 
 
