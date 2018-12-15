@@ -1,2 +1,2 @@
 config_calibre_dir=\\"$calibre_dir\\",
-config_port=$port,
+config_port=$port
