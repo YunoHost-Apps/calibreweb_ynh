@@ -142,11 +142,12 @@ sleep 5s
 systemctl stop $app
 
 #set database settings as per conf file
-conf=$(. <(echo -E echo $(<../conf/init_calibre_db_settings)))
-#sqlite3 ./app.db "UPDATE settings SET $conf WHERE ID=1"
+conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) WHERE ID=1\""
+eval sqlite3 $final_path/app.db "$conf"
 
-conf=$(. <(echo -E echo $(<../conf/init_calibre_db_user)))
-#sqlite3 $final_path/app.db "UPDATE user SET $conf WHERE ID=1"
+
+conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""
+eval sqlite3 $final_path/app.db "$conf"
 
 
 
