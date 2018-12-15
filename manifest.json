@@ -62,7 +62,6 @@
                 },
                 "example": "johndoe"
             },
-
             {
                 "name": "password",
                 "type": "password",
