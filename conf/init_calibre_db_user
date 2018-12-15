@@ -1,2 +1,3 @@
 nickname=\'$admin\',
-default_language=\'$language\'
+locale=\'$language\',
+mature_content=0
