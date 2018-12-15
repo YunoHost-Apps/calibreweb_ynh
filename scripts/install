@@ -25,9 +25,12 @@ path_url=$YNH_APP_ARG_PATH
 admin=$YNH_APP_ARG_ADMIN
 is_public=$YNH_APP_ARG_IS_PUBLIC
 language=$YNH_APP_ARG_LANGUAGE
+ynh_print_OFF
 pass=$YNH_APP_ARG_PASSWORD
+ynh_print_ON
 app=$YNH_APP_INSTANCE_NAME
 calibre_dir=$3
+upload=$7
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
@@ -54,6 +57,7 @@ ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
 ynh_app_setting_set $app admin $admin
 ynh_app_setting_set $app is_public $is_public
+ynh_app_setting_set $app calibre_dir $calibre_dir
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -72,10 +76,12 @@ ynh_app_setting_set $app port $port
 #=================================================
 
 ynh_app_setting_set $app final_path $final_path
+
 # Download, check integrity, uncompress and patch the source from app.src
-#as long as v1 is not reached, sha256sum will change without notice so not usable.
+#as long as v1 is not reached, sha256sum will change without notice so not usable, so we use cp -a instead.
 #source are directly in the app so far
 #ynh_setup_source "$final_path"
+
 cp -a ../src/. $final_path
 
 #=================================================
@@ -84,7 +90,6 @@ cp -a ../src/. $final_path
 
 ynh_install_app_dependencies $pkg_dependencies
 pip install --target $final_path/vendor -r $final_path/requirements.txt
-
 
 #=================================================
 # NGINX CONFIGURATION
@@ -113,9 +118,14 @@ ynh_add_systemd_config
 # SECURE FILES AND DIRECTORIES
 #=================================================
 
-### For security reason, any app should set the permissions to root: before anything else.
-### Then, if write authorization is needed, any access should be given only to directories
-### that really need such authorization.
+#Check if library folder exists. If not create it
+test ! -e "$calibre_dir"
+if [[ $? = 0 ]] ; then
+	ynh_print_info "Create calibre library folder $calibre_dir"
+	mkdir -p $calibre_dir
+	chown -R $app:$app $calibre_dir
+	create_dir=1
+fi
 
 # Set permissions to app files
 chown -R $app:$app $final_path
@@ -149,8 +159,9 @@ conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WH
 eval sqlite3 $final_path/app.db "$conf"
 
 #mise à jour du mot de passe (je ne sais pas pourquoi, je n'arrive pas à l'intégrer dans le fichier de conf, pb de " et ')
+ynh_print_OFF
 sqlite3 $final_path/app.db "UPDATE user SET password='$(python ../conf/generate_password_hash.py $pass $final_path/vendor)' WHERE ID=1"
-
+ynh_print_ON
 
 
 #=================================================
@@ -177,3 +188,11 @@ fi
 
 systemctl reload nginx
 systemctl start $app
+
+#=================================================
+# WARNING FOR READ ACCESS
+#=================================================
+
+if [[ ! $create_dir = 1 ]] ; then
+	ynh_print_warn "Please, give required access to $app user to the $calibre_dir folder."
+fi
