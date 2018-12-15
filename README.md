@@ -13,7 +13,7 @@ Calibre-Web is a web app providing a clean interface for browsing, reading and d
 
 *This software is a fork of [library](https://github.com/mutschler/calibreserver) and licensed under the GPL v3 License.*
 
-**Shipped version:** To be 1.0
+**Shipped version:** To be 1.0 (when released :) )
 
 ## Screenshots
 
