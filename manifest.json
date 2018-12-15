@@ -64,6 +64,16 @@
                 "example": "johndoe"
             },
             {
+                "name": "language",
+				"type":"language",
+                "ask": {
+                    "en": "Select a default language (you may change it later in the app)",
+                    "fr": "Choisissez une langue par défaut (vous pourrez la changer ultérieurement dans l'application)"
+                },
+				"choices": [ "fr", "en", "es", "de"],
+                "default": "fr"
+            },
+            {
                 "name": "password",
                 "type": "password",
                 "ask": {
@@ -75,16 +85,6 @@
                     "fr": "Utilisez le champ aide pour ajouter une information à l'intention de l'administrateur à propos de cette question."
                 },
                 "example": "Choose a password"
-            },
-            {
-                "name": "language",
-				"type":"language",
-                "ask": {
-                    "en": "Select a default language (you may change it later in the app)",
-                    "fr": "Choisissez une langue par défaut (vous pourrez la changer ultérieurement dans l'application)"
-                },
-				"choices": [ "fr", "en", "es", "de"],
-                "default": "fr"
             },
             {
                 "name": "upload",
