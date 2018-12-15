@@ -86,9 +86,6 @@ fi
 # REMOVE THE CRON FILE
 #=================================================
 
-# Remove a cron file
-#ynh_secure_remove "/etc/cron.d/$app"
-
 # Remove a directory securely
 #ynh_secure_remove "/etc/$app/"
 
