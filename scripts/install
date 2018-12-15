@@ -145,8 +145,8 @@ systemctl stop $app
 conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) WHERE ID=1\""
 eval sqlite3 $final_path/app.db "$conf"
 
-conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""
-#eval sqlite3 $final_path/app.db "$conf"
+conf="\"UPDATE user     SET $(. <(echo -E echo $(<../conf/init_calibre_db_user    ))) WHERE ID=1\""
+eval sqlite3 $final_path/app.db "$conf"
 
 
 
