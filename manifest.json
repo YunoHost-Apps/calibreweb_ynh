@@ -41,7 +41,7 @@
                 "example": "/calibre",
                 "default": "/calibre"
             },
-	    {
+		    {
                 "name": "calibre_path",
                 "ask": {
                     "en": "Select the folder containing the library",
@@ -74,7 +74,7 @@
                     "fr": "Utilisez le champ aide pour ajouter une information à l'intention de l'administrateur à propos de cette question."
                 },
                 "example": "Choose a password"
-            }
+            },
             {
                 "name": "language",
 		"type":"language",
