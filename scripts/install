@@ -25,7 +25,7 @@ path_url=$YNH_APP_ARG_PATH
 admin=$YNH_APP_ARG_ADMIN
 is_public=$YNH_APP_ARG_IS_PUBLIC
 language=$YNH_APP_ARG_LANGUAGE
-password=$YNH_APP_ARG_PASSWORD
+pass_hash=$(python ../conf/generate_password_hash.py $YNH_APP_ARG_PASSWORD $final_path/vendor)
 app=$YNH_APP_INSTANCE_NAME
 calibre_dir=$3
 
