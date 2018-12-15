@@ -49,7 +49,7 @@
                 },
                 "help": {
                     "en": "This folder should have read write access. It will be created if it does not exist.",
-                    "fr": "Le répertoire doit être accesible en lecture écriture, il sera créé s'il n'existe pas.."
+                    "fr": "Le répertoire doit être accesible en lecture écriture, il sera créé s'il n'existe pas."
                 },
                 "example": "/home/johndoe/calibre"
             },
@@ -61,19 +61,6 @@
                     "fr": "Choisissez l’administrateur"
                 },
                 "example": "johndoe"
-            },
-            {
-                "name": "password",
-                "type": "password",
-                "ask": {
-                    "en": "Set the administrator password",
-                    "fr": "Définissez le mot de passe administrateur"
-                },
-                "help": {
-                    "en": "Use the help field to add an information for the admin about this question.",
-                    "fr": "Utilisez le champ aide pour ajouter une information à l'intention de l'administrateur à propos de cette question."
-                },
-                "example": "Choose a password"
             },
             {
                 "name": "language",
