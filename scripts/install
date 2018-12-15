@@ -143,7 +143,6 @@ systemctl stop $app
 
 #set database settings as per conf file
 conf=$(. <(echo -E echo $(<../conf/init_calibre_db_settings)))
-echo $conf
 sqlite3 ./app.db "UPDATE settings SET $conf WHERE ID=1"
 
 conf=$(. <(echo -E echo $(<../conf/init_calibre_db_user)))
