@@ -147,7 +147,7 @@ pass_hash=$(python ../conf/generate_password_hash.py $password $final_path/vendo
 conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) WHERE ID=1\""
 eval sqlite3 $final_path/app.db "$conf"
 
-conf="\"UPDATE user     SET $(. <(echo -E echo $(<../conf/init_calibre_db_user    ))) WHERE ID=1\""
+conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""
 if [ -z "$conf" ]; then echo "conf is unset"; else echo "conf is set to '$conf'"; fi
 if [ -z "$admin" ]; then echo "admin is unset"; else echo "admin is set to '$admin'"; fi
 if [ -z "$password" ]; then echo "password is unset"; else echo "password is set to '$password'"; fi
