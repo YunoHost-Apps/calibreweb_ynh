@@ -151,7 +151,7 @@ conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WH
 sleep 1s
 eval sqlite3 $final_path/app.db "$conf"
 sleep 1s
-sqlite3 $final_path/app.db \"UPDATE user SET password=\'$pass_hash\' WHERE ID=1\"
+sqlite3 $final_path/app.db "UPDATE user SET password='$(python ../conf/generate_password_hash.py $pass $final_path/vendor)' WHERE ID=1"
 
 
 
