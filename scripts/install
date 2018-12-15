@@ -154,7 +154,7 @@ if [ -z "$password" ]; then echo "password is unset"; else echo "password is set
 if [ -z "$pass_hash" ]; then echo "pass_hash is unset"; else echo "pass_hash is set to '$pass_hash'"; fi
 if [ -z "$language" ]; then echo "language is unset"; else echo "language is set to '$language'"; fi
 if [ -z "$final_path" ]; then echo "final_path is unset"; else echo "final_path is set to '$final_path'"; fi
-
+sleep 1s
 eval sqlite3 $final_path/app.db "$conf"
 
 
