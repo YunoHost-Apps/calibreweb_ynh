@@ -138,12 +138,14 @@ chown -R $app:$app /var/log/$app
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
 systemctl start $app
 #sleep required on low spec like raspberryPi
-sleep 60s
+sleep 5s
 systemctl stop $app
 
 #set database settings as per conf file
 conf=$(. <(echo -e echo $(<../conf/init_calibre_db_settings)))
-sqlite3 ./app.db "UPDATE settings SET $conf WHERE ID=1"
+#sqlite3 ./app.db "UPDATE settings SET $conf WHERE ID=1"
+sqlite3 ./app.db "UPDATE settings SET calibre_dir=\"$calibre_dir\", calibre_port=$port WHERE ID=1"
+echo $conf
 
 conf=$(. <(echo -e echo $(<../conf/init_calibre_db_user)))
 sqlite3 $final_path/app.db "UPDATE user SET $conf WHERE ID=1"
