@@ -52,7 +52,7 @@
                     "en": "This folder should have read write access. It will be created if it does not exist.",
                     "fr": "Le répertoire doit être accesible en lecture écriture, il sera créé s'il n'existe pas."
                 },
-                "example": "/home/johndoe/calibre"
+                "default": "/home/yunohost.app/calibreweb"
             },
             {
                 "name": "admin",
