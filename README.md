@@ -19,6 +19,15 @@ Calibre-Web is a web app providing a clean interface for browsing, reading and d
 
 ![screenshot](https://raw.githubusercontent.com/janeczku/docker-calibre-web/master/screenshot.png)
 
+## Backup library
+
+By default, backup process will not backup calibre library (backup_core_only logic).
+You may activate backup of the library with 
+```
+yunohost app setting calibreweb backup_core_only -v 0
+```
+
+
 ## Limitations
 
 * No LDAP support
@@ -40,8 +49,7 @@ chmod o+rw path/to/library
 Developers info
 ----------------
 
-**Only if you want to use a testing branch for coding, instead of merging directly into master.**
-Please do your pull request to the [testing branch](https://github.com/YunoHost-Apps/calibreweb_ynh/tree/testing).
+Please do your pull request to the [testing branch](https://github.com/Krakinou/calibreweb_ynh/tree/Testing).
 
 To try the testing branch, please proceed like that.
 ```

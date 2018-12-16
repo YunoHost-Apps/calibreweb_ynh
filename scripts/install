@@ -116,9 +116,7 @@ ynh_system_user_create $app
 ynh_add_systemd_config
 
 #=================================================
-# GENERIC FINALIZATION
-#=================================================
-# SECURE FILES AND DIRECTORIES
+# CREATE FILES AND DIRECTORIES
 #=================================================
 
 #Check if library folder exists. If not create it
@@ -134,8 +132,6 @@ if [ ! -e "$calibre_dir"/metadata.db ]; then
 	chown $app:$app $calibre_dir/*
 fi
 
-# Set permissions to app files
-chown -R root: $final_path
 
 
 #=================================================
@@ -172,6 +168,13 @@ ynh_print_OFF
 sqlite3 $final_path/app.db "UPDATE user SET password='$(python ../conf/generate_password_hash.py $pass $final_path/vendor)' WHERE ID=1"
 ynh_print_ON
 
+#=================================================
+# SECURE FILES AND DIRECTORIES
+#=================================================
+
+# Set permissions to app files
+chown -R root: $final_path
+chown calibreweb: $final_path/app.db
 
 
 #=================================================
