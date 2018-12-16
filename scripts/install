@@ -148,22 +148,22 @@ chown -R $app:$app /var/log/$app
 #=================================================
 ynh_print_info "Setting up database and settings"
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
-systemctl start $app
+#systemctl start $app
 #sleep required on low spec like raspberryPi
 sleep 5s
 systemctl stop $app
 
 #set database settings as per conf file
-conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) WHERE ID=1\""
-eval sqlite3 $final_path/app.db "$conf"
+#conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) WHERE ID=1\""
+#eval sqlite3 $final_path/app.db "$conf"
 
-conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""
-eval sqlite3 $final_path/app.db "$conf"
+#conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""
+#eval sqlite3 $final_path/app.db "$conf"
 
 #mise à jour du mot de passe (je ne sais pas pourquoi, je n'arrive pas à l'intégrer dans le fichier de conf, pb de " et ')
-ynh_print_OFF
-sqlite3 $final_path/app.db "UPDATE user SET password='$(python ../conf/generate_password_hash.py $pass $final_path/vendor)' WHERE ID=1"
-ynh_print_ON
+#ynh_print_OFF
+#sqlite3 $final_path/app.db "UPDATE user SET password='$(python ../conf/generate_password_hash.py $pass $final_path/vendor)' WHERE ID=1"
+#ynh_print_ON
 
 
 #=================================================
@@ -171,7 +171,6 @@ ynh_print_ON
 #=================================================
 
 yunohost service add $app --log "/var/log/$app/$app.log"
-
 
 #=================================================
 # SETUP SSOWAT
@@ -195,6 +194,6 @@ systemctl start $app
 # WARNING FOR READ ACCESS
 #=================================================
 
-if [[ ! $create_dir = 1 ]] ; then
+if [[ ! $create_dir = 0 ]] ; then
 	ynh_print_warn "Please, give required access to $app user to the $calibre_dir folder."
 fi
