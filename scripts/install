@@ -119,8 +119,7 @@ ynh_add_systemd_config
 #=================================================
 
 #Check if library folder exists. If not create it
-test ! -e "$calibre_dir"
-if [[ $? = 0 ]] ; then
+if [ ! -e "$calibre_dir" ]; then
 	ynh_print_info "Create calibre library folder $calibre_dir"
 	mkdir -p $calibre_dir
 	chown -R $app:$app $calibre_dir

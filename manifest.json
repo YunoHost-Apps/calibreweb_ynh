@@ -70,7 +70,7 @@
                     "en": "Is it a public application?",
                     "fr": "Est-ce une application publique ?"
                 },
-                "default": true
+                "default": false
             },
             {
                 "name": "language",
@@ -78,7 +78,7 @@
                     "en": "Select a default language (you may change it later in the app)",
                     "fr": "Choisissez une langue par défaut (vous pourrez la changer ultérieurement dans l'application)"
                 },
-                "choices": ["fr", "en"],
+				"choices": [ "fr", "en", "es", "de"],
                 "default": "fr"
             },
             {
@@ -86,7 +86,7 @@
 				"type":"boolean",
                 "ask": {
                     "en": "Do you want to allow uploading of books (you may change it later in the app)?",
-                    "fr": "Voulez vous autoriser l'upload de livres (vous pourrez la changer ultérieurement dans l'application)?"
+                    "fr": "Voulez vous autoriser l'upload de livres (vous pourrez le changer ultérieurement dans l'application)?"
                 },
                 "default": false
             },
