@@ -60,3 +60,8 @@ sudo yunohost app install https://github.com/Krakinou/calibreweb_ynh/tree/Testin
 or
 sudo yunohost app upgrade calibreweb -u https://github.com/Krakinou/calibreweb_ynh/tree/Testing --debug
 ```
+
+
+## Todo
+- [ ] Multiinstance
+- [ ] Better Multimedia integration 
