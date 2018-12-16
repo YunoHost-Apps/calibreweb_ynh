@@ -36,11 +36,11 @@
                 "name": "path",
                 "type": "path",
                 "ask": {
-                    "en": "Choose a path for ynhexample",
-                    "fr": "Choisissez un chemin pour ynhexample"
+                    "en": "Choose a path for Calibre-web",
+                    "fr": "Choisissez un chemin pour Calibre-web"
                 },
-                "example": "/example",
-                "default": "/example"
+                "example": "/calibre",
+                "default": "/calibre"
             },
             {
                 "name": "admin",
