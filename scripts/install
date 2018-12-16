@@ -130,13 +130,12 @@ if [ ! -e "$calibre_dir" ]; then
 fi
 #Check if metadata.db file exists. If not create it (empty library)
 if [ ! -e "$calibre_dir"/metadata.db ]; then
-	cp -a ../src/calibre/. $calibre_dir
+	cp -a ../conf/metadata.db.empty $calibre_dir/metadata.db
 	chown $app:$app $calibre_dir/*
 fi
 
-
 # Set permissions to app files
-chown -R $app:$app $final_path
+chown -R root: $final_path
 
 
 #=================================================
@@ -153,6 +152,7 @@ chown -R $app:$app /var/log/$app
 #=================================================
 # SET SQLITE DATABASE SETTINGS
 #=================================================
+
 ynh_print_info "Setting up database and settings"
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
 systemctl start $app
@@ -172,6 +172,14 @@ ynh_print_OFF
 sqlite3 $final_path/app.db "UPDATE user SET password='$(python ../conf/generate_password_hash.py $pass $final_path/vendor)' WHERE ID=1"
 ynh_print_ON
 
+
+
+#=================================================
+# STORE THE CHECKSUM OF THE CONFIG FILE
+#=================================================
+
+# Calculate and store the config file checksum into the app settings
+ynh_store_file_checksum "${final_path}/app.db"
 
 #=================================================
 # ADVERTISE SERVICE IN ADMIN PANEL

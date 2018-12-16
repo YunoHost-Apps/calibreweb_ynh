@@ -21,32 +21,8 @@ admin=$(ynh_app_setting_get $app admin)
 is_public=$(ynh_app_setting_get $app is_public)
 final_path=$(ynh_app_setting_get $app final_path)
 language=$(ynh_app_setting_get $app language)
-db_name=$(ynh_app_setting_get $app db_name)
+calibre_dir=$(ynh_app_setting_get $app calibre_dir)
 
-#=================================================
-# ENSURE DOWNWARD COMPATIBILITY
-#=================================================
-
-# Fix is_public as a boolean value
-if [ "$is_public" = "Yes" ]; then
-	ynh_app_setting_set $app is_public 1
-	is_public=1
-elif [ "$is_public" = "No" ]; then
-	ynh_app_setting_set $app is_public 0
-	is_public=0
-fi
-
-# If db_name doesn't exist, create it
-if [ -z $db_name ]; then
-	db_name=$(ynh_sanitize_dbid $app)
-	ynh_app_setting_set $app db_name $db_name
-fi
-
-# If final_path doesn't exist, create it
-if [ -z $final_path ]; then
-	final_path=/var/www/$app
-	ynh_app_setting_set $app final_path $final_path
-fi
 
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
@@ -75,7 +51,12 @@ path_url=$(ynh_normalize_url_path $path_url)
 #=================================================
 
 # Download, check integrity, uncompress and patch the source from app.src
-ynh_setup_source "$final_path"
+##as long as v1 is not reached, sha256sum will change without notice so not usable, so we use cp -a instead.
+#source are directly in the app so far
+#ynh_setup_source "$final_path"
+
+cp -a ../src/calibreweb/. $final_path
+
 
 #=================================================
 # NGINX CONFIGURATION
@@ -88,7 +69,8 @@ ynh_add_nginx_config
 # UPGRADE DEPENDENCIES
 #=================================================
 
-ynh_install_app_dependencies deb1 deb2
+ynh_install_app_dependencies $pkg_dependencies
+pip install --target $final_path/vendor -r $final_path/requirements.txt
 
 #=================================================
 # CREATE DEDICATED USER
@@ -106,9 +88,9 @@ ynh_system_user_create $app
 
 ### Verify the checksum of a file, stored by `ynh_store_file_checksum` in the install script.
 ### And create a backup of this file if the checksum is different. So the file will be backed up if the admin had modified it.
-ynh_backup_if_checksum_is_different "$final_path/CONFIG_FILE"
+ynh_backup_if_checksum_is_different "$final_path/app.db"
 # Recalculate and store the checksum of the file for the next upgrade.
-ynh_store_file_checksum "$final_path/CONFIG_FILE"
+ynh_store_file_checksum "$final_path/app.db"
 
 #=================================================
 # SETUP LOGROTATE
@@ -132,6 +114,7 @@ ynh_add_systemd_config
 
 # Set permissions on app files
 chown -R root: $final_path
+chown -R $app: $final_path/app.db
 
 #=================================================
 # SETUP SSOWAT
