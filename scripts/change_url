@@ -15,7 +15,6 @@ source /usr/share/yunohost/helpers
 
 old_domain=$YNH_APP_OLD_DOMAIN
 old_path=$YNH_APP_OLD_PATH
-port=$YNH_APP_PORT
 new_domain=$YNH_APP_NEW_DOMAIN
 new_path=$YNH_APP_NEW_PATH
 
@@ -27,6 +26,8 @@ app=$YNH_APP_INSTANCE_NAME
 
 # Needed for helper "ynh_add_nginx_config"
 final_path=$(ynh_app_setting_get $app final_path)
+port=$(ynh_app_setting_get $app port)
+
 
 #=================================================
 # CHECK THE SYNTAX OF THE PATHS
