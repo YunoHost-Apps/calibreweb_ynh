@@ -174,8 +174,9 @@ ynh_print_ON
 #=================================================
 
 # Set permissions to app files
-chown -R root: $final_path
-chown calibreweb: $final_path/app.db
+#disabled - do not work when calibreweb is not owner
+#chown -R root: $final_path
+#chown $app: $final_path/app.db
 
 
 #=================================================

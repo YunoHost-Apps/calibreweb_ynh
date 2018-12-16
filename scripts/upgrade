@@ -113,8 +113,7 @@ ynh_add_systemd_config
 #=================================================
 
 # Set permissions on app files
-chown -R root: $final_path
-chown -R $app: $final_path/app.db
+chown -R $app: $final_path
 
 #=================================================
 # SETUP SSOWAT

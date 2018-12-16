@@ -62,8 +62,7 @@ ynh_system_user_create $app
 #=================================================
 
 # Restore permissions on app files
-chown -R root: $final_path
-chown calibreweb: $final_path/app.db
+chown -R $app: $final_path
 
 #=================================================
 # SPECIFIC RESTORATION
