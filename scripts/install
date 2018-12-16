@@ -131,6 +131,7 @@ fi
 #Check if metadata.db file exists. If not create it (empty library)
 if [ ! -e "$calibre_dir"/metadata.db ]; then
 	cp -a ../src/calibre/. $calibre_dir
+	chown $app:$app $calibre_dir/*
 fi
 
 
@@ -200,6 +201,6 @@ systemctl start $app
 # WARNING FOR READ ACCESS
 #=================================================
 
-if [[ ! $create_dir = 0 ]] ; then
+if [[ $create_dir = 0 ]] ; then
 	ynh_print_warn "Please, give required access to $app user to the $calibre_dir folder."
 fi
