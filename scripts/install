@@ -29,7 +29,8 @@ ynh_print_OFF
 pass=$YNH_APP_ARG_PASSWORD
 ynh_print_ON
 app=$YNH_APP_INSTANCE_NAME
-calibre_dir=$3
+#removing / at the end for consistency
+calibre_dir=${3%/}
 upload=$7
 
 #=================================================
@@ -83,7 +84,7 @@ ynh_print_info "Copying data to $final_path"
 #source are directly in the app so far
 #ynh_setup_source "$final_path"
 
-cp -a ../src/. $final_path
+cp -a ../src/calibreweb/. $final_path
 
 #=================================================
 # INSTALL DEPENDENCIES
@@ -127,6 +128,11 @@ if [ ! -e "$calibre_dir" ]; then
 	chown -R $app:$app $calibre_dir
 	create_dir=1
 fi
+#Check if metadata.db file exists. If not create it (empty library)
+if [ ! -e "$calibre_dir"/metadata.db ]; then
+	cp -a ../src/calibre/. $calibre_dir
+fi
+
 
 # Set permissions to app files
 chown -R $app:$app $final_path
@@ -148,22 +154,22 @@ chown -R $app:$app /var/log/$app
 #=================================================
 ynh_print_info "Setting up database and settings"
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
-#systemctl start $app
+systemctl start $app
 #sleep required on low spec like raspberryPi
 sleep 5s
 systemctl stop $app
 
 #set database settings as per conf file
-#conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) WHERE ID=1\""
-#eval sqlite3 $final_path/app.db "$conf"
+conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) WHERE ID=1\""
+eval sqlite3 $final_path/app.db "$conf"
 
-#conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""
-#eval sqlite3 $final_path/app.db "$conf"
+conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""
+eval sqlite3 $final_path/app.db "$conf"
 
 #mise à jour du mot de passe (je ne sais pas pourquoi, je n'arrive pas à l'intégrer dans le fichier de conf, pb de " et ')
-#ynh_print_OFF
-#sqlite3 $final_path/app.db "UPDATE user SET password='$(python ../conf/generate_password_hash.py $pass $final_path/vendor)' WHERE ID=1"
-#ynh_print_ON
+ynh_print_OFF
+sqlite3 $final_path/app.db "UPDATE user SET password='$(python ../conf/generate_password_hash.py $pass $final_path/vendor)' WHERE ID=1"
+ynh_print_ON
 
 
 #=================================================
