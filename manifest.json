@@ -27,8 +27,8 @@
                 "name": "domain",
                 "type": "domain",
                 "ask": {
-                    "en": "Choose a domain name for ynhexample",
-                    "fr": "Choisissez un nom de domaine pour ynhexample"
+                    "en": "Choose a domain name for Calibre-web",
+                    "fr": "Choisissez un nom de domaine pour Calibre-web"
                 },
                 "example": "example.com"
             },
