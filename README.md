@@ -13,7 +13,7 @@ Calibre-Web is a web app providing a clean interface for browsing, reading and d
 
 *This software is a fork of [library](https://github.com/mutschler/calibreserver) and licensed under the GPL v3 License.*
 
-**Shipped version:** To be 1.0 (when released :) )
+**Shipped version:** To be 1.0, let's say 0.9 :)
 
 ## Screenshots
 
@@ -22,8 +22,12 @@ Calibre-Web is a web app providing a clean interface for browsing, reading and d
 ## Limitations
 
 * No LDAP support
-* backup, restore and upgrade script not yet up to date
-* access to library to be done manually after install
+* access to library to be done manually after install if Calibre library was already existing, for example :
+```
+chown -R calibreweb: path/to/library
+or
+chmod o+rw path/to/library
+``` 
 
 ## Links
 
@@ -41,7 +45,7 @@ Please do your pull request to the [testing branch](https://github.com/YunoHost-
 
 To try the testing branch, please proceed like that.
 ```
-sudo yunohost app install https://github.com/YunoHost-Apps/calibreweb_ynh/tree/testing --debug
+sudo yunohost app install https://github.com/Krakinou/calibreweb_ynh/tree/Testing --debug
 or
-sudo yunohost app upgrade calibreweb -u https://github.com/YunoHost-Apps/calibreweb_ynh/tree/testing --debug
+sudo yunohost app upgrade calibreweb -u https://github.com/Krakinou/calibreweb_ynh/tree/Testing --debug
 ```
