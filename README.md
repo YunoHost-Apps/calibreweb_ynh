@@ -26,6 +26,7 @@ You may activate backup of the library with
 ```
 yunohost app setting calibreweb backup_core_only -v 0
 ```
+By default, removing the app will **never** delete the library.
 
 
 ## Limitations
