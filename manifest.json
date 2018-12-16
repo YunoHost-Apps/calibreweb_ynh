@@ -1,27 +1,25 @@
 {
-    "name": "YunoHost example app",
-    "id": "ynhexample",
+    "name": "Calibre-web",
+    "id": "calibreweb",
     "packaging_format": 1,
     "description": {
-        "en": "Example package for YunoHost application.",
-        "fr": "Exemple de package d’application pour YunoHost."
+        "en": "Calibre-web for Yunohost",
+        "fr": "Calibre-web pour Yunohost."
     },
-    "version": "1.0~ynh1",
-    "url": "https://example.com",
+    "version": "0.9~ynh1",
+    "url": "https://github.com/janeczku/calibre-web",
     "license": "free",
     "maintainer": {
-        "name": "John doe",
-        "email": "john.doe@example.com",
-        "url": "http://example.com"
+        "name": "Krakinou",
+        "email": "misterl56@hotmail.com"
     },
     "requirements": {
         "yunohost": ">= 2.7.14"
     },
-    "multi_instance": true,
+    "multi_instance": false,
     "services": [
         "nginx",
-        "php5-fpm",
-        "mysql"
+		"calibreweb"
     ],
     "arguments": {
         "install" : [
