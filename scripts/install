@@ -1,0 +1,219 @@
+#!/bin/bash
+
+#=================================================
+# GENERIC START
+#=================================================
+# IMPORT GENERIC HELPERS
+#=================================================
+
+source _common.sh
+source /usr/share/yunohost/helpers
+
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
+
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
+
+#=================================================
+# RETRIEVE ARGUMENTS FROM THE MANIFEST
+#=================================================
+
+domain=$YNH_APP_ARG_DOMAIN
+path_url=$YNH_APP_ARG_PATH
+admin=$YNH_APP_ARG_ADMIN
+is_public=$YNH_APP_ARG_IS_PUBLIC
+language=$YNH_APP_ARG_LANGUAGE
+ynh_print_OFF
+pass=$YNH_APP_ARG_PASSWORD
+ynh_print_ON
+app=$YNH_APP_INSTANCE_NAME
+#removing / at the end for consistency
+calibre_dir=${3%/}
+upload=$7
+
+#=================================================
+# CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
+#=================================================
+
+### If the app uses nginx as web server (written in HTML/PHP in most cases), the final path should be "/var/www/$app".
+### If the app provides an internal web server (or uses another application server such as uwsgi), the final path should be "/opt/yunohost/$app"
+final_path=/var/www/$app
+test ! -e "$final_path" || ynh_die "This path already contains a folder"
+
+# Normalize the url path syntax
+path_url=$(ynh_normalize_url_path $path_url)
+
+# Check web path availability
+ynh_webpath_available $domain $path_url
+# Register (book) web path
+ynh_webpath_register $app $domain $path_url
+
+#=================================================
+# STORE SETTINGS FROM MANIFEST
+#=================================================
+
+ynh_app_setting_set $app domain $domain
+ynh_app_setting_set $app path $path_url
+ynh_app_setting_set $app admin $admin
+ynh_app_setting_set $app is_public $is_public
+ynh_app_setting_set $app calibre_dir $calibre_dir
+
+#=================================================
+# STANDARD MODIFICATIONS
+#=================================================
+# FIND AND OPEN A PORT
+#=================================================
+
+# Find a free port
+port=$(ynh_find_port 8083)
+# Open this port
+ynh_print_info "Opening port $port"
+yunohost firewall allow --no-upnp TCP $port 2>&1
+ynh_app_setting_set $app port $port
+
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+
+ynh_app_setting_set $app final_path $final_path
+ynh_print_info "Copying data to $final_path"
+# Download, check integrity, uncompress and patch the source from app.src
+#as long as v1 is not reached, sha256sum will change without notice so not usable, so we use cp -a instead.
+#source are directly in the app so far
+#ynh_setup_source "$final_path"
+
+cp -a ../src/calibreweb/. $final_path
+
+#=================================================
+# INSTALL DEPENDENCIES
+#=================================================
+
+ynh_print_info "Installing dependencies and pip packages"
+ynh_install_app_dependencies $pkg_dependencies
+pip install --target $final_path/vendor -r $final_path/requirements.txt
+
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+
+# Create a dedicated nginx config
+ynh_add_nginx_config
+
+#=================================================
+# CREATE DEDICATED USER
+#=================================================
+
+# Create a system user
+ynh_system_user_create $app
+chown -R $app: $final_path
+
+#=================================================
+# SETUP SYSTEMD
+#=================================================
+
+# Create a dedicated systemd config
+ynh_add_systemd_config
+
+#=================================================
+# CREATE FILES AND DIRECTORIES
+#=================================================
+
+#Check if library folder exists. If not create it
+if [ ! -e "$calibre_dir" ]; then
+	ynh_print_info "Create calibre library folder $calibre_dir"
+	mkdir -p $calibre_dir
+	chown -R $app:$app $calibre_dir
+	create_dir=1
+fi
+#Check if metadata.db file exists. If not create it (empty library)
+if [ ! -e "$calibre_dir"/metadata.db ]; then
+	cp -a ../conf/metadata.db.empty $calibre_dir/metadata.db
+	chown $app:$app $calibre_dir/*
+fi
+
+
+
+#=================================================
+# SETUP LOGROTATE
+#=================================================
+
+# Use logrotate to manage application logfile(s)
+ynh_use_logrotate
+chown -R $app:$app /var/log/$app
+
+
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+# SET SQLITE DATABASE SETTINGS
+#=================================================
+
+ynh_print_info "Setting up database and settings"
+#we need to start and stop the service so that initial app.db file is created and that we can set default data
+systemctl start $app
+#sleep required on low spec like raspberryPi
+sleep 5s
+systemctl stop $app
+
+#set database settings as per conf file
+conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) WHERE ID=1\""
+eval sqlite3 $final_path/app.db "$conf"
+
+conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""
+eval sqlite3 $final_path/app.db "$conf"
+
+#mise à jour du mot de passe (je ne sais pas pourquoi, je n'arrive pas à l'intégrer dans le fichier de conf, pb de " et ')
+ynh_print_OFF
+sqlite3 $final_path/app.db "UPDATE user SET password='$(python ../conf/generate_password_hash.py $pass $final_path/vendor)' WHERE ID=1"
+ynh_print_ON
+
+#=================================================
+# SECURE FILES AND DIRECTORIES
+#=================================================
+
+# Set permissions to app files
+#disabled - do not work when calibreweb is not owner
+#chown -R root: $final_path
+#chown $app: $final_path/app.db
+
+
+#=================================================
+# STORE THE CHECKSUM OF THE CONFIG FILE
+#=================================================
+
+# Calculate and store the config file checksum into the app settings
+ynh_store_file_checksum "${final_path}/app.db"
+
+#=================================================
+# ADVERTISE SERVICE IN ADMIN PANEL
+#=================================================
+
+yunohost service add $app --log "/var/log/$app/$app.log"
+
+#=================================================
+# SETUP SSOWAT
+#=================================================
+
+# Make app public if necessary
+if [ $is_public -eq 1 ]
+then
+	# unprotected_uris allows SSO credentials to be passed anyway.
+	ynh_app_setting_set $app unprotected_uris "/"
+fi
+
+#=================================================
+# RELOAD NGINX
+#=================================================
+ynh_print_info "Reload nginx and start $app"
+systemctl reload nginx
+systemctl start $app
+
+#=================================================
+# WARNING FOR READ ACCESS
+#=================================================
+
+if [[ $create_dir = 0 ]] ; then
+	ynh_print_warn "Please, give required access to $app user to the $calibre_dir folder."
+fi

@@ -1,0 +1,13 @@
+[Unit]
+Description=__APP__
+After=network.target
+
+[Service]
+Type=simple
+User=__APP__
+Group=__APP__
+WorkingDirectory=__FINALPATH__/
+ExecStart=/bin/sh -c '/usr/bin/python __FINALPATH__/cps.py >> /var/log/__APP__/__APP__.log 2>&1'
+
+[Install]
+WantedBy=multi-user.target

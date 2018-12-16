@@ -1,0 +1,108 @@
+{
+    "name": "Calibre-web",
+    "id": "calibreweb",
+    "packaging_format": 1,
+    "description": {
+        "en": "Calibre-web for Yunohost",
+        "fr": "Calibre-web pour Yunohost."
+    },
+    "version": "0.9~ynh1",
+    "url": "https://github.com/janeczku/calibre-web",
+    "license": "free",
+    "maintainer": {
+        "name": "Krakinou",
+        "email": "misterl56@hotmail.com"
+    },
+    "requirements": {
+        "yunohost": ">= 2.7.14"
+    },
+    "multi_instance": false,
+    "services": [
+        "nginx",
+		"calibreweb"
+    ],
+    "arguments": {
+        "install" : [
+            {
+                "name": "domain",
+                "type": "domain",
+                "ask": {
+                    "en": "Choose a domain name for Calibre-web",
+                    "fr": "Choisissez un nom de domaine pour Calibre-web"
+                },
+                "example": "example.com"
+            },
+            {
+                "name": "path",
+                "type": "path",
+                "ask": {
+                    "en": "Choose a path for Calibre-web",
+                    "fr": "Choisissez un chemin pour Calibre-web"
+                },
+                "example": "/calibre",
+                "default": "/calibre"
+            },
+		    {
+                "name": "calibre_path",
+                "ask": {
+                    "en": "Select the folder containing the Calibre library",
+                    "fr": "Choisissez le répertoire contenant la bibliothèque Calibre"
+                },
+                "help": {
+                    "en": "This folder should have read write access. It will be created if it does not exist.",
+                    "fr": "Le répertoire doit être accesible en lecture écriture, il sera créé s'il n'existe pas."
+                },
+                "default": "/home/yunohost.app/calibreweb"
+            },
+            {
+                "name": "admin",
+                "type": "user",
+                "ask": {
+                    "en": "Choose an admin user",
+                    "fr": "Choisissez l’administrateur"
+                },
+                "example": "johndoe"
+            },
+            {
+                "name": "is_public",
+                "type": "boolean",
+                "ask": {
+                    "en": "Is it a public application?",
+                    "fr": "Est-ce une application publique ?"
+                },
+                "default": false
+            },
+            {
+                "name": "language",
+                "ask": {
+                    "en": "Select a default language (you may change it later in the app)",
+                    "fr": "Choisissez une langue par défaut (vous pourrez la changer ultérieurement dans l'application)"
+                },
+				"choices": [ "fr", "en", "es", "de"],
+                "default": "fr"
+            },
+            {
+                "name": "upload",
+				"type":"boolean",
+                "ask": {
+                    "en": "Do you want to allow uploading of books (you may change it later in the app)?",
+                    "fr": "Voulez vous autoriser l'upload de livres (vous pourrez le changer ultérieurement dans l'application)?"
+                },
+                "default": false
+            },
+            {
+                "name": "password",
+                "type": "password",
+                "ask": {
+                    "en": "Set the administrator password",
+                    "fr": "Définissez le mot de passe administrateur"
+                },
+                "help": {
+                    "en": "Use the help field to add an information for the admin about this question.",
+                    "fr": "Utilisez le champ aide pour ajouter une information à l'intention de l'administrateur à propos de cette question."
+                },
+                "example": "Averystrongpassword"
+            }
+        ]
+    }
+}
