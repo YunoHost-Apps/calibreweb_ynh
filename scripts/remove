@@ -14,11 +14,8 @@ source /usr/share/yunohost/helpers
 #=================================================
 
 app=$YNH_APP_INSTANCE_NAME
-
 domain=$(ynh_app_setting_get $app domain)
 port=$(ynh_app_setting_get $app port)
-db_name=$(ynh_app_setting_get $app db_name)
-db_user=$db_name
 final_path=$(ynh_app_setting_get $app final_path)
 
 #=================================================
@@ -28,6 +25,7 @@ final_path=$(ynh_app_setting_get $app final_path)
 #=================================================
 
 # Remove the dedicated systemd config
+ynh_print_info "Removing systemd"
 ynh_remove_systemd_config
 
 #=================================================
@@ -46,6 +44,7 @@ fi
 #=================================================
 
 # Remove metapackage and its dependencies
+ynh_print_info "Removing dependencies"
 ynh_remove_app_dependencies
 
 
@@ -54,6 +53,7 @@ ynh_remove_app_dependencies
 #=================================================
 
 # Remove the app directory securely
+ynh_print_info "Removing $final_path"
 ynh_secure_remove "$final_path"
 
 #=================================================
@@ -61,6 +61,7 @@ ynh_secure_remove "$final_path"
 #=================================================
 
 # Remove the dedicated nginx config
+ynh_print_info "Removing nginx"
 ynh_remove_nginx_config
 
 #=================================================
@@ -76,6 +77,7 @@ ynh_remove_logrotate
 
 if yunohost firewall list | grep -q "\- $port$"
 then
+	ynh_print_info "Removing open port $port"
 	echo "Close port $port" >&2
 	yunohost firewall disallow TCP $port 2>&1
 fi

@@ -68,6 +68,7 @@ ynh_app_setting_set $app calibre_dir $calibre_dir
 # Find a free port
 port=$(ynh_find_port 8083)
 # Open this port
+ynh_print_info "Opening port $port"
 yunohost firewall allow --no-upnp TCP $port 2>&1
 ynh_app_setting_set $app port $port
 
@@ -76,7 +77,7 @@ ynh_app_setting_set $app port $port
 #=================================================
 
 ynh_app_setting_set $app final_path $final_path
-
+ynh_print_info "Copying data to $final_path"
 # Download, check integrity, uncompress and patch the source from app.src
 #as long as v1 is not reached, sha256sum will change without notice so not usable, so we use cp -a instead.
 #source are directly in the app so far
@@ -88,6 +89,7 @@ cp -a ../src/. $final_path
 # INSTALL DEPENDENCIES
 #=================================================
 
+ynh_print_info "Installing dependencies and pip packages"
 ynh_install_app_dependencies $pkg_dependencies
 pip install --target $final_path/vendor -r $final_path/requirements.txt
 
@@ -144,6 +146,7 @@ chown -R $app:$app /var/log/$app
 #=================================================
 # SET SQLITE DATABASE SETTINGS
 #=================================================
+ynh_print_info "Setting up database and settings"
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
 systemctl start $app
 #sleep required on low spec like raspberryPi
@@ -184,7 +187,7 @@ fi
 #=================================================
 # RELOAD NGINX
 #=================================================
-
+ynh_print_info "Reload nginx and start $app"
 systemctl reload nginx
 systemctl start $app
 
