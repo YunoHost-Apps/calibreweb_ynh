@@ -65,3 +65,6 @@ sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibre
 ## Todo
 - [ ] Multiinstance
 - [ ] Better Multimedia integration 
+
+## License 
+Package and software are GPL 3.0
