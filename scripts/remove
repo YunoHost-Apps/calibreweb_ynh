@@ -17,6 +17,7 @@ app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get $app domain)
 port=$(ynh_app_setting_get $app port)
 final_path=$(ynh_app_setting_get $app final_path)
+calibre_dir=$(ynh_app_setting_get $app calibre_dir)
 
 #=================================================
 # STANDARD REMOVE
@@ -97,3 +98,9 @@ ynh_secure_remove "/var/log/$app/"
 
 # Delete a system user
 ynh_system_user_delete $app
+
+#=================================================
+# MESSAGE TO USER
+#=================================================
+
+ynh_print_warn "!!!The library folder $calibre_dir was not deleted. Delete it manually if required!!!"
