@@ -40,7 +40,7 @@ chown -R calibreweb: path/to/library
 or
 chmod o+rw path/to/library
 ``` 
-
+* Do not use a Nextcloud folder. It's all right if the folder is an external storage in Nextcloud but not if it's an internal one : Changing the data in the library will cause trouble with the sync
 ## Links
 
  * Report a bug: https://github.com/YunoHost-Apps/calibre_ynh/issues
@@ -64,7 +64,9 @@ sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibre
 
 ## Todo
 - [ ] Multiinstance
-- [ ] Better Multimedia integration 
+- [ ] Better Multimedia integration
+- [ ] Package_check integrtion
+- [ ] On backup/remove/upgrade : check for database location to update settings
 
 ## License 
 Package and software are GPL 3.0
