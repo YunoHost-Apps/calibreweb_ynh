@@ -126,11 +126,6 @@ ynh_add_systemd_config
 # CREATE FILES AND DIRECTORIES
 #=================================================
 
-# Build YunoHost multimedia directories
-ynh_multimedia_build_main_dir
-#add user to multimedia group
-usermod -a -G multimedia $app
-
 #Check if library folder exists. If not create it
 if [ ! -e "$calibre_dir" ]; then
 	ynh_print_info "Create calibre library folder $calibre_dir"

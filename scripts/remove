@@ -37,7 +37,7 @@ ynh_remove_systemd_config
 if yunohost service status | grep -q $app
 then
 	echo "Remove $app service"
-	yunohost service remove $app.service
+	yunohost service remove $app
 fi
 
 #=================================================
