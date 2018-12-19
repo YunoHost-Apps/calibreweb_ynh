@@ -14,7 +14,7 @@ create_dir=0
 #
 # usage: ynh_multimedia_build_main_dir
 ynh_multimedia_build_main_dir () {
-        local ynh_media_release="v1.0"
+        local ynh_media_release="v1.1"
 #        local checksum="4852c8607db820ad51f348da0dcf0c88"
 
         # Download yunohost.multimedia scripts
