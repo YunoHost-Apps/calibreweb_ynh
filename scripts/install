@@ -111,8 +111,7 @@ ynh_add_nginx_config
 
 # Create a system user
 ynh_system_user_create $app
-#add user to multimedia group
-usermod -a -G multimedia $app
+
 
 chown -R $app: $final_path
 
@@ -129,6 +128,8 @@ ynh_add_systemd_config
 
 # Build YunoHost multimedia directories
 ynh_multimedia_build_main_dir
+#add user to multimedia group
+usermod -a -G multimedia $app
 
 #Check if library folder exists. If not create it
 if [ ! -e "$calibre_dir" ]; then
