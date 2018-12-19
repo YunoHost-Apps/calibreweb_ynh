@@ -211,7 +211,7 @@ ynh_multimedia_build_main_dir () {
 #        local checksum="9ec4321a92aa2c388af4ee0072735e3e"
 
         # Download yunohost.multimedia scripts
-        wget -nv https://github.com/Karkinou/yunohost.multimedia/archive/${ynh_media_release}.tar.gz 
+        wget -nv https://github.com/Krakinou/yunohost.multimedia/archive/${ynh_media_release}.tar.gz 
 
         # Check the control sum
 #        echo "${checksum} ${ynh_media_release}.tar.gz" | md5sum -c --status \
