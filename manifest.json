@@ -4,7 +4,7 @@
     "packaging_format": 1,
     "description": {
         "en": "Calibre-web for Yunohost",
-        "fr": "Calibre-web pour Yunohost."
+        "fr": "Calibre-web pour Yunohost"
     },
     "version": "0.9~ynh1",
     "url": "https://github.com/janeczku/calibre-web",
@@ -18,7 +18,7 @@
     },
     "multi_instance": false,
     "services": [
-        "nginx",
+        "nginx"
     ],
     "arguments": {
         "install" : [
