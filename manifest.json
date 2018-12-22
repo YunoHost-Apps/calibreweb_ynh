@@ -19,7 +19,6 @@
     "multi_instance": false,
     "services": [
         "nginx",
-		"calibreweb"
     ],
     "arguments": {
         "install" : [
