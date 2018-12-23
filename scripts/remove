@@ -20,16 +20,6 @@ final_path=$(ynh_app_setting_get $app final_path)
 calibre_dir=$(ynh_app_setting_get $app calibre_dir)
 
 #=================================================
-# STANDARD REMOVE
-#=================================================
-# STOP AND REMOVE SERVICE
-#=================================================
-
-# Remove the dedicated systemd config
-ynh_print_info "Removing systemd"
-ynh_remove_systemd_config
-
-#=================================================
 # REMOVE SERVICE FROM ADMIN PANEL
 #=================================================
 
@@ -39,6 +29,18 @@ then
 	echo "Remove $app service"
 	yunohost service remove $app
 fi
+
+#=================================================
+# STANDARD REMOVE
+#=================================================
+# STOP AND REMOVE SERVICE
+#=================================================
+
+# Remove the dedicated systemd config
+ynh_print_info "Removing systemd"
+ynh_remove_systemd_config
+
+
 
 #=================================================
 # REMOVE DEPENDENCIES
