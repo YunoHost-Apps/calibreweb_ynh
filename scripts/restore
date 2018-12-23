@@ -125,4 +125,4 @@ ynh_app_setting_delete $app backup_core_only
 #=================================================
 
 systemctl reload nginx
-systemctl start $app.service
+ynh_systemd_action -l "INFO in server: Starting Gevent server"

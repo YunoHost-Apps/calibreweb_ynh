@@ -131,3 +131,4 @@ fi
 #=================================================
 
 systemctl reload nginx
+ynh_systemd_action -a restart -l "INFO in server: Starting Gevent server"
