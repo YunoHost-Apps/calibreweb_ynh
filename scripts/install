@@ -216,7 +216,8 @@ fi
 #=================================================
 ynh_print_info "Reload nginx and start $app"
 systemctl reload nginx
-systemctl start $app
+#systemctl start $app
+ynh_systemd_action -l "Started calibreweb"
 
 #=================================================
 # WARNING FOR READ ACCESS
