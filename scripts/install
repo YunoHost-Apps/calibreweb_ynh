@@ -217,7 +217,7 @@ fi
 ynh_print_info "Reload nginx and start $app"
 systemctl reload nginx
 #systemctl start $app
-ynh_systemd_action -l "Started calibreweb"
+ynh_systemd_action -l "INFO in server: Starting Gevent server"
 
 #=================================================
 # WARNING FOR READ ACCESS
