@@ -155,9 +155,10 @@ chown -R $app:$app /var/log/$app
 
 ynh_print_info "Setting up database and settings"
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
-ynh_systemd_action -l "INFO in server: Starting Gevent server"
+#ynh_systemd_action -l "INFO in server: Starting Gevent server"
+systemctl start $app
 #sleep required on low spec like raspberryPi
-sleep 1s
+sleep 5s
 ynh_systemd_action -a stop
 
 
