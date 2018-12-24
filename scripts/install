@@ -37,8 +37,6 @@ upload=$7
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
 
-### If the app uses nginx as web server (written in HTML/PHP in most cases), the final path should be "/var/www/$app".
-### If the app provides an internal web server (or uses another application server such as uwsgi), the final path should be "/opt/yunohost/$app"
 final_path=/var/www/$app
 test ! -e "$final_path" || ynh_die "This path already contains a folder"
 
@@ -97,7 +95,7 @@ pip install --target $final_path/vendor -r $final_path/requirements.txt
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-#Cannot use empty string for X-script-name
+#Cannot use empty string for X-script-name, causes an issue in the python prg
 if [ $path_url = "/" ] ; then
 	ynh_replace_string "X-Script-Name   __PATH__;" "X-Script-Name   /$app;" ../conf/nginx.conf
 fi
@@ -111,7 +109,6 @@ ynh_add_nginx_config
 
 # Create a system user
 ynh_system_user_create $app
-
 
 chown -R $app: $final_path
 
@@ -173,7 +170,7 @@ eval sqlite3 $final_path/app.db "$conf"
 
 #mise à jour du mot de passe (je ne sais pas pourquoi, je n'arrive pas à l'intégrer dans le fichier de conf, pb de " et ')
 ynh_print_OFF
-#had to set it on two lines or package_linter cries...
+#had to set it on two lines or package_linter cries like a baby...
 pass=$(python ../conf/generate_password_hash.py "$pass" $final_path/vendor)
 sqlite3 $final_path/app.db "UPDATE user SET password='$pass' WHERE ID=1"
 ynh_print_ON

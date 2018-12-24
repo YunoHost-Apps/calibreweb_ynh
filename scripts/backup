@@ -25,14 +25,19 @@ app=$YNH_APP_INSTANCE_NAME
 final_path=$(ynh_app_setting_get $app final_path)
 path_url=$(ynh_app_setting_get $app path)
 domain=$(ynh_app_setting_get $app domain)
-calibre_dir=$(ynh_app_setting_get $app calibre_dir)
+
+#Get settings from database in case it has been changed in the app
+calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
+#Save it in settings so that it can be used back afterward
+calibre_dir=${calibre_dir%/}
+ynh_app_setting_set $app calibre_dir $calibre_dir 
 
 #=================================================
 # STANDARD BACKUP STEPS
 #=================================================
 # BACKUP THE APP MAIN DIR
 #=================================================
-
+#This will backup the app.db file at the same time
 ynh_backup "$final_path"
 
 #=================================================
@@ -69,5 +74,3 @@ then
 else
 	echo "Data dir will not be saved, because backup_core_only is set." >&2
 fi
-
-
