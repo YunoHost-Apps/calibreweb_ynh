@@ -110,6 +110,10 @@ systemctl enable $app.service
 #=================================================
 
 ynh_restore_file "/etc/logrotate.d/$app"
+if [ ! -e /var/log/$app ]; then
+	mkdir /var/log/$app
+fi
+chown -R $app:$app /var/log/$app
 
 #=================================================
 # RESTORE THE DATA DIRECTORY

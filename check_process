@@ -1,5 +1,5 @@
 ;; Complete Test
-# Comment ignored
+# First Run of complete test
 	; Manifest
 		domain="domain.tld"	(DOMAIN)
 		path="/calibre"	(PATH)
@@ -9,7 +9,6 @@
 		is_public=0	(PUBLIC|public=1|private=0)
 		upload=1
 		password="a very long password"
-#		port="8083"	(PORT)
 	; Checks
 		pkg_linter=1
 		setup_sub_dir=1
@@ -23,6 +22,24 @@
 		incorrect_path=1
 		port_already_use=1 (8083)
 		change_url=1
+#;; Failed upgrade
+#Run to trigger an error during upgrade to check backup_restore
+#	; pre-install
+#		touch /tmp/upgrade_error
+#	; Manifest
+#		domain="domain.tld"	(DOMAIN)
+#		path="/calibre"	(PATH)
+#		calibre_path="/home/yunohost.app/calibreweb"
+#		admin="john"	(USER)
+#		language="en"
+#		is_public=0	(PUBLIC|public=1|private=0)
+#		upload=1
+#		password="a very long password"
+#	; Checks
+#		setup_sub_dir=1
+#		setup_root=1
+#		upgrade=1
+#		upgrade=1	from_commit=3b9c5041e4fa73cb965368379f2b83d076c65341
 ;;; Levels
 	Level 1=auto
 	Level 2=auto
@@ -41,3 +58,5 @@ Notification=none
 	; commit=3b9c5041e4fa73cb965368379f2b83d076c65341
 		name=Name of this previous version
 		manifest_arg=domain=DOMAIN&path=PATH&admin=USER&password=pass&is_public=0&
+		
+		
