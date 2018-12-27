@@ -1,4 +1,4 @@
 #useless as long as V1.0 not issued
-SOURCE_URL=https://github.com/janeczku/calibre-web/archive/master.zip
-SOURCE_SUM=82d6633464fc60d198a671ba973a837f769296c9c5e2ac58537ba20c1e48c563
+SOURCE_URL=https://github.com/janeczku/calibre-web/archive/d0fd1a46014006138977398ee65f48c98df937e7.zip
+SOURCE_SUM=0d297719f32670840fb1fcee52d3e73fa6213127709809d9a232f862d037af03
 SOURCE_FORMAT=zip
