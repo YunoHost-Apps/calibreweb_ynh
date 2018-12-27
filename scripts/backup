@@ -70,7 +70,8 @@ backup_core_only=$(ynh_app_setting_get "$app" backup_core_only)
 # If backup_core_only have any value in the settings.yml file, do not backup the data directory
 if [ ! -z $backup_core_only ]
 then
+	ynh_print_info "Backing up the library folder $calibre_dir"
 	ynh_backup "$calibre_dir"
 else
-	echo "Data dir will not be saved, because backup_core_only is set." >&2
+	ynh_print_info "Data dir will not be saved, because backup_core_only is set." >&2
 fi
