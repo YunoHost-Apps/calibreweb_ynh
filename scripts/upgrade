@@ -52,12 +52,7 @@ path_url=$(ynh_normalize_url_path $path_url)
 #=================================================
 
 # Download, check integrity, uncompress and patch the source from app.src
-##as long as v1 is not reached, sha256sum will change without notice so not usable, so we use cp -a instead.
-#source are directly in the app so far
 #ynh_setup_source "$final_path"
-
-cp -a ../src/calibreweb/. $final_path
-
 
 #=================================================
 # NGINX CONFIGURATION
