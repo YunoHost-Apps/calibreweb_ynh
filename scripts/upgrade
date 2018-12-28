@@ -127,7 +127,7 @@ fi
 #=================================================
 #This line of code is just used to caused an error in upgrade to be tested by package_check 
 if [ -e /tmp/upgrade_error ]; then
-	exit 1
+	ynh_die
 fi
 
 #=================================================

@@ -52,7 +52,7 @@ chmod o+rw path/to/library
 Developers info
 ----------------
 
-Please do your pull request to the [testing branch](https://github.com/Krakinou/calibreweb_ynh/tree/Testing).
+Please do your pull request to the [testing branch](https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing).
 
 To try the testing branch, please proceed like that.
 ```
@@ -65,8 +65,8 @@ sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibre
 ## Todo
 - [ ] Multiinstance
 - [ ] Better Multimedia integration : Integrate in Yunohost.multimedia
-- [ ] Package_check integration
-- [ ] On backup/remove/upgrade : check for database location to update settings
+- [X] Package_check integration
+- [X] On backup/remove/upgrade : check for database location to update settings
 
 
 ## LICENSE

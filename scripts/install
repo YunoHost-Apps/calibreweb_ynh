@@ -76,7 +76,7 @@ ynh_app_setting_set $app port $port
 #=================================================
 
 ynh_app_setting_set $app final_path $final_path
-ynh_print_info "Copying data to $final_path"
+ynh_print_info "Downloading sources to $final_path"
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source "$final_path"
 

@@ -56,7 +56,7 @@ Email=
 Notification=none
 ;;; Upgrade options
 	; commit=3b9c5041e4fa73cb965368379f2b83d076c65341
-		name=Name of this previous version
-		manifest_arg=domain=DOMAIN&path=PATH&admin=USER&password=pass&is_public=0&
+		name=First in progress release of the app 0.9~ynh2
+		manifest_arg=domain=DOMAIN&path=PATH&admin=USER&
 		
 		
