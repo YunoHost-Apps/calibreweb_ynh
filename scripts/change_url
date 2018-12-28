@@ -17,7 +17,6 @@ old_domain=$YNH_APP_OLD_DOMAIN
 old_path=$YNH_APP_OLD_PATH
 new_domain=$YNH_APP_NEW_DOMAIN
 new_path=$YNH_APP_NEW_PATH
-
 app=$YNH_APP_INSTANCE_NAME
 
 #=================================================
@@ -70,6 +69,10 @@ then
 	# Set global variables for nginx helper
 	domain="$old_domain"
 	path_url="$new_path"
+	#Cannot use empty string for X-script-name, causes an issue in the python prg
+	if [ $path_url = "/" ] ; then
+		ynh_replace_string "X-Script-Name   __PATH__;" "X-Script-Name   /$app;" ../conf/nginx.conf
+	fi
 	# Create a dedicated nginx config
 	ynh_add_nginx_config
 fi

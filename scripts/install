@@ -37,8 +37,6 @@ upload=$7
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
 
-### If the app uses nginx as web server (written in HTML/PHP in most cases), the final path should be "/var/www/$app".
-### If the app provides an internal web server (or uses another application server such as uwsgi), the final path should be "/opt/yunohost/$app"
 final_path=/var/www/$app
 test ! -e "$final_path" || ynh_die "This path already contains a folder"
 
@@ -78,13 +76,10 @@ ynh_app_setting_set $app port $port
 #=================================================
 
 ynh_app_setting_set $app final_path $final_path
-ynh_print_info "Copying data to $final_path"
+ynh_print_info "Downloading sources to $final_path"
 # Download, check integrity, uncompress and patch the source from app.src
-#as long as v1 is not reached, sha256sum will change without notice so not usable, so we use cp -a instead.
-#source are directly in the app so far
-#ynh_setup_source "$final_path"
+ynh_setup_source "$final_path"
 
-cp -a ../src/calibreweb/. $final_path
 
 #=================================================
 # INSTALL DEPENDENCIES
@@ -97,7 +92,7 @@ pip install --target $final_path/vendor -r $final_path/requirements.txt
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-#Cannot use empty string for X-script-name
+#Cannot use empty string for X-script-name, causes an issue in the python prg
 if [ $path_url = "/" ] ; then
 	ynh_replace_string "X-Script-Name   __PATH__;" "X-Script-Name   /$app;" ../conf/nginx.conf
 fi
@@ -111,6 +106,7 @@ ynh_add_nginx_config
 
 # Create a system user
 ynh_system_user_create $app
+
 chown -R $app: $final_path
 
 #=================================================
@@ -156,10 +152,12 @@ chown -R $app:$app /var/log/$app
 
 ynh_print_info "Setting up database and settings"
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
-systemctl start $app
+ynh_systemd_action -l "INFO in server: Starting Gevent server"
+#systemctl start $app
 #sleep required on low spec like raspberryPi
-sleep 5s
-systemctl stop $app
+sleep 2s
+ynh_systemd_action -a stop
+
 
 #set database settings as per conf file
 conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) WHERE ID=1\""
@@ -170,7 +168,9 @@ eval sqlite3 $final_path/app.db "$conf"
 
 #mise à jour du mot de passe (je ne sais pas pourquoi, je n'arrive pas à l'intégrer dans le fichier de conf, pb de " et ')
 ynh_print_OFF
-sqlite3 $final_path/app.db "UPDATE user SET password='$(python ../conf/generate_password_hash.py "$pass" $final_path/vendor)' WHERE ID=1"
+#had to set it on two lines or package_linter cries like a baby...
+pass=$(python ../conf/generate_password_hash.py "$pass" $final_path/vendor)
+sqlite3 $final_path/app.db "UPDATE user SET password='$pass' WHERE ID=1"
 ynh_print_ON
 
 #=================================================
@@ -212,7 +212,7 @@ fi
 #=================================================
 ynh_print_info "Reload nginx and start $app"
 systemctl reload nginx
-systemctl start $app
+ynh_systemd_action -l "INFO in server: Starting Gevent server"
 
 #=================================================
 # WARNING FOR READ ACCESS

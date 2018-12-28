@@ -20,6 +20,17 @@ final_path=$(ynh_app_setting_get $app final_path)
 calibre_dir=$(ynh_app_setting_get $app calibre_dir)
 
 #=================================================
+# REMOVE SERVICE FROM ADMIN PANEL
+#=================================================
+
+# Remove a service from the admin panel, added by `yunohost service add`
+if yunohost service status | grep -q $app
+then
+	echo "Remove $app service"
+	yunohost service remove $app
+fi
+
+#=================================================
 # STANDARD REMOVE
 #=================================================
 # STOP AND REMOVE SERVICE
@@ -29,16 +40,7 @@ calibre_dir=$(ynh_app_setting_get $app calibre_dir)
 ynh_print_info "Removing systemd"
 ynh_remove_systemd_config
 
-#=================================================
-# REMOVE SERVICE FROM ADMIN PANEL
-#=================================================
 
-# Remove a service from the admin panel, added by `yunohost service add`
-if yunohost service status | grep -q $app
-then
-	echo "Remove $app service"
-	yunohost service remove $app.service
-fi
 
 #=================================================
 # REMOVE DEPENDENCIES

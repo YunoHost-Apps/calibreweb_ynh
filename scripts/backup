@@ -5,8 +5,12 @@
 #=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
-
-source ../settings/scripts/_common.sh
+if [ ! -e _common.sh ]; then
+	# Get the _common.sh file if it's not in the current directory
+	cp ../settings/scripts/_common.sh ./_common.sh
+	chmod a+rx _common.sh
+fi
+source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -25,14 +29,19 @@ app=$YNH_APP_INSTANCE_NAME
 final_path=$(ynh_app_setting_get $app final_path)
 path_url=$(ynh_app_setting_get $app path)
 domain=$(ynh_app_setting_get $app domain)
-calibre_dir=$(ynh_app_setting_get $app calibre_dir)
+
+#Get settings from database in case it has been changed in the app
+calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
+#Save it in settings so that it can be used back afterward
+calibre_dir=${calibre_dir%/}
+ynh_app_setting_set $app calibre_dir $calibre_dir 
 
 #=================================================
 # STANDARD BACKUP STEPS
 #=================================================
 # BACKUP THE APP MAIN DIR
 #=================================================
-
+#This will backup the app.db file at the same time
 ynh_backup "$final_path"
 
 #=================================================
@@ -65,9 +74,8 @@ backup_core_only=$(ynh_app_setting_get "$app" backup_core_only)
 # If backup_core_only have any value in the settings.yml file, do not backup the data directory
 if [ ! -z $backup_core_only ]
 then
+	ynh_print_info "Backing up the library folder $calibre_dir"
 	ynh_backup "$calibre_dir"
 else
-	echo "Data dir will not be saved, because backup_core_only is set." >&2
+	ynh_print_info "Data dir will not be saved, because backup_core_only is set." >&2
 fi
-
-

@@ -6,7 +6,12 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-source ../settings/scripts/_common.sh
+if [ ! -e _common.sh ]; then
+	# Get the _common.sh file if it's not in the current directory
+	cp ../settings/scripts/_common.sh ./_common.sh
+	chmod a+rx _common.sh
+fi
+source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -26,6 +31,8 @@ domain=$(ynh_app_setting_get $app domain)
 path_url=$(ynh_app_setting_get $app path)
 final_path=$(ynh_app_setting_get $app final_path)
 calibre_dir=$(ynh_app_setting_get $app calibre_dir)
+is_public=$(ynh_app_setting_get $app is_public)
+port=$(ynh_app_setting_get $app port)
 
 #=================================================
 # CHECK IF THE APP CAN BE RESTORED
@@ -41,21 +48,30 @@ test ! -d $final_path \
 #=================================================
 # RESTORE THE NGINX CONFIGURATION
 #=================================================
-
+ynh_print_info "Restore nginx settings"
 ynh_restore_file "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
-# RESTORE THE APP MAIN DIR
+# REOPEN PORT
 #=================================================
 
-ynh_restore_file "$final_path"
+ynh_print_info "Reopening port $port"
+yunohost firewall allow --no-upnp TCP $port 2>&1
+ynh_app_setting_set $app port $port
 
 #=================================================
 # RECREATE THE DEDICATED USER
 #=================================================
 
+ynh_print_info "Restore user $app"
 # Create the dedicated user (if not existing)
 ynh_system_user_create $app
+
+#=================================================
+# RESTORE THE APP MAIN DIR
+#=================================================
+ynh_print_info "Restore app directory $final_path"
+ynh_restore_file "$final_path"
 
 #=================================================
 # RESTORE USER RIGHTS
@@ -71,7 +87,9 @@ chown -R $app: $final_path
 #=================================================
 
 # Define and install dependencies
+ynh_print_info "Installing dependencies and pip packages"
 ynh_install_app_dependencies $pkg_dependencies
+pip install --target $final_path/vendor -r $final_path/requirements.txt
 
 #=================================================
 # ADVERTISE SERVICE IN ADMIN PANEL
@@ -92,6 +110,10 @@ systemctl enable $app.service
 #=================================================
 
 ynh_restore_file "/etc/logrotate.d/$app"
+if [ ! -e /var/log/$app ]; then
+	mkdir /var/log/$app
+fi
+chown -R $app:$app /var/log/$app
 
 #=================================================
 # RESTORE THE DATA DIRECTORY
@@ -111,7 +133,7 @@ else
 	fi
 #Check if metadata.db file exists. If not create it (empty library)
 	if [ ! -e "$calibre_dir"/metadata.db ]; then
-		cp -a ../conf/metadata.db.empty $calibre_dir/metadata.db
+		cp -a ../settings/conf/metadata.db.empty $calibre_dir/metadata.db
 		chown $app:$app $calibre_dir/*
 	fi
 fi
@@ -119,10 +141,27 @@ fi
 ynh_app_setting_delete $app backup_core_only
 
 #=================================================
+# SETUP SSOWAT
+#=================================================
+
+# Make app public if necessary
+if [ $is_public -eq 1 ]
+then
+	# unprotected_uris allows SSO credentials to be passed anyway.
+	ynh_app_setting_set $app unprotected_uris "/"
+fi
+
+#=================================================
 # GENERIC FINALIZATION
 #=================================================
 # RELOAD NGINX
 #=================================================
-
+ynh_print_info "Reload nginx and start $app"
 systemctl reload nginx
-systemctl start $app.service
+ynh_systemd_action -l "INFO in server: Starting Gevent server"
+
+#=================================================
+# WARNING FOR READ ACCESS
+#=================================================
+ynh_print_warn "Please, give required access to $app user to the $calibre_dir folder."
+

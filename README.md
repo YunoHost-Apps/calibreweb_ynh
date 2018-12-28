@@ -1,6 +1,6 @@
 
 # Calibre-web for YunoHost
-
+[![Integration level](https://dash.yunohost.org/integration/calibreweb.svg)](https://ci-apps.yunohost.org/jenkins/job/calibreweb%20%28Community%29/lastBuild/consoleFull)  
 [![Install calibreweb with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=calibreweb)
 
 > *This package allow you to install calibreweb quickly and simply on a YunoHost server.  
@@ -52,7 +52,7 @@ chmod o+rw path/to/library
 Developers info
 ----------------
 
-Please do your pull request to the [testing branch](https://github.com/Krakinou/calibreweb_ynh/tree/Testing).
+Please do your pull request to the [testing branch](https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing).
 
 To try the testing branch, please proceed like that.
 ```
@@ -64,9 +64,10 @@ sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibre
 
 ## Todo
 - [ ] Multiinstance
-- [ ] Better Multimedia integration
-- [ ] Package_check integrtion
-- [ ] On backup/remove/upgrade : check for database location to update settings
+- [ ] Better Multimedia integration : Integrate in Yunohost.multimedia
+- [X] Package_check integration
+- [X] On backup/remove/upgrade : check for database location to update settings
 
-## License 
+
+## LICENSE
 Package and software are GPL 3.0

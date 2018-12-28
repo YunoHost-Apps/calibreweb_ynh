@@ -1,0 +1,60 @@
+;; Complete Test
+# First Run of complete test
+	; Manifest
+		domain="domain.tld"	(DOMAIN)
+		path="/calibre"	(PATH)
+		calibre_path="/home/yunohost.app/calibreweb"
+		admin="john"	(USER)
+		language="en"
+		is_public=0	(PUBLIC|public=1|private=0)
+		upload=1
+		password="a very long password"
+	; Checks
+		pkg_linter=1
+		setup_sub_dir=1
+		setup_root=1
+		setup_private=1
+		setup_public=1
+		upgrade=1	from_commit=3b9c5041e4fa73cb965368379f2b83d076c65341
+		backup_restore=1
+		multi_instance=0
+		incorrect_path=1
+		port_already_use=1 (8083)
+		change_url=1
+#;; Failed upgrade
+#Run to trigger an error during upgrade to check backup_restore
+#	; pre-install
+#		touch /tmp/upgrade_error
+#	; Manifest
+#		domain="domain.tld"	(DOMAIN)
+#		path="/calibre"	(PATH)
+#		calibre_path="/home/yunohost.app/calibreweb"
+#		admin="john"	(USER)
+#		language="en"
+#		is_public=0	(PUBLIC|public=1|private=0)
+#		upload=1
+#		password="a very long password"
+#	; Checks
+#		setup_sub_dir=1
+#		setup_root=1
+#		upgrade=1	from_commit=3b9c5041e4fa73cb965368379f2b83d076c65341
+;;; Levels
+	Level 1=auto
+	Level 2=auto
+	Level 3=auto
+	Level 4=na
+	Level 5=auto
+	Level 6=auto
+	Level 7=auto
+	Level 8=0
+	Level 9=0
+	Level 10=0
+;;; Options
+Email=
+Notification=none
+;;; Upgrade options
+	; commit=3b9c5041e4fa73cb965368379f2b83d076c65341
+		name=First in progress release of the app 0.9~ynh1
+		manifest_arg=domain=DOMAIN&path=PATH&admin=USER&password=pass&is_public=1&
+		
+		

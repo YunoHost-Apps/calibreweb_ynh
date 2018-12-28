@@ -21,7 +21,14 @@ admin=$(ynh_app_setting_get $app admin)
 is_public=$(ynh_app_setting_get $app is_public)
 final_path=$(ynh_app_setting_get $app final_path)
 language=$(ynh_app_setting_get $app language)
-calibre_dir=$(ynh_app_setting_get $app calibre_dir)
+
+#Get settings from database in case it has been changed in the app
+calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
+#Save it in settings so that it can be used back afterward
+calibre_dir=${calibre_dir%/}
+ynh_app_setting_set $app calibre_dir $calibre_dir
+
+port=$(ynh_app_setting_get $app port)
 
 
 #=================================================
@@ -51,12 +58,8 @@ path_url=$(ynh_normalize_url_path $path_url)
 #=================================================
 
 # Download, check integrity, uncompress and patch the source from app.src
-##as long as v1 is not reached, sha256sum will change without notice so not usable, so we use cp -a instead.
-#source are directly in the app so far
-#ynh_setup_source "$final_path"
-
-cp -a ../src/calibreweb/. $final_path
-
+ynh_print_info "Download and install new sources"
+ynh_setup_source "$final_path"
 
 #=================================================
 # NGINX CONFIGURATION
@@ -127,7 +130,16 @@ then
 fi
 
 #=================================================
+# PACKAGE_CHECK
+#=================================================
+#This line of code is just used to caused an error in upgrade to be tested by package_check 
+if [ -e /tmp/upgrade_error ]; then
+	ynh_die
+fi
+
+#=================================================
 # RELOAD NGINX
 #=================================================
 
 systemctl reload nginx
+ynh_systemd_action -a restart -l "INFO in server: Starting Gevent server"
