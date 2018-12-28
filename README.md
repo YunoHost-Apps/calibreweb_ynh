@@ -23,7 +23,7 @@ Alternatively, you may use [COPS](https://github.com/YunoHost-Apps/cops_ynh) whi
 
 ## Backup library
 
-By default, backup process will not backup Calibre library (backup_core_only logic).
+By default, backup process will not backup Calibre library ([backup_core_only logic](https://yunohost.org/#/backup_fr)).
 You may activate backup of the library with 
 ```
 yunohost app setting calibreweb backup_core_only -v 0
@@ -52,7 +52,7 @@ chmod o+rw path/to/library
 Developers info
 ----------------
 
-Please do your pull request to the [testing branch](https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing).
+Please do your pull request to the [testing branch](https://github.com/Yunohost-Apps/calibre_ynh/tree/Testing).
 
 To try the testing branch, please proceed like that.
 ```
@@ -63,7 +63,7 @@ sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibre
 
 
 ## Todo
-- [ ] Multiinstance
+- [X] Multiinstance
 - [ ] Better Multimedia integration : Integrate in Yunohost.multimedia
 - [X] Package_check integration
 - [X] On backup/remove/upgrade : check for database location to update settings
