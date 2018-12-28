@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pkg_dependencies="sqlite3 python-pip"
+pkg_dependencies="sqlite3 python-pip imagemagick"
 create_dir=0
 
 
