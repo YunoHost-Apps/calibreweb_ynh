@@ -21,7 +21,13 @@ admin=$(ynh_app_setting_get $app admin)
 is_public=$(ynh_app_setting_get $app is_public)
 final_path=$(ynh_app_setting_get $app final_path)
 language=$(ynh_app_setting_get $app language)
-calibre_dir=$(ynh_app_setting_get $app calibre_dir)
+
+#Get settings from database in case it has been changed in the app
+calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
+#Save it in settings so that it can be used back afterward
+calibre_dir=${calibre_dir%/}
+ynh_app_setting_set $app calibre_dir $calibre_dir
+
 port=$(ynh_app_setting_get $app port)
 
 
