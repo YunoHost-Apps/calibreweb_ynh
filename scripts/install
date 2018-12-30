@@ -135,8 +135,7 @@ if [ ! -e "$calibre_dir"/metadata.db ]; then
 fi
 
 
-#ynh_multimedia_build_main_dir
-#ynh_multimedia_addfolder "eBook" "$calibre_dir"
+ynh_multimedia_build_main_dir
 #ynh_multimedia_addaccess $app
 
 

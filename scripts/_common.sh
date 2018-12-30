@@ -100,11 +100,11 @@ ynh_systemd_action() {
 #
 # usage: ynh_multimedia_build_main_dir
 ynh_multimedia_build_main_dir () {
-        local ynh_media_release="v1.1"
-        local checksum="9ec4321a92aa2c388af4ee0072735e3e"
+        local ynh_media_release="v1.2"
+        local checksum="b933c446b4aff8a7619804480c06a879"
 
         # Download yunohost.multimedia scripts
-        wget -nv https://github.com/YunoHost-Apps/yunohost.multimedia/archive/${ynh_media_release}.tar.gz 
+        wget -nv https://github.com/Krakinou/yunohost.multimedia/archive/${ynh_media_release}.tar.gz 
 
         # Check the control sum
         echo "${checksum} ${ynh_media_release}.tar.gz" | md5sum -c --status \
