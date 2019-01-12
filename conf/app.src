@@ -1,4 +1,4 @@
 #useless as long as V1.0 not issued
-SOURCE_URL=https://github.com/YunoHost-Apps/calibre_ynh/archive/master.zip
-SOURCE_SUM=3cef8d95f2543cc07f5b2a9975f8633d614d2f02e404e1538353a6bd18f3f405
+SOURCE_URL=https://github.com/Krakinou/calibre-web/archive/82e4f11334444f8650fbf5e0b16a4e8eb70253da.zip
+SOURCE_SUM=29f68e6ef88cce19f0f6a2006517c43d93167ad80f13cbe16cdc78b4ea8d52be
 SOURCE_FORMAT=zip
