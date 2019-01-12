@@ -29,9 +29,8 @@ ynh_print_OFF
 pass=$YNH_APP_ARG_PASSWORD
 ynh_print_ON
 app=$YNH_APP_INSTANCE_NAME
-#removing / at the end for consistency
-calibre_dir=${3%/}
-upload=$7
+upload=$6
+public_library=$7
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
@@ -56,7 +55,7 @@ ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
 ynh_app_setting_set $app admin $admin
 ynh_app_setting_set $app is_public $is_public
-ynh_app_setting_set $app calibre_dir $calibre_dir
+
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -80,13 +79,12 @@ ynh_print_info "Downloading sources to $final_path"
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source "$final_path"
 
-
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
 
 ynh_print_info "Installing dependencies and pip packages"
-ynh_install_app_dependencies $pkg_dependencies
+ynh_install_app_dependencies $PKG_DEPENDENCIES
 pip install --target $final_path/vendor -r $final_path/requirements.txt
 
 #=================================================
@@ -120,24 +118,30 @@ ynh_add_systemd_config
 # CREATE FILES AND DIRECTORIES
 #=================================================
 
+#Logic is as follow : if app is set to be publicly accessible, we will assume that the library should be set in "Share" multimedia directory
+# If app is set to be private but access is requested for all user, we will assume the same
+# If app is set to be private but access is limited to the admin user, we will set it inside his own multimedia directory.
+# Access to the app is managed in the SSOwat part of the script.
 
-#Check if library folder exists. If not create it
-if [ ! -e "$calibre_dir" ]; then
-	ynh_print_info "Create calibre library folder $calibre_dir"
-	mkdir -p $calibre_dir
-	chown -R $app:$app $calibre_dir
-	create_dir=1
+#build multimedia directory
+ynh_multimedia_build_main_dir
+ynh_multimedia_addaccess $app
+
+if [ $is_public -eq 1 ]; then 						#app is public, library is public
+	calibre_dir=$DOSSIER_MEDIA/Share/eBook
+elif [$is_public -eq 0 ] && [ $public_library -eq 1 ]; then  #app is private, library is public
+	calibre_dir=$DOSSIER_MEDIA/Share/eBook
+else 												#app is private, library is private
+	calibre_dir=$DOSSIER_MEDIA/$admin/eBook
 fi
+
 #Check if metadata.db file exists. If not create it (empty library)
 if [ ! -e "$calibre_dir"/metadata.db ]; then
 	cp -a ../conf/metadata.db.empty $calibre_dir/metadata.db
 	chown $app:$app $calibre_dir/*
 fi
 
-
-ynh_multimedia_build_main_dir
-#ynh_multimedia_addaccess $app
-
+ynh_app_setting_set $app calibre_dir $calibre_dir
 
 #=================================================
 # SETUP LOGROTATE
@@ -210,6 +214,11 @@ then
 	# unprotected_uris allows SSO credentials to be passed anyway.
 	ynh_app_setting_set $app unprotected_uris "/"
 fi
+if [ $public_library -eq 0 ]; then
+	yunohost app addaccess $app -u $admin
+fi
+
+
 
 #=================================================
 # RELOAD NGINX
@@ -217,11 +226,3 @@ fi
 ynh_print_info "Reload nginx and start $app"
 systemctl reload nginx
 ynh_systemd_action -l "INFO in server: Starting Gevent server"
-
-#=================================================
-# WARNING FOR READ ACCESS
-#=================================================
-
-if [[ $create_dir = 0 ]] ; then
-	ynh_print_warn "Please, give required access to $app user to the $calibre_dir folder."
-fi

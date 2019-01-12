@@ -1,6 +1,7 @@
 #!/bin/bash
 
-pkg_dependencies="sqlite3 python-pip imagemagick"
+PKG_DEPENDENCIES="sqlite3 python-pip imagemagick"
+DOSSIER_MEDIA=/home/yunohost.multimedia
 create_dir=0
 
 
@@ -101,7 +102,7 @@ ynh_systemd_action() {
 # usage: ynh_multimedia_build_main_dir
 ynh_multimedia_build_main_dir () {
         local ynh_media_release="v1.2"
-        local checksum="b933c446b4aff8a7619804480c06a879"
+        local checksum="806a827ba1902d6911095602a9221181"
 
         # Download yunohost.multimedia scripts
         wget -nv https://github.com/Krakinou/yunohost.multimedia/archive/${ynh_media_release}.tar.gz 

@@ -41,18 +41,6 @@
                 "example": "/calibre",
                 "default": "/calibre"
             },
-		    {
-                "name": "calibre_path",
-                "ask": {
-                    "en": "Select the folder containing the Calibre library",
-                    "fr": "Choisissez le répertoire contenant la bibliothèque Calibre"
-                },
-                "help": {
-                    "en": "This folder should have read write access. It will be created if it does not exist.",
-                    "fr": "Le répertoire doit être accessible en lecture écriture, il sera créé s'il n'existe pas."
-                },
-                "default": "/home/yunohost.app/calibreweb"
-            },
             {
                 "name": "admin",
                 "type": "user",
@@ -73,6 +61,7 @@
             },
             {
                 "name": "language",
+		"optional": true,
                 "ask": {
                     "en": "Select a default language (you may change it later in the app)",
                     "fr": "Choisissez une langue par défaut (vous pourrez la changer ultérieurement dans l'application)"
@@ -82,10 +71,21 @@
             },
             {
                 "name": "upload",
-				"type":"boolean",
+		"type":"boolean",
+		"optional": true,
                 "ask": {
                     "en": "Do you want to allow uploading of books (you may change it later in the app)?",
                     "fr": "Voulez vous autoriser l'upload de livres (vous pourrez le changer ultérieurement dans l'application)?"
+                },
+                "default": false
+            },
+            {
+                "name": "public_library",
+		"type":"boolean",
+		"optional": true,
+                "ask": {
+                    "en": "Do you want to allow access to the library to all Yunohost users?",
+                    "fr": "Voulez vous autoriser l'accès à la bibliothèque à tous les utilisateurs Yunohost?"
                 },
                 "default": false
             },
