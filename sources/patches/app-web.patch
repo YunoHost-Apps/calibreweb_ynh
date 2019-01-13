@@ -1,19 +1,20 @@
---- a/cps/web.py	2019-01-12 09:01:08.000000000 +0100
-+++ b/cps/web.py	2019-01-13 16:13:23.000000000 +0100
+--- ./ori-calibre-web/cps/web.py	2019-01-12 09:01:08.000000000 +0100
++++ ./calibre-web-Yunohost_integration/cps/web.py	2019-01-13 20:11:57.000000000 +0100
 @@ -58,6 +58,8 @@
  import server
  from reverseproxy import ReverseProxied
  
-+global vlogout
++vlogout = 0
 +
  try:
      from googleapiclient.errors import HttpError
  except ImportError:
-@@ -2360,10 +2362,28 @@
+@@ -2360,10 +2362,29 @@
          return redirect(url_for('basic_configuration'))
      if current_user is not None and current_user.is_authenticated:
          return redirect(url_for('index'))
 +    auth_user = request.headers.get('X-Remote-User')
++    global vlogout
 +    if auth_user and config.config_use_ldap and not vlogout:
 +        vlogout = 0
 +        user = ub.session.query(ub.User).filter(func.lower(ub.User.nickname) == auth_user.strip().lower()).first()
@@ -39,15 +40,16 @@
              login_user(user, remember=True)
              flash(_(u"you are now logged in as: '%(nickname)s'", nickname=user.nickname), category="success")
              return redirect_back(url_for("index"))
-@@ -2384,6 +2404,7 @@
+@@ -2384,6 +2405,8 @@
  @login_required
  def logout():
      if current_user is not None and current_user.is_authenticated:
++        global vlogout
 +        vlogout = 1
          logout_user()
      return redirect(url_for('login'))
  
-@@ -3088,6 +3109,21 @@
+@@ -3088,6 +3111,21 @@
          if "config_ebookconverter" in to_save:
              content.config_ebookconverter = int(to_save["config_ebookconverter"])
  
