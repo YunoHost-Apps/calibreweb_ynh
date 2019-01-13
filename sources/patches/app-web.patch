@@ -1,5 +1,5 @@
---- ./calibre-web-Yunohost_integration/cps/web.py	2019-01-13 16:13:23.000000000 +0100
-+++ ./ori-calibre-web-master/cps/web.py	2019-01-12 09:01:08.000000000 +0100
+--- a/cps/web.py	2019-01-13 16:13:23.000000000 +0100
++++ b/cps/web.py	2019-01-12 09:01:08.000000000 +0100
 @@ -58,8 +58,6 @@
  import server
  from reverseproxy import ReverseProxied
