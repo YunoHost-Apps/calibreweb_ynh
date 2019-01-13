@@ -92,7 +92,7 @@ pip install --target $final_path/vendor -r $final_path/requirements.txt
 #=================================================
 #Cannot use empty string for X-script-name, causes an issue in the python prg
 if [ $path_url = "/" ] ; then
-	ynh_replace_string "X-Script-Name   __PATH__;" "X-Script-Name   /$app;" ../conf/nginx.conf
+	ynh_replace_string "X-Script-Name				__PATH__;" "X-Script-Name				$app;" ../conf/nginx.conf
 fi
 
 # Create a dedicated nginx config
