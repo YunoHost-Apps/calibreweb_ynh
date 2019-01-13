@@ -1,71 +1,71 @@
---- a/cps/web.py	2019-01-13 16:13:23.000000000 +0100
-+++ b/cps/web.py	2019-01-12 09:01:08.000000000 +0100
-@@ -58,8 +58,6 @@
+--- a/cps/web.py	2019-01-12 09:01:08.000000000 +0100
++++ b/cps/web.py	2019-01-13 16:13:23.000000000 +0100
+@@ -58,6 +58,8 @@
  import server
  from reverseproxy import ReverseProxied
  
--global vlogout
--
++global vlogout
++
  try:
      from googleapiclient.errors import HttpError
  except ImportError:
-@@ -2362,28 +2360,10 @@
+@@ -2360,10 +2362,28 @@
          return redirect(url_for('basic_configuration'))
      if current_user is not None and current_user.is_authenticated:
          return redirect(url_for('index'))
--    auth_user = request.headers.get('X-Remote-User')
--    if auth_user and config.config_use_ldap and not vlogout:
--        vlogout = 0
--        user = ub.session.query(ub.User).filter(func.lower(ub.User.nickname) == auth_user.strip().lower()).first()
--        login_user(user, remember=True)
--        flash(_(u"you are now logged in as: '%(nickname)s'", nickname=user.nickname), category="success")
--        return redirect(url_for("index"))
++    auth_user = request.headers.get('X-Remote-User')
++    if auth_user and config.config_use_ldap and not vlogout:
++        vlogout = 0
++        user = ub.session.query(ub.User).filter(func.lower(ub.User.nickname) == auth_user.strip().lower()).first()
++        login_user(user, remember=True)
++        flash(_(u"you are now logged in as: '%(nickname)s'", nickname=user.nickname), category="success")
++        return redirect(url_for("index"))
      if request.method == "POST":
          form = request.form.to_dict()
          user = ub.session.query(ub.User).filter(func.lower(ub.User.nickname) == form['username'].strip().lower()).first()
--        if config.config_use_ldap and user:
--            import ldap
--            try:
--                ub.User.try_login(form['username'], form['password'])
--                login_user(user, remember=True)
--                flash(_(u"you are now logged in as: '%(nickname)s'", nickname=user.nickname), category="success")
--                return redirect_back(url_for("index"))
--            except ldap.INVALID_CREDENTIALS:
--                ipAdress = request.headers.get('X-Forwarded-For', request.remote_addr)
--                app.logger.info('LDAP Login failed for user "' + form['username'] + '" IP-adress: ' + ipAdress)
--                flash(_(u"Wrong Username or Password"), category="error")
--        elif user and check_password_hash(user.password, form['password']) and user.nickname is not "Guest":
-+        if user and check_password_hash(user.password, form['password']) and user.nickname is not "Guest":
+-        if user and check_password_hash(user.password, form['password']) and user.nickname is not "Guest":
++        if config.config_use_ldap and user:
++            import ldap
++            try:
++                ub.User.try_login(form['username'], form['password'])
++                login_user(user, remember=True)
++                flash(_(u"you are now logged in as: '%(nickname)s'", nickname=user.nickname), category="success")
++                return redirect_back(url_for("index"))
++            except ldap.INVALID_CREDENTIALS:
++                ipAdress = request.headers.get('X-Forwarded-For', request.remote_addr)
++                app.logger.info('LDAP Login failed for user "' + form['username'] + '" IP-adress: ' + ipAdress)
++                flash(_(u"Wrong Username or Password"), category="error")
++        elif user and check_password_hash(user.password, form['password']) and user.nickname is not "Guest":
              login_user(user, remember=True)
              flash(_(u"you are now logged in as: '%(nickname)s'", nickname=user.nickname), category="success")
              return redirect_back(url_for("index"))
-@@ -2404,7 +2384,6 @@
+@@ -2384,6 +2404,7 @@
  @login_required
  def logout():
      if current_user is not None and current_user.is_authenticated:
--        vlogout = 1
++        vlogout = 1
          logout_user()
      return redirect(url_for('login'))
  
-@@ -3109,21 +3088,6 @@
+@@ -3088,6 +3109,21 @@
          if "config_ebookconverter" in to_save:
              content.config_ebookconverter = int(to_save["config_ebookconverter"])
  
--        #LDAP configuratop,
--        if "config_use_ldap" in to_save and to_save["config_use_ldap"] == "on":
--            if not "config_ldap_provider_url" in to_save or not "config_ldap_dn" in to_save:
--                ub.session.commit()
--                flash(_(u'Please enter a LDAP provider and a DN'), category="error")
--                return render_title_template("config_edit.html", content=config, origin=origin,
--                                             gdrive=gdriveutils.gdrive_support, gdriveError=gdriveError,
--                                             goodreads=goodreads_support, title=_(u"Basic Configuration"),
--                                             page="config")
--            else:
--                content.config_use_ldap = 1
--                content.config_ldap_provider_url = to_save["config_ldap_provider_url"]
--                content.config_ldap_dn = to_save["config_ldap_dn"]
--                db_change = True
--
++        #LDAP configuratop,
++        if "config_use_ldap" in to_save and to_save["config_use_ldap"] == "on":
++            if not "config_ldap_provider_url" in to_save or not "config_ldap_dn" in to_save:
++                ub.session.commit()
++                flash(_(u'Please enter a LDAP provider and a DN'), category="error")
++                return render_title_template("config_edit.html", content=config, origin=origin,
++                                             gdrive=gdriveutils.gdrive_support, gdriveError=gdriveError,
++                                             goodreads=goodreads_support, title=_(u"Basic Configuration"),
++                                             page="config")
++            else:
++                content.config_use_ldap = 1
++                content.config_ldap_provider_url = to_save["config_ldap_provider_url"]
++                content.config_ldap_dn = to_save["config_ldap_dn"]
++                db_change = True
++
          # Remote login configuration
          content.config_remote_login = ("config_remote_login" in to_save and to_save["config_remote_login"] == "on")
          if not content.config_remote_login:
