@@ -25,9 +25,6 @@ path_url=$YNH_APP_ARG_PATH
 admin=$YNH_APP_ARG_ADMIN
 is_public=$YNH_APP_ARG_IS_PUBLIC
 language=$YNH_APP_ARG_LANGUAGE
-ynh_print_OFF
-pass=$YNH_APP_ARG_PASSWORD
-ynh_print_ON
 app=$YNH_APP_INSTANCE_NAME
 upload=$6
 public_library=$7
@@ -161,7 +158,7 @@ chown -R $app:$app /var/log/$app
 ynh_print_info "Setting up database and settings"
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
 ynh_systemd_action -l "INFO in server: Starting Gevent server"
-#systemctl start $app
+
 #sleep required on low spec like raspberryPi
 sleep 2s
 ynh_systemd_action -a stop
@@ -175,11 +172,11 @@ conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WH
 eval sqlite3 $final_path/app.db "$conf"
 
 #mise à jour du mot de passe (je ne sais pas pourquoi, je n'arrive pas à l'intégrer dans le fichier de conf, pb de " et ')
-ynh_print_OFF
+#ynh_print_OFF
 #had to set it on two lines or package_linter cries like a baby...
-pass=$(python ../conf/generate_password_hash.py "$pass" $final_path/vendor)
-sqlite3 $final_path/app.db "UPDATE user SET password='$pass' WHERE ID=1"
-ynh_print_ON
+#pass=$(python ../conf/generate_password_hash.py "$pass" $final_path/vendor)
+#sqlite3 $final_path/app.db "UPDATE user SET password='$pass' WHERE ID=1"
+#ynh_print_ON
 
 #=================================================
 # SECURE FILES AND DIRECTORIES

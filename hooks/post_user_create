@@ -1,0 +1,52 @@
+#!/bin/bash
+# Source YunoHost helpers
+source /usr/share/yunohost/helpers
+#reste à insérer la gestion des répertoires
+
+app=calibreweb
+username=$1
+mail=$2
+pass_clear=$3
+final_path=$(ynh_app_setting_get $app final_path)
+
+get_db() {
+        # $1 = nom de la table
+        # cette ligne de malade : 
+        # 1/ Recupere le schém de la table user
+        # 2/ En extrait les noms de champs (en prenant le premier mot après la tabulation)
+        # 3/ en supprime les clé UNIQUE, PRIMARY et CHECK dont on ne veut pas
+        # 4/ remplace la liste avec retour à la ligne par une liste séparé par des virgules
+        # 5/ Enlève la dernière virgule
+        sqlite3 ./app.db ".schema $1" | awk '/\t/ {print $1}' | grep -v -e "UNIQUE" -e "PRIMARY" -e "CHECK" -e "FOREIGN" | awk '{printf "%s, ", $0}' | head -c -2
+}
+
+######################################
+#1 get admin user and id from database
+######################################
+#we take the admin user as we're sure there is at least this one
+
+admin=$(ynh_app_setting_get $app admin)
+echo "admin : $admin"
+admin_id=$(sqlite3 $final_path/app.db "SELECT id FROM user WHERE nickname='$admin'")
+
+######################################
+#get user table structure
+######################################
+table_schema=$(get_db "user")
+
+######################################
+#Build new entry for user
+######################################
+insert_user=$table_schema
+insert_user="${insert_user/id/null}" #so that a new entry is created
+insert_user="${insert_user/nickname/\'$username\'}"
+insert_user="${insert_user/role/0}" #standard role
+pass_hash=$(python /etc/yunohost/apps/$app/conf/generate_password_hash.py "$pass_clear" $final_path/vendor)
+insert_user="${insert_user/password/\$pass_hash}" #we get the same pass even if it's not use with LDAP, ones never knows...
+insert_user="${insert_user/email/\'$mail\'}"
+
+#######################################
+# Insert New entry in database
+#######################################
+
+sqlite3 $final_path/app.db "INSERT INTO user ($table_schema) SELECT $insert_user FROM user WHERE ID = $admin_id;"

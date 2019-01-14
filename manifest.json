@@ -6,7 +6,7 @@
         "en": "Calibre-web for Yunohost",
         "fr": "Calibre-web pour Yunohost"
     },
-    "version": "0.91~ynh2",
+    "version": "0.92~ynh3",
     "url": "https://github.com/janeczku/calibre-web",
     "license": "free",
     "maintainer": {
@@ -14,7 +14,7 @@
         "email": "misterl56@hotmail.com"
     },
     "requirements": {
-        "yunohost": ">= 2.7.14"
+        "yunohost": ">= 3.0.0"
     },
     "multi_instance": true,
     "services": [
@@ -61,18 +61,18 @@
             },
             {
                 "name": "language",
-		"optional": true,
+                "optional": true,
                 "ask": {
                     "en": "Select a default language (you may change it later in the app)",
                     "fr": "Choisissez une langue par défaut (vous pourrez la changer ultérieurement dans l'application)"
                 },
-				"choices": [ "fr", "en", "es", "de"],
+                "choices": [ "fr", "en", "es", "de"],
                 "default": "fr"
             },
             {
                 "name": "upload",
-		"type":"boolean",
-		"optional": true,
+                "type":"boolean",
+                "optional": true,
                 "ask": {
                     "en": "Do you want to allow uploading of books (you may change it later in the app)?",
                     "fr": "Voulez vous autoriser l'upload de livres (vous pourrez le changer ultérieurement dans l'application)?"
@@ -81,22 +81,13 @@
             },
             {
                 "name": "public_library",
-		"type":"boolean",
-		"optional": true,
+                "type":"boolean",
+                "optional": true,
                 "ask": {
                     "en": "Do you want to allow access to the library to all Yunohost users?",
                     "fr": "Voulez vous autoriser l'accès à la bibliothèque à tous les utilisateurs Yunohost?"
                 },
                 "default": false
-            },
-            {
-                "name": "password",
-                "type": "password",
-                "ask": {
-                    "en": "Set the administrator password",
-                    "fr": "Définissez le mot de passe administrateur"
-                },
-                "example": "Averystrongpassword"
             }
         ]
     }
