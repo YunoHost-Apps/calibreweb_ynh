@@ -1,18 +1,42 @@
---- ./ori-calibre-web/cps/web.py	2019-01-12 09:01:08.000000000 +0100
-+++ ./calibre-web-Yunohost_integration/cps/web.py	2019-01-13 20:11:57.000000000 +0100
-@@ -58,6 +58,8 @@
+--- ./calibre-web-9e5fa45df7cd840d8a26d25f953857a13d6bc5de/cps/web.py	2019-01-16 17:50:51.000000000 +0100
++++ "/home/nicolas/Nextcloud/06 - Technique/08 - git/calibre-web/cps/web.py"	2019-01-19 10:55:51.728967203 +0100
+@@ -58,6 +58,11 @@
  import server
  from reverseproxy import ReverseProxied
  
++#Yunohost LDAP integration - 1
 +vlogout = 0
++#END Yunohost LDAP integration -1
++
 +
  try:
      from googleapiclient.errors import HttpError
  except ImportError:
-@@ -2360,10 +2362,29 @@
+@@ -1072,7 +1077,7 @@
+         json_dumps = json.dumps([dict(name=r.name.replace('|',',')) for r in entries])
+         return json_dumps
+ 
+-
++		
+ @app.route("/get_tags_json", methods=['GET', 'POST'])
+ @login_required_if_no_ano
+ def get_tags_json():
+@@ -1192,8 +1197,8 @@
+             r = requests.get(repository_url + '/git/commits/' + commit['object']['sha'])
+             r.raise_for_status()
+             update_data = r.json()
+-        except requests.exceptions.HTTPError as e:
+-            status['error'] = _(u'HTTP Error') + ' ' + str(e)
++        except requests.exceptions.HTTPError as ex:
++            status['error'] = _(u'HTTP Error') + ' ' + str(ex)
+         except requests.exceptions.ConnectionError:
+             status['error'] = _(u'Connection error')
+         except requests.exceptions.Timeout:
+@@ -2360,10 +2365,36 @@
          return redirect(url_for('basic_configuration'))
      if current_user is not None and current_user.is_authenticated:
          return redirect(url_for('index'))
++#Yunohost integration - 2
 +    auth_user = request.headers.get('X-Remote-User')
 +    global vlogout
 +    if auth_user and config.config_use_ldap and not vlogout:
@@ -21,10 +45,15 @@
 +        login_user(user, remember=True)
 +        flash(_(u"you are now logged in as: '%(nickname)s'", nickname=user.nickname), category="success")
 +        return redirect(url_for("index"))
++#END Yunohost integration - 2
      if request.method == "POST":
          form = request.form.to_dict()
          user = ub.session.query(ub.User).filter(func.lower(ub.User.nickname) == form['username'].strip().lower()).first()
 -        if user and check_password_hash(user.password, form['password']) and user.nickname is not "Guest":
++#Yunohost integration - 3
++#        if user and check_password_hash(user.password, form['password']) and user.nickname is not "Guest":
++#END Yunohost integration - 3
++#Yunohost Integration - 4
 +        if config.config_use_ldap and user:
 +            import ldap
 +            try:
@@ -37,23 +66,27 @@
 +                app.logger.info('LDAP Login failed for user "' + form['username'] + '" IP-adress: ' + ipAdress)
 +                flash(_(u"Wrong Username or Password"), category="error")
 +        elif user and check_password_hash(user.password, form['password']) and user.nickname is not "Guest":
++#End Yunohost Integration - 4
              login_user(user, remember=True)
              flash(_(u"you are now logged in as: '%(nickname)s'", nickname=user.nickname), category="success")
              return redirect_back(url_for("index"))
-@@ -2384,6 +2405,8 @@
+@@ -2384,6 +2415,10 @@
  @login_required
  def logout():
      if current_user is not None and current_user.is_authenticated:
++#Yunohost Integration - 5
 +        global vlogout
 +        vlogout = 1
++#End Yunohost integration - 5
          logout_user()
      return redirect(url_for('login'))
  
-@@ -3088,6 +3111,21 @@
+@@ -3088,6 +3123,23 @@
          if "config_ebookconverter" in to_save:
              content.config_ebookconverter = int(to_save["config_ebookconverter"])
  
-+        #LDAP configuratop,
++#Yunohost Integration - 6
++        #LDAP configuration,
 +        if "config_use_ldap" in to_save and to_save["config_use_ldap"] == "on":
 +            if not "config_ldap_provider_url" in to_save or not "config_ldap_dn" in to_save:
 +                ub.session.commit()
@@ -67,6 +100,7 @@
 +                content.config_ldap_provider_url = to_save["config_ldap_provider_url"]
 +                content.config_ldap_dn = to_save["config_ldap_dn"]
 +                db_change = True
++#END Yunohost integration - 6
 +
          # Remote login configuration
          content.config_remote_login = ("config_remote_login" in to_save and to_save["config_remote_login"] == "on")
