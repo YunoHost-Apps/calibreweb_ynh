@@ -1,5 +1,5 @@
---- ./calibre-web-9e5fa45df7cd840d8a26d25f953857a13d6bc5de/cps/ub.py	2019-01-16 17:50:51.000000000 +0100
-+++ "/home/nicolas/Nextcloud/06 - Technique/08 - git/calibre-web/cps/ub.py"	2019-01-19 11:03:55.799293389 +0100
+--- z/cps/ub.py	2019-01-16 17:50:51.000000000 +0100
++++ b/cps/ub.py	2019-01-19 11:03:55.799293389 +0100
 @@ -148,6 +148,16 @@
      def __repr__(self):
          return '<User %r>' % self.nickname
