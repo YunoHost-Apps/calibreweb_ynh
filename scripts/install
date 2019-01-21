@@ -130,7 +130,7 @@ ynh_multimedia_addaccess $app
 
 if [ $is_public -eq 1 ]; then 						#app is public, library is public
 	calibre_dir=$DOSSIER_MEDIA/Share/eBook
-elif [$is_public -eq 0 ] && [ $public_library -eq 1 ]; then  #app is private, library is public
+elif [ $is_public -eq 0 ] && [ $public_library -eq 1 ]; then  #app is private, library is public
 	calibre_dir=$DOSSIER_MEDIA/Share/eBook
 else 												#app is private, library is private
 	calibre_dir=$DOSSIER_MEDIA/$admin/eBook

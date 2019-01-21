@@ -87,7 +87,7 @@
                     "en": "Do you want to allow access to the library to all Yunohost users?",
                     "fr": "Voulez vous autoriser l'accès à la bibliothèque à tous les utilisateurs Yunohost?"
                 },
-                "default": false
+                "default": true
             }
         ]
     }
