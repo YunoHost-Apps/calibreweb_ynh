@@ -4,6 +4,16 @@ PKG_DEPENDENCIES="sqlite3 python-pip imagemagick"
 DOSSIER_MEDIA=/home/yunohost.multimedia
 create_dir=0
 
+get_db() {
+        # $1 = nom de la table
+        # cette ligne de malade : 
+        # 1/ Recupere le schém de la table user
+        # 2/ En extrait les noms de champs (en prenant le premier mot après la tabulation)
+        # 3/ en supprime les clé UNIQUE, PRIMARY et CHECK dont on ne veut pas
+        # 4/ remplace la liste avec retour à la ligne par une liste séparé par des virgules
+        # 5/ Enlève la dernière virgule
+    sqlite3 $final_path/app.db ".schema $1" | awk '/\t/ {print $1}' | grep -v -e "UNIQUE" -e "PRIMARY" -e "CHECK" -e "FOREIGN" | awk '{printf "%s, ", $0}' | head -c -2
+}
 
 #=================================================
 # EXPERIMENTAL HELPERS

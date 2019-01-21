@@ -28,6 +28,10 @@ language=$YNH_APP_ARG_LANGUAGE
 app=$YNH_APP_INSTANCE_NAME
 upload=$6
 public_library=$7
+#if app is public, we assume library is public
+if [ $is_public -eq 1 ]; then
+	public_library=1
+fi
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
@@ -177,6 +181,33 @@ eval sqlite3 $final_path/app.db "$conf"
 #pass=$(python ../conf/generate_password_hash.py "$pass" $final_path/vendor)
 #sqlite3 $final_path/app.db "UPDATE user SET password='$pass' WHERE ID=1"
 #ynh_print_ON
+
+#Creation des autres utilisateurs
+if [ $public_library -eq 1 ]; then
+	table_schema=$(get_db "user")
+	
+	for i in $(ynh_user_list); do
+		if [ $i = $admin ]; then continue; fi
+		mail=$(ynh_user_get_info $i 'mail')
+		######################################
+		#Build new entry for user
+		######################################
+		insert_user=$table_schema
+		insert_user="${insert_user/id/null}" #so that a new entry is created
+		insert_user="${insert_user/nickname/\'$i\'}"
+		insert_user="${insert_user/role/0}" #standard role
+	#	pass_hash=$(python /etc/yunohost/apps/$app/conf/generate_password_hash.py "$pass_clear" $final_path/vendor)
+	#	insert_user="${insert_user/password/\'$pass_hash\'}" #we get the same pass even if it's not thanks to LDAP, ones never knows...
+		insert_user="${insert_user/email/\'$mail\'}"
+		
+		#######################################
+		# Insert New entry in database
+		#######################################
+		
+		sqlite3 $final_path/app.db "INSERT INTO user ($table_schema) SELECT $insert_user FROM user WHERE ID = 1;"
+	
+	done
+fi
 
 #=================================================
 # SECURE FILES AND DIRECTORIES

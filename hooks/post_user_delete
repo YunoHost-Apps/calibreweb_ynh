@@ -2,7 +2,11 @@
 # Source YunoHost helpers
 source /usr/share/yunohost/helpers
 
-app=calibreweb
+#pour récupérer l'app_id, on prend le nom du fichier puis on retire les 3 premiers caratères
+app=`basename "$0"`
+app=${app:3}
+source /etc/yunohost/apps/$app/scripts/_common.sh
+
 username=$1
 final_path=$(ynh_app_setting_get $app final_path)
 del_tables_user="book_read_link remote_auth_token downloads shelf bookmark"
@@ -12,7 +16,6 @@ del_id() {
         #$1=table
         #$2=id_type
         #$3=id
-
         sqlite3 $final_path/app.db "DELETE FROM $1 WHERE $2='$3'" 
 }
 
@@ -20,16 +23,14 @@ del_id() {
 user_id=$(sqlite3 $final_path/app.db "SELECT id from user WHERE nickname='$username'")
 shelf_id=$(sqlite3 $final_path/app.db "SELECT id from shelf WHERE user_id='$user_id'")
 
-
 #Delete all entry with dependencies for user
+#pas de check sur l'existence de l'utilisateur car fonctionne sans
 for i in $del_tables_shelf
 do
-        echo "$i"
         del_id "$i" "shelf" $shelf_id
 done
 for i in $del_tables_user
 do
-        echo "$i"
         del_id "$i" "user_id" $user_id
 done
 
