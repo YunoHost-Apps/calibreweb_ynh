@@ -72,7 +72,7 @@ ynh_add_nginx_config
 # UPGRADE DEPENDENCIES
 #=================================================
 
-ynh_install_app_dependencies $pkg_dependencies
+ynh_install_app_dependencies $PKG_DEPENDENCIES
 pip install --target $final_path/vendor -r $final_path/requirements.txt
 
 #=================================================
