@@ -95,6 +95,11 @@ ynh_backup_if_checksum_is_different "$final_path/app.db"
 # Recalculate and store the checksum of the file for the next upgrade.
 ynh_store_file_checksum "$final_path/app.db"
 
+#build multimedia directory
+#Create multimedia directory but we do not change the calibre_dir : It's the user to make this choice.
+ynh_multimedia_build_main_dir
+ynh_multimedia_addaccess $app
+
 #=================================================
 # SETUP LOGROTATE
 #=================================================
