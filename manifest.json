@@ -84,8 +84,8 @@
                 "type":"boolean",
                 "optional": true,
                 "ask": {
-                    "en": "Do you want to allow access to the library to all Yunohost users?",
-                    "fr": "Voulez vous autoriser l'accès à la bibliothèque à tous les utilisateurs Yunohost?"
+                    "en": "Do you want to allow access to the library to all Yunohost users? Yes will set the library in /home/yunohost.multimedia/share/eBook",
+                    "fr": "Voulez vous autoriser l'accès à la bibliothèque à tous les utilisateurs Yunohost? Yes parametrera la bibliothèque pour /home/yunohost.multimedia/share/eBook"
                 },
                 "default": true
             }
