@@ -169,7 +169,7 @@ ynh_systemd_action -a stop
 
 
 #set database settings as per conf file
-conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) WHERE ID=1\""
+conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
 eval sqlite3 $final_path/app.db "$conf"
 
 conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""

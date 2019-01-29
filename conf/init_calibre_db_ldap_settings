@@ -1,3 +1,3 @@
 config_use_ldap=1,
 config_ldap_provider_url=\'localhost:389\',
-config_ldap_dn=\'uid=%s,ou=users,dc=yunohost,dc=org\',
+config_ldap_dn=\'uid=%s,ou=users,dc=yunohost,dc=org\'

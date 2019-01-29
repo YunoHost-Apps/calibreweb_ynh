@@ -99,7 +99,8 @@ ynh_multimedia_addaccess $app
 ynh_backup_if_checksum_is_different "$final_path/app.db"
 
 #set database settings as per conf file : restart server so that app.db is regenerated, then add new ldap settings
-ynh_systemd_action -a restart -l "INFO in server: Starting Gevent server"
+ynh_systemd_action -a stop
+ynh_systemd_action -l "INFO in server: Starting Gevent server"
 conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
 eval sqlite3 $final_path/app.db "$conf"
 
