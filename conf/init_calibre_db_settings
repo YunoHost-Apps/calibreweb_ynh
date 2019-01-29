@@ -8,7 +8,4 @@ config_use_goodreads=0,
 config_logfile=\'\',
 config_converterpath=\'\',
 config_calibre=\'\',
-config_use_ldap=1,
-config_ldap_provider_url=\'localhost:389\',
-config_ldap_dn=\'uid=%s,ou=users,dc=yunohost,dc=org\',
 config_uploading=\'$upload\'

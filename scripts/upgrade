@@ -89,21 +89,22 @@ ynh_system_user_create $app
 # ...
 #=================================================
 
-### Verify the checksum of a file, stored by `ynh_store_file_checksum` in the install script.
-### And create a backup of this file if the checksum is different. So the file will be backed up if the admin had modified it.
-ynh_backup_if_checksum_is_different "$final_path/app.db"
-
-#set database settings as per conf file
-conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) WHERE ID=1\""
-eval sqlite3 $final_path/app.db "$conf"
-
-# Recalculate and store the checksum of the file for the next upgrade.
-ynh_store_file_checksum "$final_path/app.db"
-
 #build multimedia directory
 #Create multimedia directory but we do not change the calibre_dir : It's the user to make this choice.
 ynh_multimedia_build_main_dir
 ynh_multimedia_addaccess $app
+
+### Verify the checksum of a file, stored by `ynh_store_file_checksum` in the install script.
+### And create a backup of this file if the checksum is different. So the file will be backed up if the admin had modified it.
+ynh_backup_if_checksum_is_different "$final_path/app.db"
+
+#set database settings as per conf file : restart server so that app.db is regenerated, then add new ldap settings
+ynh_systemd_action -a restart -l "INFO in server: Starting Gevent server"
+conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
+eval sqlite3 $final_path/app.db "$conf"
+
+# Recalculate and store the checksum of the file for the next upgrade.
+ynh_store_file_checksum "$final_path/app.db"
 
 #=================================================
 # SETUP LOGROTATE
