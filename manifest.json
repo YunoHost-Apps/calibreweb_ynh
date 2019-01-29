@@ -57,14 +57,22 @@
                     "en": "Is it a public application?",
                     "fr": "Est-ce une application publique ?"
                 },
+                "help":{
+                	"en":"No will set the library in /home/yunohost.multimedia/admin/eBook, but if you set thje library as public",
+                	"fr":"Non parametrera la bibliothèque pour /home/yunohost.multimedia/admin/eBook sauf si la bibliothèque est également publique"
+                },
                 "default": false
             },
             {
                 "name": "language",
                 "optional": true,
                 "ask": {
-                    "en": "Select a default language (you may change it later in the app)",
-                    "fr": "Choisissez une langue par défaut (vous pourrez la changer ultérieurement dans l'application)"
+                    "en": "Select a default language",
+                    "fr": "Choisissez une langue par défaut"
+                },
+                "help":{
+                	"en":"You may change it later in the app",
+                	"fr":"Vous pourrez la changer ultérieurement dans l'application"
                 },
                 "choices": [ "fr", "en", "es", "de"],
                 "default": "fr"
@@ -74,8 +82,12 @@
                 "type":"boolean",
                 "optional": true,
                 "ask": {
-                    "en": "Do you want to allow uploading of books (you may change it later in the app)?",
-                    "fr": "Voulez vous autoriser l'upload de livres (vous pourrez le changer ultérieurement dans l'application)?"
+                    "en": "Do you want to allow uploading of books?",
+                    "fr": "Voulez vous autoriser l'upload de livres?"
+                },
+                "help":{
+                	"en":"You may change it later in the app",
+                	"fr":"Vous pourrez le changer ultérieurement dans l'application"
                 },
                 "default": false
             },
@@ -84,8 +96,12 @@
                 "type":"boolean",
                 "optional": true,
                 "ask": {
-                    "en": "Do you want to allow access to the library to all Yunohost users? Yes will set the library in /home/yunohost.multimedia/share/eBook",
-                    "fr": "Voulez vous autoriser l'accès à la bibliothèque à tous les utilisateurs Yunohost? Yes parametrera la bibliothèque pour /home/yunohost.multimedia/share/eBook"
+                    "en": "Do you want to allow access to the library to all Yunohost users? ",
+                    "fr": "Voulez vous autoriser l'accès à la bibliothèque à tous les utilisateurs Yunohost?"
+                },
+                "help":{
+                	"en":"Yes will set the library in /home/yunohost.multimedia/share/eBook",
+                	"fr":"Oui parametrera la bibliothèque pour /home/yunohost.multimedia/share/eBook"
                 },
                 "default": true
             }
