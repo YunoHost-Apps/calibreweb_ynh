@@ -85,17 +85,22 @@ pip install --target $final_path/vendor -r $final_path/requirements.txt
 # Create a dedicated user (if not existing)
 ynh_system_user_create $app
 
+# Set permissions on app files (required to be able to update database)
+chown -R $app: $final_path
 
 #=================================================
 # SPECIFIC UPGRADE
 #=================================================
-# ...
+#build multimedia directory
 #=================================================
 
-#build multimedia directory
 #Create multimedia directory but we do not change the calibre_dir : It's the user to make this choice.
 ynh_multimedia_build_main_dir
 ynh_multimedia_addaccess $app
+
+#=================================================
+#Update database structure
+#=================================================
 
 ### Verify the checksum of a file, stored by `ynh_store_file_checksum` in the install script.
 ### And create a backup of this file if the checksum is different. So the file will be backed up if the admin had modified it.
