@@ -58,7 +58,7 @@
                     "fr": "Est-ce une application publique ?"
                 },
                 "help":{
-                	"en":"No will set the library in /home/yunohost.multimedia/admin/eBook, but if you set thje library as public",
+                	"en":"No will set the library in /home/yunohost.multimedia/admin/eBook, except if you set the library as public",
                 	"fr":"Non parametrera la bibliothèque pour /home/yunohost.multimedia/admin/eBook sauf si la bibliothèque est également publique"
                 },
                 "default": false
