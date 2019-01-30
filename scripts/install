@@ -25,13 +25,13 @@ path_url=$YNH_APP_ARG_PATH
 admin=$YNH_APP_ARG_ADMIN
 is_public=$YNH_APP_ARG_IS_PUBLIC
 language=$YNH_APP_ARG_LANGUAGE
-ynh_print_OFF
-pass=$YNH_APP_ARG_PASSWORD
-ynh_print_ON
 app=$YNH_APP_INSTANCE_NAME
-#removing / at the end for consistency
-calibre_dir=${3%/}
-upload=$7
+upload=$6
+public_library=$7
+#if app is public, we assume library is public
+if [ $is_public -eq 1 ]; then
+	public_library=1
+fi
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
@@ -56,7 +56,7 @@ ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
 ynh_app_setting_set $app admin $admin
 ynh_app_setting_set $app is_public $is_public
-ynh_app_setting_set $app calibre_dir $calibre_dir
+
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -80,13 +80,12 @@ ynh_print_info "Downloading sources to $final_path"
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source "$final_path"
 
-
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
 
 ynh_print_info "Installing dependencies and pip packages"
-ynh_install_app_dependencies $pkg_dependencies
+ynh_install_app_dependencies $PKG_DEPENDENCIES
 pip install --target $final_path/vendor -r $final_path/requirements.txt
 
 #=================================================
@@ -94,7 +93,7 @@ pip install --target $final_path/vendor -r $final_path/requirements.txt
 #=================================================
 #Cannot use empty string for X-script-name, causes an issue in the python prg
 if [ $path_url = "/" ] ; then
-	ynh_replace_string "X-Script-Name   __PATH__;" "X-Script-Name   /$app;" ../conf/nginx.conf
+	ynh_replace_string "        proxy_set_header		X-Script-Name" "#       proxy_set_header		X-Script-Name" ../conf/nginx.conf
 fi
 
 # Create a dedicated nginx config
@@ -120,25 +119,30 @@ ynh_add_systemd_config
 # CREATE FILES AND DIRECTORIES
 #=================================================
 
+#Logic is as follow : if app is set to be publicly accessible, we will assume that the library should be set in "Share" multimedia directory
+# If app is set to be private but access is requested for all user, we will assume the same
+# If app is set to be private but access is limited to the admin user, we will set it inside his own multimedia directory.
+# Access to the app is managed in the SSOwat part of the script.
 
-#Check if library folder exists. If not create it
-if [ ! -e "$calibre_dir" ]; then
-	ynh_print_info "Create calibre library folder $calibre_dir"
-	mkdir -p $calibre_dir
-	chown -R $app:$app $calibre_dir
-	create_dir=1
+#build multimedia directory
+ynh_multimedia_build_main_dir
+ynh_multimedia_addaccess $app
+
+if [ $is_public -eq 1 ]; then 						#app is public, library is public
+	calibre_dir=$DOSSIER_MEDIA/share/eBook
+elif [ $is_public -eq 0 ] && [ $public_library -eq 1 ]; then  #app is private, library is public
+	calibre_dir=$DOSSIER_MEDIA/share/eBook
+else 												#app is private, library is private
+	calibre_dir=$DOSSIER_MEDIA/$admin/eBook
 fi
+
 #Check if metadata.db file exists. If not create it (empty library)
 if [ ! -e "$calibre_dir"/metadata.db ]; then
 	cp -a ../conf/metadata.db.empty $calibre_dir/metadata.db
 	chown $app:$app $calibre_dir/*
 fi
 
-
-#ynh_multimedia_build_main_dir
-#ynh_multimedia_addfolder "eBook" "$calibre_dir"
-#ynh_multimedia_addaccess $app
-
+ynh_app_setting_set $app calibre_dir $calibre_dir
 
 #=================================================
 # SETUP LOGROTATE
@@ -158,25 +162,52 @@ chown -R $app:$app /var/log/$app
 ynh_print_info "Setting up database and settings"
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
 ynh_systemd_action -l "INFO in server: Starting Gevent server"
-#systemctl start $app
+
 #sleep required on low spec like raspberryPi
 sleep 2s
 ynh_systemd_action -a stop
 
 
 #set database settings as per conf file
-conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) WHERE ID=1\""
+conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
 eval sqlite3 $final_path/app.db "$conf"
 
 conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""
 eval sqlite3 $final_path/app.db "$conf"
 
 #mise à jour du mot de passe (je ne sais pas pourquoi, je n'arrive pas à l'intégrer dans le fichier de conf, pb de " et ')
-ynh_print_OFF
+#ynh_print_OFF
 #had to set it on two lines or package_linter cries like a baby...
-pass=$(python ../conf/generate_password_hash.py "$pass" $final_path/vendor)
-sqlite3 $final_path/app.db "UPDATE user SET password='$pass' WHERE ID=1"
-ynh_print_ON
+#pass=$(python ../conf/generate_password_hash.py "$pass" $final_path/vendor)
+#sqlite3 $final_path/app.db "UPDATE user SET password='$pass' WHERE ID=1"
+#ynh_print_ON
+
+#Creation des autres utilisateurs
+if [ $public_library -eq 1 ]; then
+	table_schema=$(get_db "user")
+	
+	for i in $(ynh_user_list); do
+		if [ $i = $admin ]; then continue; fi
+		mail=$(ynh_user_get_info $i 'mail')
+		######################################
+		#Build new entry for user
+		######################################
+		insert_user=$table_schema
+		insert_user="${insert_user/id/null}" #so that a new entry is created
+		insert_user="${insert_user/nickname/\'$i\'}"
+		insert_user="${insert_user/role/0}" #standard role
+	#	pass_hash=$(python /etc/yunohost/apps/$app/conf/generate_password_hash.py "$pass_clear" $final_path/vendor)
+	#	insert_user="${insert_user/password/\'$pass_hash\'}" #we get the same pass even if it's not thanks to LDAP, ones never knows...
+		insert_user="${insert_user/email/\'$mail\'}"
+		
+		#######################################
+		# Insert New entry in database
+		#######################################
+		
+		sqlite3 $final_path/app.db "INSERT INTO user ($table_schema) SELECT $insert_user FROM user WHERE ID = 1;"
+	
+	done
+fi
 
 #=================================================
 # SECURE FILES AND DIRECTORIES
@@ -211,6 +242,11 @@ then
 	# unprotected_uris allows SSO credentials to be passed anyway.
 	ynh_app_setting_set $app unprotected_uris "/"
 fi
+if [ $public_library -eq 0 ]; then
+	yunohost app addaccess $app -u $admin
+fi
+
+
 
 #=================================================
 # RELOAD NGINX
@@ -218,11 +254,3 @@ fi
 ynh_print_info "Reload nginx and start $app"
 systemctl reload nginx
 ynh_systemd_action -l "INFO in server: Starting Gevent server"
-
-#=================================================
-# WARNING FOR READ ACCESS
-#=================================================
-
-if [[ $create_dir = 0 ]] ; then
-	ynh_print_warn "Please, give required access to $app user to the $calibre_dir folder."
-fi

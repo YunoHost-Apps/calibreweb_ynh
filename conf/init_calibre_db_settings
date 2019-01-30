@@ -8,4 +8,4 @@ config_use_goodreads=0,
 config_logfile=\'\',
 config_converterpath=\'\',
 config_calibre=\'\',
-config_uploading=\'$upload\'
+config_uploading=\'$upload\',

@@ -13,9 +13,18 @@ Calibre-Web is a web app providing a clean interface for browsing, reading and d
 
 *This software is a fork of [library](https://github.com/mutschler/calibreserver) and licensed under the GPL v3 License.*
 
-Alternatively, you may use [COPS](https://github.com/YunoHost-Apps/cops_ynh) which also allows access to you Calibre Library, but in read-only mode. 
+Alternatively, you may use [COPS](https://github.com/YunoHost-Apps/cops_ynh) which also allows access to your Calibre Library, but in read-only mode. 
 
 **Shipped version:** To be 1.0, let's say 0.9 :)
+
+
+Library will be placed in `/home/yunohost.multimedia/share/eBook` folder except if both :
+ - calibreweb is set as a private application
+ - calibreweb library is set as a public library
+
+In this case the library will be set in `/home/yunohost.multimedia/[admin]/eBook` folder. Library folder can always be changed manually in the application settings by the administrator.
+
+This app support http authentification.
 
 ## Screenshots
 
@@ -31,10 +40,10 @@ yunohost app setting calibreweb backup_core_only -v 0
 By default, removing the app will **never** delete the library.
 
 
-## Limitations
+## Known Limitations
 
-* No LDAP support
-* access to library to be done manually after install if Calibre library was already existing, for example :
+* Partial LDAP support : user existing both in Yunohost and calibreweb can use their Yunohost password to log in, but user existing previously to the application installation will not be duplicated in the database automatically
+* Authorization access to library to be done manually after install if Calibre library was already existing, for example :
 ```
 chown -R calibreweb: path/to/library
 or
@@ -42,6 +51,7 @@ chmod o+rw path/to/library
 ``` 
 * Do not use a Nextcloud folder. It's all right if the folder is an external storage in Nextcloud but not if it's an internal one : Changing the data in the library will cause trouble with the sync
 * "Magic link feature is not yet available
+* Change to library made outside calibreweb are not automatically updated in calibreweb. It is required to disconnect and reconnect to see the changes
 
 ## Links
 
@@ -66,11 +76,12 @@ sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibre
 
 ## Todo
 - [X] Multiinstance
-- [ ] Better Multimedia integration : Integrate in Yunohost.multimedia
-- [ ] User and possibly LDAP integration
+- [X] Better Multimedia integration : Integrate in Yunohost.multimedia
+- [X] User and possibly LDAP integration, http auth
 - [X] Package_check integration
 - [X] On backup/remove/upgrade : check for database location to update settings
 - [ ] enable magic link
+- [ ] Add cronjob to reload database
 
 
 ## LICENSE

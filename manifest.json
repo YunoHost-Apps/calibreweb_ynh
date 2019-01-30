@@ -6,7 +6,7 @@
         "en": "Calibre-web for Yunohost",
         "fr": "Calibre-web pour Yunohost"
     },
-    "version": "0.91~ynh2",
+    "version": "0.92~ynh3",
     "url": "https://github.com/janeczku/calibre-web",
     "license": "free",
     "maintainer": {
@@ -14,7 +14,7 @@
         "email": "misterl56@hotmail.com"
     },
     "requirements": {
-        "yunohost": ">= 2.7.14"
+        "yunohost": ">= 3.0.0"
     },
     "multi_instance": true,
     "services": [
@@ -41,18 +41,6 @@
                 "example": "/calibre",
                 "default": "/calibre"
             },
-		    {
-                "name": "calibre_path",
-                "ask": {
-                    "en": "Select the folder containing the Calibre library",
-                    "fr": "Choisissez le répertoire contenant la bibliothèque Calibre"
-                },
-                "help": {
-                    "en": "This folder should have read write access. It will be created if it does not exist.",
-                    "fr": "Le répertoire doit être accessible en lecture écriture, il sera créé s'il n'existe pas."
-                },
-                "default": "/home/yunohost.app/calibreweb"
-            },
             {
                 "name": "admin",
                 "type": "user",
@@ -69,34 +57,53 @@
                     "en": "Is it a public application?",
                     "fr": "Est-ce une application publique ?"
                 },
+                "help":{
+                	"en":"No will set the library in /home/yunohost.multimedia/admin/eBook, except if you set the library as public",
+                	"fr":"Non parametrera la bibliothèque pour /home/yunohost.multimedia/admin/eBook sauf si la bibliothèque est également publique"
+                },
                 "default": false
             },
             {
                 "name": "language",
+                "optional": true,
                 "ask": {
-                    "en": "Select a default language (you may change it later in the app)",
-                    "fr": "Choisissez une langue par défaut (vous pourrez la changer ultérieurement dans l'application)"
+                    "en": "Select a default language",
+                    "fr": "Choisissez une langue par défaut"
                 },
-				"choices": [ "fr", "en", "es", "de"],
+                "help":{
+                	"en":"You may change it later in the app",
+                	"fr":"Vous pourrez la changer ultérieurement dans l'application"
+                },
+                "choices": [ "fr", "en", "es", "de"],
                 "default": "fr"
             },
             {
                 "name": "upload",
-				"type":"boolean",
+                "type":"boolean",
+                "optional": true,
                 "ask": {
-                    "en": "Do you want to allow uploading of books (you may change it later in the app)?",
-                    "fr": "Voulez vous autoriser l'upload de livres (vous pourrez le changer ultérieurement dans l'application)?"
+                    "en": "Do you want to allow uploading of books?",
+                    "fr": "Voulez vous autoriser l'upload de livres?"
+                },
+                "help":{
+                	"en":"You may change it later in the app",
+                	"fr":"Vous pourrez le changer ultérieurement dans l'application"
                 },
                 "default": false
             },
             {
-                "name": "password",
-                "type": "password",
+                "name": "public_library",
+                "type":"boolean",
+                "optional": true,
                 "ask": {
-                    "en": "Set the administrator password",
-                    "fr": "Définissez le mot de passe administrateur"
+                    "en": "Do you want to allow access to the library to all Yunohost users? ",
+                    "fr": "Voulez vous autoriser l'accès à la bibliothèque à tous les utilisateurs Yunohost?"
                 },
-                "example": "Averystrongpassword"
+                "help":{
+                	"en":"Yes will set the library in /home/yunohost.multimedia/share/eBook",
+                	"fr":"Oui parametrera la bibliothèque pour /home/yunohost.multimedia/share/eBook"
+                },
+                "default": true
             }
         ]
     }

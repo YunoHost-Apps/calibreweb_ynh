@@ -1,8 +1,19 @@
 #!/bin/bash
 
-pkg_dependencies="sqlite3 python-pip imagemagick"
+PKG_DEPENDENCIES="sqlite3 python-pip imagemagick"
+DOSSIER_MEDIA=/home/yunohost.multimedia
 create_dir=0
 
+get_db() {
+        # $1 = nom de la table
+        # cette ligne de malade : 
+        # 1/ Recupere le schém de la table user
+        # 2/ En extrait les noms de champs (en prenant le premier mot après la tabulation)
+        # 3/ en supprime les clé UNIQUE, PRIMARY et CHECK dont on ne veut pas
+        # 4/ remplace la liste avec retour à la ligne par une liste séparé par des virgules
+        # 5/ Enlève la dernière virgule
+    sqlite3 $final_path/app.db ".schema $1" | awk '/\t/ {print $1}' | grep -v -e "UNIQUE" -e "PRIMARY" -e "CHECK" -e "FOREIGN" | awk '{printf "%s, ", $0}' | head -c -2
+}
 
 #=================================================
 # EXPERIMENTAL HELPERS
@@ -100,11 +111,11 @@ ynh_systemd_action() {
 #
 # usage: ynh_multimedia_build_main_dir
 ynh_multimedia_build_main_dir () {
-        local ynh_media_release="v1.1"
-        local checksum="9ec4321a92aa2c388af4ee0072735e3e"
+        local ynh_media_release="v1.2"
+        local checksum="806a827ba1902d6911095602a9221181"
 
         # Download yunohost.multimedia scripts
-        wget -nv https://github.com/YunoHost-Apps/yunohost.multimedia/archive/${ynh_media_release}.tar.gz 
+        wget -nv https://github.com/Yunohost-Apps/yunohost.multimedia/archive/${ynh_media_release}.tar.gz 
 
         # Check the control sum
         echo "${checksum} ${ynh_media_release}.tar.gz" | md5sum -c --status \

@@ -44,6 +44,9 @@ ynh_clean_setup () {
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
+#Stop the app in case database is updated
+ynh_systemd_action -a stop
+
 #=================================================
 # CHECK THE PATH
 #=================================================
@@ -65,14 +68,18 @@ ynh_setup_source "$final_path"
 # NGINX CONFIGURATION
 #=================================================
 
+if [ $path_url = "/" ] ; then
+	ynh_replace_string "        proxy_set_header		X-Script-Name" "#       proxy_set_header		X-Script-Name" ../conf/nginx.conf
+fi
+
 # Create a dedicated nginx config
 ynh_add_nginx_config
 
 #=================================================
 # UPGRADE DEPENDENCIES
 #=================================================
-
-ynh_install_app_dependencies $pkg_dependencies
+ynh_print_info "Download and install dependencies"
+ynh_install_app_dependencies $PKG_DEPENDENCIES
 pip install --target $final_path/vendor -r $final_path/requirements.txt
 
 #=================================================
@@ -82,16 +89,36 @@ pip install --target $final_path/vendor -r $final_path/requirements.txt
 # Create a dedicated user (if not existing)
 ynh_system_user_create $app
 
+# Set permissions on app files (required to be able to update database)
+chown -R $app: $final_path
 
 #=================================================
 # SPECIFIC UPGRADE
 #=================================================
-# ...
+#build multimedia directory
+#=================================================
+
+#Create multimedia directory but we do not change the calibre_dir : It's the user to make this choice.
+ynh_multimedia_build_main_dir
+ynh_multimedia_addaccess $app
+
+#=================================================
+#Update database structure
 #=================================================
 
 ### Verify the checksum of a file, stored by `ynh_store_file_checksum` in the install script.
 ### And create a backup of this file if the checksum is different. So the file will be backed up if the admin had modified it.
 ynh_backup_if_checksum_is_different "$final_path/app.db"
+
+#set database settings as per conf file : restart server so that app.db is regenerated, then add new ldap settings
+ynh_systemd_action -l "INFO in server: Starting Gevent server"
+#sleep required on low spec like raspberryPi
+sleep 2s
+ynh_systemd_action -a stop
+
+conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
+eval sqlite3 $final_path/app.db "$conf"
+
 # Recalculate and store the checksum of the file for the next upgrade.
 ynh_store_file_checksum "$final_path/app.db"
 
