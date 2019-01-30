@@ -13,15 +13,16 @@ Calibre-Web is a web app providing a clean interface for browsing, reading and d
 
 *This software is a fork of [library](https://github.com/mutschler/calibreserver) and licensed under the GPL v3 License.*
 
-Alternatively, you may use [COPS](https://github.com/YunoHost-Apps/cops_ynh) which also allows access to you Calibre Library, but in read-only mode. 
+Alternatively, you may use [COPS](https://github.com/YunoHost-Apps/cops_ynh) which also allows access to your Calibre Library, but in read-only mode. 
 
 **Shipped version:** To be 1.0, let's say 0.9 :)
 
-Library will be placed in /home/yunohost.multimedia/share/eBook except if both 
+
+Library will be placed in `/home/yunohost.multimedia/share/eBook` folder except if both :
  - calibreweb is set as a private application
  - calibreweb library is set as a public library
-In this case the library will be set in /home/yunohost.multimedia/[admin]/eBook folder
-Library folder can always be changed manually in the application settings by the admin
+
+In this case the library will be set in `/home/yunohost.multimedia/[admin]/eBook` folder. Library folder can always be changed manually in the application settings by the administrator.
 
 This app support http authentification.
 
