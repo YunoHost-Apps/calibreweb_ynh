@@ -1,5 +1,5 @@
---- z/cps/ub.py	2019-01-16 17:50:51.000000000 +0100
-+++ b/cps/ub.py	2019-01-19 11:03:55.799293389 +0100
+--- a/cps/ub.py	2019-01-16 17:50:51.000000000 +0100
++++ b/cps/ub.py	2019-01-30 22:23:29.709075421 +0100
 @@ -148,6 +148,16 @@
      def __repr__(self):
          return '<User %r>' % self.nickname
@@ -61,9 +61,9 @@
      try:
          session.query(exists().where(Settings.config_columns_to_ignore)).scalar()
      except exc.OperationalError:
-@@ -662,13 +682,22 @@
-         conn.execute("ALTER TABLE Settings ADD column `config_calibre` String DEFAULT ''")
-         session.commit()
+@@ -624,6 +644,16 @@
+         conn.execute("ALTER TABLE Settings ADD column `config_goodreads_api_key` String DEFAULT ''")
+         conn.execute("ALTER TABLE Settings ADD column `config_goodreads_api_secret` String DEFAULT ''")
      try:
 +#Yunohost Integration - 4
 +        session.query(exists().where(Settings.config_use_ldap)).scalar()
@@ -75,9 +75,10 @@
 +        session.commit()
 +    try:
 +#END Yunohost Integration - 4
-         session.query(exists().where(Settings.config_theme)).scalar()
-     except exc.OperationalError:  # Database is not compatible, some rows are missing
+         session.query(exists().where(Settings.config_mature_content_tags)).scalar()
+     except exc.OperationalError:
          conn = engine.connect()
+@@ -668,7 +698,6 @@
          conn.execute("ALTER TABLE Settings ADD column `config_theme` INTEGER DEFAULT 0")
          session.commit()
  
