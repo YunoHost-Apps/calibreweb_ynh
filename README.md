@@ -15,7 +15,7 @@ Calibre-Web is a web app providing a clean interface for browsing, reading and d
 
 Alternatively, you may use [COPS](https://github.com/YunoHost-Apps/cops_ynh) which also allows access to your Calibre Library, but in read-only mode. 
 
-**Shipped version:** To be 1.0, let's say 0.9 :)
+**Shipped version:** 1.0
 
 
 Library will be placed in `/home/yunohost.multimedia/share/eBook` folder except if both :
