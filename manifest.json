@@ -6,7 +6,7 @@
         "en": "Calibre-web for Yunohost",
         "fr": "Calibre-web pour Yunohost"
     },
-    "version": "0.92~ynh3",
+    "version": "1.0~ynh3",
     "url": "https://github.com/janeczku/calibre-web",
     "license": "free",
     "maintainer": {
