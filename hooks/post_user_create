@@ -16,7 +16,7 @@ final_path=$(ynh_app_setting_get $app final_path)
 
 public_library=$(ynh_app_setting_get "$app" public_library)
 #User are duplicated in the database only if library is public
-if [ public_library -eq 1 ]; then 
+if [ $public_library -eq 1 ]; then 
 	######################################
 	#1 get admin user and id from database
 	######################################

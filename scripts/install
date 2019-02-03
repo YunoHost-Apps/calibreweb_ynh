@@ -118,7 +118,7 @@ ynh_add_systemd_config
 #=================================================
 # CREATE FILES AND DIRECTORIES
 #=================================================
-
+ynh_print_info "Creating files and directory"
 #Logic is as follow : if app is set to be publicly accessible, we will assume that the library should be set in "Share" multimedia directory
 # If app is set to be private but access is requested for all user, we will assume the same
 # If app is set to be private but access is limited to the admin user, we will set it inside his own multimedia directory.

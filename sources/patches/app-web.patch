@@ -1,38 +1,16 @@
---- a/cps/web.py	2019-01-16 17:50:51.000000000 +0100
-+++ b/cps/web.py	2019-01-19 10:55:51.728967203 +0100
-@@ -58,6 +58,11 @@
+--- a/cps/web.py	2019-01-27 08:32:26.000000000 +0100
++++ b/cps/web.py	2019-02-02 12:38:12.364323004 +0100
+@@ -78,6 +78,9 @@
  import server
  from reverseproxy import ReverseProxied
- 
+ from updater import updater_thread
 +#Yunohost LDAP integration - 1
 +vlogout = 0
 +#END Yunohost LDAP integration -1
-+
-+
+ 
  try:
      from googleapiclient.errors import HttpError
- except ImportError:
-@@ -1072,7 +1077,7 @@
-         json_dumps = json.dumps([dict(name=r.name.replace('|',',')) for r in entries])
-         return json_dumps
- 
--
-+		
- @app.route("/get_tags_json", methods=['GET', 'POST'])
- @login_required_if_no_ano
- def get_tags_json():
-@@ -1192,8 +1197,8 @@
-             r = requests.get(repository_url + '/git/commits/' + commit['object']['sha'])
-             r.raise_for_status()
-             update_data = r.json()
--        except requests.exceptions.HTTPError as e:
--            status['error'] = _(u'HTTP Error') + ' ' + str(e)
-+        except requests.exceptions.HTTPError as ex:
-+            status['error'] = _(u'HTTP Error') + ' ' + str(ex)
-         except requests.exceptions.ConnectionError:
-             status['error'] = _(u'Connection error')
-         except requests.exceptions.Timeout:
-@@ -2360,10 +2365,36 @@
+@@ -2256,10 +2259,36 @@
          return redirect(url_for('basic_configuration'))
      if current_user is not None and current_user.is_authenticated:
          return redirect(url_for('index'))
@@ -70,7 +48,7 @@
              login_user(user, remember=True)
              flash(_(u"you are now logged in as: '%(nickname)s'", nickname=user.nickname), category="success")
              return redirect_back(url_for("index"))
-@@ -2384,6 +2415,10 @@
+@@ -2280,6 +2309,10 @@
  @login_required
  def logout():
      if current_user is not None and current_user.is_authenticated:
@@ -81,7 +59,7 @@
          logout_user()
      return redirect(url_for('login'))
  
-@@ -3088,6 +3123,23 @@
+@@ -2987,6 +3020,23 @@
          if "config_ebookconverter" in to_save:
              content.config_ebookconverter = int(to_save["config_ebookconverter"])
  
