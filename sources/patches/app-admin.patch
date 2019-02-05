@@ -1,0 +1,11 @@
+--- a/cps/templates/admin.html	2019-02-05 21:21:55.615940498 +0100
++++ b/cps/templates/admin.html	2019-02-05 21:23:29.171461028 +0100
+@@ -129,7 +129,7 @@
+       </table>
+ 
+       <div class="hidden" id="update_error"> <span>{{update_error}}</span></div>
+-      <div class="btn btn-default" id="check_for_update">{{_('Check for update')}}</div>
++      <!--<div class="btn btn-default" id="check_for_update">{{_('Check for update')}}</div>-->
+       <div class="btn btn-default hidden" id="perform_update" data-toggle="modal" data-target="#UpdateprogressDialog">{{_('Perform Update')}}</div>
+     </div>
+   </div>
