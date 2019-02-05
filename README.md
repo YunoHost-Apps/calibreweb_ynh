@@ -82,6 +82,7 @@ sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibre
 - [X] On backup/remove/upgrade : check for database location to update settings
 - [ ] enable magic link
 - [ ] Add cronjob to reload database
+- [ ] Disable internal update
 
 
 ## LICENSE
