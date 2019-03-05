@@ -55,7 +55,7 @@ chmod o+rw path/to/library
 
 ## Links
 
- * Report a bug: https://github.com/YunoHost-Apps/calibre_ynh/issues
+ * Report a bug: https://github.com/YunoHost-Apps/calibreweb_ynh/issues
  * App website: https://github.com/janeczku/calibre-web
  * YunoHost website: https://yunohost.org/
 
@@ -64,13 +64,13 @@ chmod o+rw path/to/library
 Developers info
 ----------------
 
-Please do your pull request to the [testing branch](https://github.com/Yunohost-Apps/calibre_ynh/tree/Testing).
+Please do your pull request to the [testing branch](https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing).
 
 To try the testing branch, please proceed like that.
 ```
-sudo yunohost app install https://github.com/Yunohost-Apps/calibre_ynh/tree/Testing --debug
+sudo yunohost app install https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing --debug
 or
-sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibre_ynh/tree/Testing --debug
+sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing --debug
 ```
 
 
