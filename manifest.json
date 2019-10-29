@@ -3,8 +3,8 @@
     "id": "calibreweb",
     "packaging_format": 1,
     "description": {
-        "en": "Clean interface for browsing, reading and downloading eBooks",
-        "fr": "Interface simplifié pour parcourir, lire et charger des eBooks"
+        "en": "Browsing, reading and downloading eBooks using a Calibre database",
+        "fr": "Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre"
     },
     "version": "0.96.0~ynh3",
     "url": "https://github.com/janeczku/calibre-web",
