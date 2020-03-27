@@ -1,5 +1,5 @@
---- a/web.py	2019-01-27 08:32:26.000000000 +0100
-+++ b/web.py	2020-03-27 01:40:35.665802573 +0100
+--- a/cps/web.py	2019-01-27 08:32:26.000000000 +0100
++++ b/cps/web.py	2020-03-27 22:23:00.634974283 +0100
 @@ -78,6 +78,9 @@
  import server
  from reverseproxy import ReverseProxied
@@ -21,7 +21,142 @@
              data = {'status': 'error', 'message': 'Forbidden'}
              response = make_response(json.dumps(data, ensure_ascii=False))
              response.headers["Content-Type"] = "application/json; charset=utf-8"
-@@ -1586,7 +1591,10 @@
+@@ -768,8 +773,10 @@
+ @requires_basic_auth_if_no_ano
+ def feed_hot():
+     off = request.args.get("offset") or 0
++#backport fix for newer sqlalchemy  - 1
+     all_books = ub.session.query(ub.Downloads, ub.func.count(ub.Downloads.book_id)).order_by(
+         ub.func.count(ub.Downloads.book_id).desc()).group_by(ub.Downloads.book_id)
++#End backport fix for newer sqlalchemy - 1
+     hot_books = all_books.offset(off).limit(config.config_books_per_page)
+     entries = list()
+     for book in hot_books:
+@@ -793,8 +800,10 @@
+ @requires_basic_auth_if_no_ano
+ def feed_authorindex():
+     off = request.args.get("offset") or 0
++#backport fix for newer sqlalchemy - 2
+     entries = db.session.query(db.Authors).join(db.books_authors_link).join(db.Books).filter(common_filters())\
+-        .group_by('books_authors_link.author').order_by(db.Authors.sort).limit(config.config_books_per_page).offset(off)
++        .group_by(text('books_authors_link.author')).order_by(db.Authors.sort).limit(config.config_books_per_page).offset(off)
++#End backport fix for newer sqlalchemy - 2
+     pagination = Pagination((int(off) / (int(config.config_books_per_page)) + 1), config.config_books_per_page,
+                             len(db.session.query(db.Authors).all()))
+     return render_xml_template('feed.xml', listelements=entries, folder='feed_author', pagination=pagination)
+@@ -813,8 +822,10 @@
+ @requires_basic_auth_if_no_ano
+ def feed_publisherindex():
+     off = request.args.get("offset") or 0
++#backport fix for newer sqlalchemy - 3
+     entries = db.session.query(db.Publishers).join(db.books_publishers_link).join(db.Books).filter(common_filters())\
+-        .group_by('books_publishers_link.publisher').order_by(db.Publishers.sort).limit(config.config_books_per_page).offset(off)
++        .group_by(text('books_publishers_link.publisher')).order_by(db.Publishers.sort).limit(config.config_books_per_page).offset(off)
++#End backport fix for newer sqlalchemy - 3
+     pagination = Pagination((int(off) / (int(config.config_books_per_page)) + 1), config.config_books_per_page,
+                             len(db.session.query(db.Publishers).all()))
+     return render_xml_template('feed.xml', listelements=entries, folder='feed_publisher', pagination=pagination)
+@@ -834,8 +845,10 @@
+ @requires_basic_auth_if_no_ano
+ def feed_categoryindex():
+     off = request.args.get("offset") or 0
++#backport fix for newer sqlalchemy - 4
+     entries = db.session.query(db.Tags).join(db.books_tags_link).join(db.Books).filter(common_filters())\
+-        .group_by('books_tags_link.tag').order_by(db.Tags.name).offset(off).limit(config.config_books_per_page)
++        .group_by(text('books_tags_link.tag')).order_by(db.Tags.name).offset(off).limit(config.config_books_per_page)
++#End backport fix for newer sqlalchemy - 4
+     pagination = Pagination((int(off) / (int(config.config_books_per_page)) + 1), config.config_books_per_page,
+                             len(db.session.query(db.Tags).all()))
+     return render_xml_template('feed.xml', listelements=entries, folder='feed_category', pagination=pagination)
+@@ -854,8 +867,10 @@
+ @requires_basic_auth_if_no_ano
+ def feed_seriesindex():
+     off = request.args.get("offset") or 0
++#backport fix for newer sqlalchemy - 5
+     entries = db.session.query(db.Series).join(db.books_series_link).join(db.Books).filter(common_filters())\
+-        .group_by('books_series_link.series').order_by(db.Series.sort).offset(off).all()
++        .group_by(text('books_series_link.series')).order_by(db.Series.sort).offset(off).all()
++#End backport fix for newer sqlalchemy - 5
+     pagination = Pagination((int(off) / (int(config.config_books_per_page)) + 1), config.config_books_per_page,
+                             len(db.session.query(db.Series).all()))
+     return render_xml_template('feed.xml', listelements=entries, folder='feed_series', pagination=pagination)
+@@ -1267,8 +1282,10 @@
+         else:
+             random = false()
+         off = int(int(config.config_books_per_page) * (page - 1))
++#backport fix for newer sqlalchemy - 6
+         all_books = ub.session.query(ub.Downloads, ub.func.count(ub.Downloads.book_id)).order_by(
+             ub.func.count(ub.Downloads.book_id).desc()).group_by(ub.Downloads.book_id)
++#End backport fix for newer sqlalchemy - 6
+         hot_books = all_books.offset(off).limit(config.config_books_per_page)
+         entries = list()
+         for book in hot_books:
+@@ -1317,9 +1334,11 @@
+ @login_required_if_no_ano
+ def author_list():
+     if current_user.show_author():
++#backport fix for newer sqlalchemy - 7
+         entries = db.session.query(db.Authors, func.count('books_authors_link.book').label('count'))\
+             .join(db.books_authors_link).join(db.Books).filter(common_filters())\
+-            .group_by('books_authors_link.author').order_by(db.Authors.sort).all()
++            .group_by(text('books_authors_link.author')).order_by(db.Authors.sort).all()
++#End backport fix for newer sqlalchemy - 7
+         for entry in entries:
+             entry.Authors.name = entry.Authors.name.replace('|', ',')
+         return render_title_template('list.html', entries=entries, folder='author',
+@@ -1359,9 +1378,11 @@
+ @login_required_if_no_ano
+ def publisher_list():
+     if current_user.show_publisher():
++#backport fix for newer sqlalchemy - 8
+         entries = db.session.query(db.Publishers, func.count('books_publishers_link.book').label('count'))\
+             .join(db.books_publishers_link).join(db.Books).filter(common_filters())\
+-            .group_by('books_publishers_link.publisher').order_by(db.Publishers.sort).all()
++            .group_by(text('books_publishers_link.publisher')).order_by(db.Publishers.sort).all()
++#End backport fix for newer sqlalchemy - 8
+         return render_title_template('list.html', entries=entries, folder='publisher',
+                                      title=_(u"Publisher list"), page="publisherlist")
+     else:
+@@ -1406,9 +1427,11 @@
+ @login_required_if_no_ano
+ def series_list():
+     if current_user.show_series():
++#backport fix for newer sqlalchemy - 9
+         entries = db.session.query(db.Series, func.count('books_series_link.book').label('count'))\
+             .join(db.books_series_link).join(db.Books).filter(common_filters())\
+-            .group_by('books_series_link.series').order_by(db.Series.sort).all()
++            .group_by(text('books_series_link.series')).order_by(db.Series.sort).all()
++#End backport fix for newer sqlalchemy - 9
+         return render_title_template('list.html', entries=entries, folder='series',
+                                      title=_(u"Series list"), page="serieslist")
+     else:
+@@ -1446,9 +1469,11 @@
+                 languages[0].name = cur_l.get_language_name(get_locale())
+             else:
+                 languages[0].name = _(isoLanguages.get(part3=languages[0].lang_code).name)
++#backport fix for newer sqlalchemy - 10
+         lang_counter = db.session.query(db.books_languages_link,
+                                         func.count('books_languages_link.book').label('bookcount')).group_by(
+-            'books_languages_link.lang_code').all()
++            text('books_languages_link.lang_code')).all()
++#End backport fix for newer sqlalchemy - 10
+         return render_title_template('languages.html', languages=languages, lang_counter=lang_counter,
+                                      title=_(u"Available languages"), page="langlist")
+     else:
+@@ -1477,9 +1502,11 @@
+ @login_required_if_no_ano
+ def category_list():
+     if current_user.show_category():
++#backport fix for newer sqlalchemy - 11
+         entries = db.session.query(db.Tags, func.count('books_tags_link.book').label('count'))\
+             .join(db.books_tags_link).join(db.Books).order_by(db.Tags.name).filter(common_filters())\
+-            .group_by('books_tags_link.tag').all()
++            .group_by(text('books_tags_link.tag')).all()
++#End backport fix for newer sqlalchemy - 11
+         return render_title_template('list.html', entries=entries, folder='category',
+                                      title=_(u"Category list"), page="catlist")
+     else:
+@@ -1586,7 +1613,10 @@
          kindle_list = helper.check_send_to_kindle(entries)
          reader_list = helper.check_read_formats(entries)
  
@@ -33,7 +168,7 @@
                                       title=entries.title, books_shelfs=book_in_shelfs,
                                       have_read=have_read, kindle_list=kindle_list, reader_list=reader_list, page="book")
      else:
-@@ -2256,10 +2264,36 @@
+@@ -2256,10 +2286,36 @@
          return redirect(url_for('basic_configuration'))
      if current_user is not None and current_user.is_authenticated:
          return redirect(url_for('index'))
@@ -71,7 +206,7 @@
              login_user(user, remember=True)
              flash(_(u"you are now logged in as: '%(nickname)s'", nickname=user.nickname), category="success")
              return redirect_back(url_for("index"))
-@@ -2280,6 +2314,10 @@
+@@ -2280,6 +2336,10 @@
  @login_required
  def logout():
      if current_user is not None and current_user.is_authenticated:
@@ -82,7 +217,7 @@
          logout_user()
      return redirect(url_for('login'))
  
-@@ -2389,17 +2427,24 @@
+@@ -2389,17 +2449,24 @@
  @app.route("/shelf/add/<int:shelf_id>/<int:book_id>")
  @login_required
  def add_to_shelf(shelf_id, book_id):
@@ -109,7 +244,7 @@
              flash(_(u"Sorry you are not allowed to add a book to the the shelf: %(shelfname)s", shelfname=shelf.name),
                    category="error")
              return redirect(url_for('index'))
-@@ -2407,7 +2452,9 @@
+@@ -2407,7 +2474,9 @@
  
      if shelf.is_public and not current_user.role_edit_shelfs():
          app.logger.info("User is not allowed to edit public shelves")
@@ -120,7 +255,7 @@
              flash(_(u"You are not allowed to edit public shelves"), category="error")
              return redirect(url_for('index'))
          return "User is not allowed to edit public shelves", 403
-@@ -2416,7 +2463,9 @@
+@@ -2416,7 +2485,9 @@
                                            ub.BookShelf.book_id == book_id).first()
      if book_in_shelf:
          app.logger.info("Book is already part of the shelf: %s" % shelf.name)
@@ -131,7 +266,7 @@
              flash(_(u"Book is already part of the shelf: %(shelfname)s", shelfname=shelf.name), category="error")
              return redirect(url_for('index'))
          return "Book is already part of the shelf: %s" % shelf.name, 400
-@@ -2430,7 +2479,9 @@
+@@ -2430,7 +2501,9 @@
      ins = ub.BookShelf(shelf=shelf.id, book_id=book_id, order=maxOrder + 1)
      ub.session.add(ins)
      ub.session.commit()
@@ -142,7 +277,7 @@
          flash(_(u"Book has been added to shelf: %(sname)s", sname=shelf.name), category="success")
          if "HTTP_REFERER" in request.environ:
              return redirect(request.environ["HTTP_REFERER"])
-@@ -2496,10 +2547,15 @@
+@@ -2496,10 +2569,15 @@
  @app.route("/shelf/remove/<int:shelf_id>/<int:book_id>")
  @login_required
  def remove_from_shelf(shelf_id, book_id):
@@ -159,7 +294,7 @@
              return redirect(url_for('index'))
          return "Invalid shelf specified", 400
  
-@@ -2518,20 +2574,26 @@
+@@ -2518,20 +2596,26 @@
  
          if book_shelf is None:
              app.logger.info("Book already removed from shelf")
@@ -189,7 +324,7 @@
              flash(_(u"Sorry you are not allowed to remove a book from this shelf: %(sname)s", sname=shelf.name),
                    category="error")
              return redirect(url_for('index'))
-@@ -2987,6 +3049,23 @@
+@@ -2987,6 +3071,23 @@
          if "config_ebookconverter" in to_save:
              content.config_ebookconverter = int(to_save["config_ebookconverter"])
  
