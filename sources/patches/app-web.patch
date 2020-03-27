@@ -1,5 +1,5 @@
---- a/cps/web.py	2019-01-27 08:32:26.000000000 +0100
-+++ b/cps/web.py	2019-02-02 12:38:12.364323004 +0100
+--- a/web.py	2019-01-27 08:32:26.000000000 +0100
++++ b/web.py	2020-03-27 01:40:35.665802573 +0100
 @@ -78,6 +78,9 @@
  import server
  from reverseproxy import ReverseProxied
@@ -10,7 +10,30 @@
  
  try:
      from googleapiclient.errors import HttpError
-@@ -2256,10 +2259,36 @@
+@@ -347,7 +350,9 @@
+     def inner(*args, **kwargs):
+         if config.config_remote_login:
+             return f(*args, **kwargs)
+-        if request.is_xhr:
++#backport fix for using werkzeug 1.0.0 - 1
++        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
++#End backport fix for using werkzeug 1.0.0 - 1
+             data = {'status': 'error', 'message': 'Forbidden'}
+             response = make_response(json.dumps(data, ensure_ascii=False))
+             response.headers["Content-Type"] = "application/json; charset=utf-8"
+@@ -1586,7 +1591,10 @@
+         kindle_list = helper.check_send_to_kindle(entries)
+         reader_list = helper.check_read_formats(entries)
+ 
+-        return render_title_template('detail.html', entry=entries, cc=cc, is_xhr=request.is_xhr,
++        return render_title_template('detail.html', entry=entries, cc=cc,
++#backport fix for using werkzeug 1.0.0 - 2
++                                     is_xhr=request.headers.get('X-Requested-With')=='XMLHttpRequest',
++#End backport fix for using werkzeug 1.0.0 - 2
+                                      title=entries.title, books_shelfs=book_in_shelfs,
+                                      have_read=have_read, kindle_list=kindle_list, reader_list=reader_list, page="book")
+     else:
+@@ -2256,10 +2264,36 @@
          return redirect(url_for('basic_configuration'))
      if current_user is not None and current_user.is_authenticated:
          return redirect(url_for('index'))
@@ -48,7 +71,7 @@
              login_user(user, remember=True)
              flash(_(u"you are now logged in as: '%(nickname)s'", nickname=user.nickname), category="success")
              return redirect_back(url_for("index"))
-@@ -2280,6 +2309,10 @@
+@@ -2280,6 +2314,10 @@
  @login_required
  def logout():
      if current_user is not None and current_user.is_authenticated:
@@ -59,7 +82,114 @@
          logout_user()
      return redirect(url_for('login'))
  
-@@ -2987,6 +3020,23 @@
+@@ -2389,17 +2427,24 @@
+ @app.route("/shelf/add/<int:shelf_id>/<int:book_id>")
+ @login_required
+ def add_to_shelf(shelf_id, book_id):
++#backport fix for using werkzeug 1.0.0 - 3
++    xhr = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
++#End backport fix for using werkzeug 1.0.0 - 3
+     shelf = ub.session.query(ub.Shelf).filter(ub.Shelf.id == shelf_id).first()
+     if shelf is None:
+         app.logger.info("Invalid shelf specified")
+-        if not request.is_xhr:
++#backport fix for using werkzeug 1.0.0 - 4
++        if not xhr:
++#End backport fix for using werkzeug 1.0.0 - 4
+             flash(_(u"Invalid shelf specified"), category="error")
+             return redirect(url_for('index'))
+         return "Invalid shelf specified", 400
+ 
+     if not shelf.is_public and not shelf.user_id == int(current_user.id):
+         app.logger.info("Sorry you are not allowed to add a book to the the shelf: %s" % shelf.name)
+-        if not request.is_xhr:
++#backport fix for using werkzeug 1.0.0 - 5
++        if not xhr:
++#End backport fix for using werkzeug 1.0.0 - 5
+             flash(_(u"Sorry you are not allowed to add a book to the the shelf: %(shelfname)s", shelfname=shelf.name),
+                   category="error")
+             return redirect(url_for('index'))
+@@ -2407,7 +2452,9 @@
+ 
+     if shelf.is_public and not current_user.role_edit_shelfs():
+         app.logger.info("User is not allowed to edit public shelves")
+-        if not request.is_xhr:
++#backport fix for using werkzeug 1.0.0 - 6
++        if not xhr:
++#End backport fix for using werkzeug 1.0.0 - 6
+             flash(_(u"You are not allowed to edit public shelves"), category="error")
+             return redirect(url_for('index'))
+         return "User is not allowed to edit public shelves", 403
+@@ -2416,7 +2463,9 @@
+                                           ub.BookShelf.book_id == book_id).first()
+     if book_in_shelf:
+         app.logger.info("Book is already part of the shelf: %s" % shelf.name)
+-        if not request.is_xhr:
++#backport fix for using werkzeug 1.0.0 - 7
++        if not xhr:
++#End backport fix for using werkzeug 1.0.0 - 7
+             flash(_(u"Book is already part of the shelf: %(shelfname)s", shelfname=shelf.name), category="error")
+             return redirect(url_for('index'))
+         return "Book is already part of the shelf: %s" % shelf.name, 400
+@@ -2430,7 +2479,9 @@
+     ins = ub.BookShelf(shelf=shelf.id, book_id=book_id, order=maxOrder + 1)
+     ub.session.add(ins)
+     ub.session.commit()
+-    if not request.is_xhr:
++#backport fix for using werkzeug 1.0.0 - 8
++    if not xhr:
++#End backport fix for using werkzeug 1.0.0 - 8
+         flash(_(u"Book has been added to shelf: %(sname)s", sname=shelf.name), category="success")
+         if "HTTP_REFERER" in request.environ:
+             return redirect(request.environ["HTTP_REFERER"])
+@@ -2496,10 +2547,15 @@
+ @app.route("/shelf/remove/<int:shelf_id>/<int:book_id>")
+ @login_required
+ def remove_from_shelf(shelf_id, book_id):
++#backport fix for using werkzeug 1.0.0 - 9
++    xhr = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
++#End backport fix for using werkzeug 1.0.0 - 9
+     shelf = ub.session.query(ub.Shelf).filter(ub.Shelf.id == shelf_id).first()
+     if shelf is None:
+         app.logger.info("Invalid shelf specified")
+-        if not request.is_xhr:
++#backport fix for using werkzeug 1.0.0 - 10
++        if not xhr:
++#End backport fix for using werkzeug 1.0.0 - 10
+             return redirect(url_for('index'))
+         return "Invalid shelf specified", 400
+ 
+@@ -2518,20 +2574,26 @@
+ 
+         if book_shelf is None:
+             app.logger.info("Book already removed from shelf")
+-            if not request.is_xhr:
++#backport fix for using werkzeug 1.0.0 - 11
++            if not xhr:
++#End backport fix for using werkzeug 1.0.0 - 11
+                 return redirect(url_for('index'))
+             return "Book already removed from shelf", 410
+ 
+         ub.session.delete(book_shelf)
+         ub.session.commit()
+ 
+-        if not request.is_xhr:
++#backport fix for using werkzeug 1.0.0 - 12
++        if not xhr:
++#End backport fix for using werkzeug 1.0.0 - 12
+             flash(_(u"Book has been removed from shelf: %(sname)s", sname=shelf.name), category="success")
+             return redirect(request.environ["HTTP_REFERER"])
+         return "", 204
+     else:
+         app.logger.info("Sorry you are not allowed to remove a book from this shelf: %s" % shelf.name)
+-        if not request.is_xhr:
++#backport fix for using werkzeug 1.0.0 - 13
++        if not xhr:
++#End backport fix for using werkzeug 1.0.0 - 13
+             flash(_(u"Sorry you are not allowed to remove a book from this shelf: %(sname)s", sname=shelf.name),
+                   category="error")
+             return redirect(url_for('index'))
+@@ -2987,6 +3049,23 @@
          if "config_ebookconverter" in to_save:
              content.config_ebookconverter = int(to_save["config_ebookconverter"])
  
