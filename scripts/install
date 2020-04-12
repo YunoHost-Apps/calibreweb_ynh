@@ -254,4 +254,4 @@ fi
 #=================================================
 ynh_print_info "Reload nginx and start $app"
 systemctl reload nginx
-ynh_systemd_action -l "INFO in server: Starting Gevent server"
+ynh_systemd_action
