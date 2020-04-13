@@ -80,7 +80,8 @@ ynh_add_nginx_config
 #=================================================
 ynh_print_info "Download and install dependencies"
 ynh_install_app_dependencies $PKG_DEPENDENCIES
-pip install --target $final_path/vendor -r $final_path/requirements.txt
+pip3 install --no-cache-dir --target $final_path/vendor -r $final_path/requirements.txt
+pip3 install --no-cache-dir --target $final_path/vendor -r $final_path/optional-requirements.txt
 
 #=================================================
 # CREATE DEDICATED USER
@@ -111,9 +112,9 @@ ynh_multimedia_addaccess $app
 ynh_backup_if_checksum_is_different "$final_path/app.db"
 
 #set database settings as per conf file : restart server so that app.db is regenerated, then add new ldap settings
-ynh_systemd_action -l "INFO in server: Starting Gevent server"
+ynh_systemd_action
 #sleep required on low spec like raspberryPi
-sleep 2s
+sleep 5s
 ynh_systemd_action -a stop
 
 conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
@@ -153,7 +154,8 @@ chown -R $app: $final_path
 if [ $is_public -eq 1 ]
 then
 	# unprotected_uris allows SSO credentials to be passed anyway
-	ynh_app_setting_set $app unprotected_uris "/"
+	#ynh_app_setting_set $app unprotected_uris "/"
+	ynh_permission_update --permission "main" --add visitors
 fi
 
 #=================================================
@@ -169,4 +171,4 @@ fi
 #=================================================
 
 systemctl reload nginx
-ynh_systemd_action -a restart -l "INFO in server: Starting Gevent server"
+ynh_systemd_action -a restart

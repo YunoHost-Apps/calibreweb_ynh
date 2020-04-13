@@ -89,7 +89,8 @@ chown -R $app: $final_path
 # Define and install dependencies
 ynh_print_info "Installing dependencies and pip packages"
 ynh_install_app_dependencies $PKG_DEPENDENCIES
-pip install --target $final_path/vendor -r $final_path/requirements.txt
+#pip package not required as already in app directory
+#pip install --target $final_path/vendor -r $final_path/requirements.txt
 
 #=================================================
 # ADVERTISE SERVICE IN ADMIN PANEL

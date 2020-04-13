@@ -32,6 +32,8 @@ public_library=$7
 if [ $is_public -eq 1 ]; then
 	public_library=1
 fi
+source _settings.sh
+
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
@@ -86,8 +88,8 @@ ynh_setup_source "$final_path"
 
 ynh_print_info "Installing dependencies and pip packages"
 ynh_install_app_dependencies $PKG_DEPENDENCIES
-pip install --target $final_path/vendor -r $final_path/requirements.txt
-pip install --target $final_path/vendor -r $final_path/optional-requirements.txt
+pip3 install --no-cache-dir --target $final_path/vendor -r $final_path/requirements.txt
+pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/optional-requirements.txt
 
 #=================================================
 # NGINX CONFIGURATION
@@ -162,15 +164,17 @@ chown -R $app:$app /var/log/$app
 
 ynh_print_info "Setting up database and settings"
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
-ynh_systemd_action -l "INFO in server: Starting Gevent server"
+ynh_systemd_action
 
 #sleep required on low spec like raspberryPi
-sleep 2s
+sleep 5s
 ynh_systemd_action -a stop
 
 
 #set database settings as per conf file
-conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
+#insertion of dummy value for config_ldap_serv_username and config_ldap_serv_password : required for calibreweb and simpleldap but not
+#required by Yunohost ldap.
+conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))), $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
 eval sqlite3 $final_path/app.db "$conf"
 
 conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""
@@ -241,7 +245,8 @@ yunohost service add $app --log "/var/log/$app/$app.log"
 if [ $is_public -eq 1 ]
 then
 	# unprotected_uris allows SSO credentials to be passed anyway.
-	ynh_app_setting_set $app unprotected_uris "/"
+	#ynh_app_setting_set $app unprotected_uris "/"
+	ynh_permission_update --permission "main" --add visitors
 fi
 if [ $public_library -eq 0 ]; then
 	yunohost app addaccess $app -u $admin

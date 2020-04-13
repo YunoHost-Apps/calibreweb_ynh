@@ -7,7 +7,7 @@ Type=simple
 User=__APP__
 Group=__APP__
 WorkingDirectory=__FINALPATH__/
-ExecStart=/bin/sh -c '/usr/bin/python __FINALPATH__/cps.py'
+ExecStart=/bin/sh -c '/usr/bin/python3.5 __FINALPATH__/cps.py'
 
 [Install]
 WantedBy=multi-user.target
