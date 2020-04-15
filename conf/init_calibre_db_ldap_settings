@@ -4,6 +4,9 @@ config_ldap_port=389,
 config_ldap_schema=\'ldap\',
 config_ldap_serv_username=\'cn=admin,dc=yunohost,dc=org\',
 config_ldap_serv_password=\'eXVub2hvc3RfZGV2\',
-config_ldap_dn=\'ou=users,dc=yunohost,dc=org\',
-config_ldap_user_object=\'uid=%s\',
-config_ldap_openldap=1
+config_ldap_dn=\'dc=yunohost,dc=org\',
+config_ldap_user_object=\'\(\&\(objectClass=posixAccount\)\(uid=%s\)\)\',
+config_ldap_openldap=1,
+config_ldap_group_object_filter='\(\&\(objectClass=posixGroup\)\(permission=cn=%s.main,ou=permission,dc=yunohost,dc=org\)\)',
+config_ldap_group_members_field='memberUid',
+config_ldap_group_name='calibreweb'
