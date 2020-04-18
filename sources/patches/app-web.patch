@@ -1,0 +1,10 @@
+--- /home/nicolas/Bureau/calibre-web-06fde4fcd00fcd067a58939e1d9eabee62a86913/cps/web.py	2020-04-18 11:48:34.000000000 +0200
++++ ./web.py	2020-04-18 18:13:44.221590991 +0200
+@@ -1216,6 +1216,7 @@
+         user = ub.session.query(ub.User).filter(func.lower(ub.User.nickname) == form['username'].strip().lower()) \
+             .first()
+         if config.config_login_type == constants.LOGIN_LDAP and services.ldap and user and form['password'] != "":
++            import_ldap_user()
+             login_result, error = services.ldap.bind_user(form['username'], form['password'])
+             if login_result:
+                 login_user(user, remember=True)

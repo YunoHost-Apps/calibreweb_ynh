@@ -1,0 +1,12 @@
+--- a/cps/static/js/main.js	2020-04-18 11:48:34.000000000 +0200
++++ b/cps/static/js/main.js	2020-04-18 17:39:49.405631791 +0200
+@@ -308,7 +308,8 @@
+         $.ajax({
+             method:"get",
+             dataType: "json",
+-            url: path + "/../../import_ldap_users",
++            url: window.location.pathname + "/../../import_ldap_users",
++//            url: path + "/../../import_ldap_users",
+             success: function success(data) {
+                 $("#spinner2").hide();
+                 ResultText = data.text;
