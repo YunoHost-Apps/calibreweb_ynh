@@ -12,6 +12,7 @@ source /usr/share/yunohost/helpers
 #=================================================
 # LOAD SETTINGS
 #=================================================
+ynh_script_progression --message="Loading installation settings..." --weight=2
 
 app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get $app domain)
@@ -23,10 +24,10 @@ calibre_dir=$(ynh_app_setting_get $app calibre_dir)
 # REMOVE SERVICE FROM ADMIN PANEL
 #=================================================
 
-# Remove a service from the admin panel, added by `yunohost service add`
-if yunohost service status | grep -q $app
+# Remove the service from the list of services known by Yunohost (added from `yunohost service add`)
+if ynh_exec_warn_less yunohost service status $app >/dev/null
 then
-	echo "Remove $app service"
+	ynh_script_progression --message="Removing $app service..." --time --weight=1
 	yunohost service remove $app
 fi
 
@@ -37,7 +38,7 @@ fi
 #=================================================
 
 # Remove the dedicated systemd config
-ynh_script_progression -t --message="Removing systemd..."
+ynh_script_progression --message="Stopping and removing the systemd service..."
 ynh_remove_systemd_config
 
 
@@ -47,7 +48,7 @@ ynh_remove_systemd_config
 #=================================================
 
 # Remove metapackage and its dependencies
-ynh_script_progression -t --message="Removing Dependencies..."
+ynh_script_progression --message="Removing Dependencies..."
 ynh_remove_app_dependencies
 
 
@@ -56,15 +57,15 @@ ynh_remove_app_dependencies
 #=================================================
 
 # Remove the app directory securely
-ynh_script_progression -t --message="Removing $final_path..."
-ynh_secure_remove "$final_path"
+ynh_script_progression --message="Removing $final_path..."
+ynh_secure_remove --file="$final_path"
 
 #=================================================
 # REMOVE NGINX CONFIGURATION
 #=================================================
 
 # Remove the dedicated nginx config
-ynh_script_progression -t --message="Removing Nginx Config..."
+ynh_script_progression --message="Removing nginx web server configuration..."
 ynh_remove_nginx_config
 
 #=================================================
@@ -72,6 +73,7 @@ ynh_remove_nginx_config
 #=================================================
 
 # Remove the app-specific logrotate config
+ynh_script_progression --message="Removing logrotate configuration..."
 ynh_remove_logrotate
 
 #=================================================
@@ -80,14 +82,14 @@ ynh_remove_logrotate
 
 if yunohost firewall list | grep -q "\- $port$"
 then
-	ynh_script_progression -t --message="Closing port $port..."
+	ynh_script_progression --message="Closing port $port..."
 	yunohost firewall disallow TCP $port 2>&1
 fi
 
 #=================================================
 # SPECIFIC REMOVE
 #=================================================
-ynh_script_progression -t --message="Removing log and user $app..."
+ynh_script_progression --message="Removing log and user $app..."
 
 # Remove the log files
 ynh_secure_remove "/var/log/$app/"
@@ -97,12 +99,12 @@ ynh_secure_remove "/var/log/$app/"
 #=================================================
 # REMOVE DEDICATED USER
 #=================================================
-
+ynh_script_progression --message="Removing the dedicated system user..."
 # Delete a system user
-ynh_system_user_delete $app
+ynh_system_user_delete --username=$app
 
 #=================================================
 # MESSAGE TO USER
 #=================================================
-
+ynh_script_progression --message="Removal of $app completed" --last
 ynh_print_warn "!!!The library folder $calibre_dir was not deleted. Delete it manually if required!!!"
