@@ -1,10 +1,30 @@
---- /home/nicolas/Bureau/calibre-web-06fde4fcd00fcd067a58939e1d9eabee62a86913/cps/web.py	2020-04-18 11:48:34.000000000 +0200
-+++ ./web.py	2020-04-18 18:13:44.221590991 +0200
-@@ -1216,6 +1216,7 @@
-         user = ub.session.query(ub.User).filter(func.lower(ub.User.nickname) == form['username'].strip().lower()) \
-             .first()
-         if config.config_login_type == constants.LOGIN_LDAP and services.ldap and user and form['password'] != "":
-+            import_ldap_user()
-             login_result, error = services.ldap.bind_user(form['username'], form['password'])
-             if login_result:
-                 login_user(user, remember=True)
+--- a/cps/web.py	2020-04-18 11:48:34.000000000 +0200
++++ b/cps/web.py	2020-04-19 13:42:18.719536869 +0200
+@@ -1206,6 +1206,13 @@
+     if not config.db_configured:
+         log.debug(u"Redirect to initial configuration")
+         return redirect(url_for('admin.basic_configuration'))
++    if config.config_login_type == constants.LOGIN_LDAP and services.ldap:
++        import_ldap_users()
++        auth_user = request.headers.get('X-Remote-User')
++        if auth_user:
++            user = ub.session.query(ub.User).filter(func.lower(ub.User.nickname) == auth_user.strip().lower()).first()
++            log.info("Login of user %s", user.nickname)
++            login_user(user)
+     if current_user is not None and current_user.is_authenticated:
+         return redirect(url_for('web.index'))
+     if config.config_login_type == constants.LOGIN_LDAP and not services.ldap:
+@@ -1284,8 +1291,11 @@
+         logout_user()
+         if feature_support['oauth'] and (config.config_login_type == 2 or config.config_login_type == 3):
+             logout_oauth_user()
+-    log.debug(u"User logged out")
+-    return redirect(url_for('web.login'))
++        auth_user = request.headers.get('X-Remote-User')
++    if auth_user:
++        return redirect(request.host_url)
++    else:
++        return redirect(url_for('web.login'))
+ 
+ 
+ @web.route('/remote/login')

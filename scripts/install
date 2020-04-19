@@ -38,6 +38,7 @@ source _settings.sh
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
+ynh_script_progression -t --message="Validating installation parameters..."
 
 final_path=/var/www/$app
 test ! -e "$final_path" || ynh_die "This path already contains a folder"
@@ -53,6 +54,7 @@ ynh_webpath_register $app $domain $path_url
 #=================================================
 # STORE SETTINGS FROM MANIFEST
 #=================================================
+ynh_script_progression -t --message="Storing installation settings..."
 
 ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
@@ -69,32 +71,36 @@ ynh_app_setting_set $app is_public $is_public
 # Find a free port
 port=$(ynh_find_port 8083)
 # Open this port
-ynh_print_info "Opening port $port"
+ynh_script_progression -t --message="Opening port $port..." --weight=5
 yunohost firewall allow --no-upnp TCP $port 2>&1
 ynh_app_setting_set $app port $port
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-
+ynh_script_progression -t --message="Downloading sources to $final_path..." --weight=10
 ynh_app_setting_set $app final_path $final_path
-ynh_print_info "Downloading sources to $final_path"
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source "$final_path"
 
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
+ynh_script_progression -t --message="Installing dependencies..." --weight=15
 
-ynh_print_info "Installing dependencies and pip packages"
 ynh_install_app_dependencies $PKG_DEPENDENCIES
+ynh_script_progression -t --message="Installing dependencies..." --weight=15
 pip3 install --no-cache-dir --target $final_path/vendor -r $final_path/requirements.txt
+ynh_script_progression -t --message="Installing dependencies..." --weight=40
 pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/optional-requirements.txt
 
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
 #Cannot use empty string for X-script-name, causes an issue in the python prg
+ynh_script_progression -t --message="Setting up system configuration..." --weight=5
+
+
 if [ $path_url = "/" ] ; then
 	ynh_replace_string "        proxy_set_header		X-Script-Name" "#       proxy_set_header		X-Script-Name" ../conf/nginx.conf
 fi
@@ -121,7 +127,7 @@ ynh_add_systemd_config
 #=================================================
 # CREATE FILES AND DIRECTORIES
 #=================================================
-ynh_print_info "Creating files and directory"
+ynh_script_progression -t --message="Creating files and directory..."
 #Logic is as follow : if app is set to be publicly accessible, we will assume that the library should be set in "Share" multimedia directory
 # If app is set to be private but access is requested for all user, we will assume the same
 # If app is set to be private but access is limited to the admin user, we will set it inside his own multimedia directory.
@@ -161,8 +167,7 @@ chown -R $app:$app /var/log/$app
 #=================================================
 # SET SQLITE DATABASE SETTINGS
 #=================================================
-
-ynh_print_info "Setting up database and settings"
+ynh_script_progression -t --message="Setting up database and settings..."
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
 ynh_systemd_action
 
@@ -221,6 +226,6 @@ fi
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_print_info "Reload nginx and start $app"
+ynh_script_progression -t -l --message="Reload nginx and start $app..."
 systemctl reload nginx
 ynh_systemd_action

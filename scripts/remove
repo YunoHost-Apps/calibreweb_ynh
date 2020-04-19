@@ -37,7 +37,7 @@ fi
 #=================================================
 
 # Remove the dedicated systemd config
-ynh_print_info "Removing systemd"
+ynh_script_progression -t --message="Removing systemd..."
 ynh_remove_systemd_config
 
 
@@ -47,7 +47,7 @@ ynh_remove_systemd_config
 #=================================================
 
 # Remove metapackage and its dependencies
-ynh_print_info "Removing dependencies"
+ynh_script_progression -t --message="Removing Dependencies..."
 ynh_remove_app_dependencies
 
 
@@ -56,7 +56,7 @@ ynh_remove_app_dependencies
 #=================================================
 
 # Remove the app directory securely
-ynh_print_info "Removing $final_path"
+ynh_script_progression -t --message="Removing $final_path..."
 ynh_secure_remove "$final_path"
 
 #=================================================
@@ -64,7 +64,7 @@ ynh_secure_remove "$final_path"
 #=================================================
 
 # Remove the dedicated nginx config
-ynh_print_info "Removing nginx config"
+ynh_script_progression -t --message="Removing Nginx Config..."
 ynh_remove_nginx_config
 
 #=================================================
@@ -80,14 +80,14 @@ ynh_remove_logrotate
 
 if yunohost firewall list | grep -q "\- $port$"
 then
-	ynh_print_info "Removing open port $port"
-	echo "Close port $port" >&2
+	ynh_script_progression -t --message="Closing port $port..."
 	yunohost firewall disallow TCP $port 2>&1
 fi
 
 #=================================================
 # SPECIFIC REMOVE
 #=================================================
+ynh_script_progression -t --message="Removing log and user $app..."
 
 # Remove the log files
 ynh_secure_remove "/var/log/$app/"

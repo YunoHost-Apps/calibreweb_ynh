@@ -1,5 +1,5 @@
---- /home/nicolas/Bureau/calibre-web-06fde4fcd00fcd067a58939e1d9eabee62a86913/cps/templates/admin.html	2020-04-18 11:48:34.000000000 +0200
-+++ ./admin.html	2020-04-18 18:21:39.272422475 +0200
+--- a/cps/templates/admin.html	2020-04-18 11:48:34.000000000 +0200
++++ b/cps/templates/admin.html	2020-04-18 18:21:39.272422475 +0200
 @@ -149,8 +149,6 @@
        </table>
  
