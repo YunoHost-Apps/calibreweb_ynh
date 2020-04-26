@@ -38,7 +38,7 @@ source _settings.sh
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
-ynh_script_progression --message="Validating installation parameters..."
+ynh_script_progression --message="Validating installation parameters..." --weight=5
 
 final_path=/var/www/$app
 test ! -e "$final_path" || ynh_die "This path already contains a folder"
@@ -54,7 +54,7 @@ ynh_webpath_register $app $domain $path_url
 #=================================================
 # STORE SETTINGS FROM MANIFEST
 #=================================================
-ynh_script_progression --message="Storing installation settings..."
+ynh_script_progression --message="Storing installation settings..." --weight=5
 
 ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
@@ -90,10 +90,10 @@ ynh_setup_source "$final_path"
 ynh_script_progression --message="Installing package dependencies..." --weight=15
 ynh_install_app_dependencies $PKG_DEPENDENCIES
 
-ynh_script_progression --message="Installing pip requirements ..." --weight=30
+ynh_script_progression --message="Installing pip requirements..." --weight=50
 pip3 install --no-cache-dir --target $final_path/vendor -r $final_path/requirements.txt
 
-ynh_script_progression --message="Installing pip additionnal requirements..." --weight=40
+ynh_script_progression --message="Installing pip additionnal requirements..." --weight=60
 pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/optional-requirements.txt
 
 #=================================================
@@ -129,7 +129,7 @@ ynh_add_systemd_config
 #=================================================
 # CREATE FILES AND DIRECTORIES
 #=================================================
-ynh_script_progression --message="Creating files and directory..."
+ynh_script_progression --message="Creating files and directory..." --weight=5
 #Logic is as follow : if app is set to be publicly accessible, we will assume that the library should be set in "Share" multimedia directory
 # If app is set to be private but access is requested for all user, we will assume the same
 # If app is set to be private but access is limited to the admin user, we will set it inside his own multimedia directory.
@@ -169,7 +169,7 @@ chown -R $app:$app /var/log/$app
 #=================================================
 # SET SQLITE DATABASE SETTINGS
 #=================================================
-ynh_script_progression --message="Setting up database and settings..."
+ynh_script_progression --message="Setting up database and settings..." --weight=5 
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
 ynh_systemd_action
 
@@ -227,11 +227,11 @@ fi
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_script_progression --message="Reload nginx and start $app..."
+ynh_script_progression --message="Reload nginx and start $app..." --weight=5 -t
 ynh_systemd_action --service_name=nginx --action=reload
 ynh_systemd_action
 
 #=================================================
 # END OF SCRIPT
 #=================================================
-ynh_script_progression --message="Installation of $app completed" --last
+ynh_script_progression --message="Installation of $app completed" --last -t

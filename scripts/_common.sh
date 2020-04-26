@@ -11,6 +11,11 @@ get_db() {
     sqlite3 $final_path/app.db ".schema $1" | awk '/\t/ {print $1}' | grep -v -e "UNIQUE" -e "PRIMARY" -e "CHECK" -e "FOREIGN" | awk '{printf "%s, ", $0}' | head -c -2
 }
 
+version_gt() { 
+	test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1";
+}
+
+
 #=================================================
 # EXPERIMENTAL HELPERS
 # TO BE DELETED WHEN RELEASED
