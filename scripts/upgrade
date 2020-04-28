@@ -13,9 +13,10 @@ source /usr/share/yunohost/helpers
 # LOAD SETTINGS
 #=================================================
 ynh_script_progression --message="Loading installation settings..." --weight=2
-app=$YNH_APP_INSTANCE_NAME
 
+app=$YNH_APP_INSTANCE_NAME
 domain=$(ynh_app_setting_get $app domain)
+port=$(ynh_app_setting_get $app port)
 path_url=$(ynh_app_setting_get $app path)
 admin=$(ynh_app_setting_get $app admin)
 is_public=$(ynh_app_setting_get $app is_public)
@@ -23,13 +24,14 @@ final_path=$(ynh_app_setting_get $app final_path)
 language=$(ynh_app_setting_get $app language)
 
 
-#Get settings from database in case it has been changed in the app
+#Get settings from database in case it has been changed in the app and save it in settings so that it can be used back afterward
 calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
-#Save it in settings so that it can be used back afterward
 calibre_dir=${calibre_dir%/}
 ynh_app_setting_set $app calibre_dir $calibre_dir
 
-port=$(ynh_app_setting_get $app port)
+upload=$(sqlite3 $final_path/app.db "SELECT config_uploading FROM settings WHERE ID=1")
+ynh_app_setting_set $app upload $upload
+
 source _settings.sh
 
 #=================================================
@@ -99,7 +101,7 @@ fi
 
 if [ "$upgrade_type" == "UPGRADE_APP" ]
 then
-	ynh_script_progression --message="Upgrading source files from $current_upstream_app_version to new_upstream_package_version..." --weight=10
+	ynh_script_progression --message="Upgrading source files from $current_upstream_app_version to $new_upstream_package_version..." --weight=10
 	# Download, check integrity, uncompress and patch the source from app.src
 	ynh_setup_source --dest_dir="$final_path"
 fi
@@ -228,7 +230,7 @@ ynh_systemd_action --service_name=nginx --action=reload
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --time --weight=1
 
-ynh_systemd_action --service_name=$app --action="start"
+ynh_systemd_action --service_name=$app --action="start" -l "Starting Tornado server on :8083" -t 20
 #=================================================
 # END OF SCRIPT
 #=================================================

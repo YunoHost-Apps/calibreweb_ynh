@@ -118,13 +118,13 @@ fi
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=1
 
-ynh_systemd_action --service_name=$app --action="start"
+ynh_systemd_action --service_name=$app --action="start" -l "Starting Tornado server on :8083" -t 20
 #=================================================
 # RELOAD NGINX
 #=================================================
 ynh_script_progression --message="Reloading nginx web server..." --weight=1
 
-ynh_systemd_action --service_name=nginx --action=reload
+ynh_systemd_action --service_name=nginx --action=reload 
 
 #=================================================
 # END OF SCRIPT
