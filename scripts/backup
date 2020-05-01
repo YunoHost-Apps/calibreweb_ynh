@@ -6,7 +6,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-source ../settings/scripts/_common.sh
+
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -19,9 +19,9 @@ ynh_abort_if_errors
 #=================================================
 # LOAD SETTINGS
 #=================================================
-ynh_script_progression --message="Loading installation settings..." --time --weight=1
-app=$YNH_APP_INSTANCE_NAME
+ynh_script_progression --message="Loading installation settings..." --weight=1
 
+app=$YNH_APP_INSTANCE_NAME
 final_path=$(ynh_app_setting_get $app final_path)
 path_url=$(ynh_app_setting_get $app path)
 domain=$(ynh_app_setting_get $app domain)
@@ -32,6 +32,7 @@ calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM setting
 calibre_dir=${calibre_dir%/}
 ynh_app_setting_set $app calibre_dir $calibre_dir 
 
+source ../settings/scripts/_common.sh
 
 
 #=================================================
@@ -39,7 +40,7 @@ ynh_app_setting_set $app calibre_dir $calibre_dir
 #=================================================
 # STOP SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Stopping a systemd service..." --time --weight=1
+ynh_script_progression --message="Stopping a systemd service..." --weight=1
 
 ynh_systemd_action --service_name=$app --action="stop"
 
@@ -48,7 +49,7 @@ ynh_systemd_action --service_name=$app --action="stop"
 # BACKUP THE APP MAIN DIR
 #=================================================
 
-ynh_script_progression --message="Backing up the main app directory..." --time --weight=1
+ynh_script_progression --message="Backing up the main app directory..." --weight=1
 #This will backup the app.db file at the same time
 ynh_backup --src_path="$final_path"
 
@@ -56,7 +57,7 @@ ynh_backup --src_path="$final_path"
 # BACKUP THE NGINX CONFIGURATION
 #=================================================
 
-ynh_script_progression --message="Backing up nginx web server configuration..." --time --weight=1
+ynh_script_progression --message="Backing up nginx web server configuration..." --weight=1
 
 ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"
 
@@ -66,13 +67,13 @@ ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"
 #=================================================
 # BACKUP LOGROTATE
 #=================================================
-ynh_script_progression --message="Backing up logrotate configuration..." --time --weight=1
+ynh_script_progression --message="Backing up logrotate configuration..." --weight=1
 ynh_backup --src_path="/etc/logrotate.d/$app"
 
 #=================================================
 # BACKUP SYSTEMD
 #=================================================
-ynh_script_progression --message="Backing up systemd configuration..." --time --weight=1
+ynh_script_progression --message="Backing up systemd configuration..." --weight=1
 ynh_backup --src_path="/etc/systemd/system/$app.service"
 
 
@@ -87,12 +88,13 @@ ynh_backup --src_path="$calibre_dir" --is_big
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..." --time --weight=1
+ynh_script_progression --message="Starting a systemd service..." --weight=5
 
-ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
+ynh_systemd_action --service_name=$app --action="start" -t 20
+sleep 2s
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Backup script completed for $app. (YunoHost will then actually copy those files to the archive)." --time --last
+ynh_script_progression --message="Backup script completed for $app. (YunoHost will then actually copy those files to the archive)." --last

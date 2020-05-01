@@ -1,19 +1,10 @@
 #!/bin/bash
 
-get_db() {
-        # $1 = nom de la table
-        # cette ligne de malade : 
-        # 1/ Recupere le schém de la table user
-        # 2/ En extrait les noms de champs (en prenant le premier mot après la tabulation)
-        # 3/ en supprime les clé UNIQUE, PRIMARY et CHECK dont on ne veut pas
-        # 4/ remplace la liste avec retour à la ligne par une liste séparé par des virgules
-        # 5/ Enlève la dernière virgule
-    sqlite3 $final_path/app.db ".schema $1" | awk '/\t/ {print $1}' | grep -v -e "UNIQUE" -e "PRIMARY" -e "CHECK" -e "FOREIGN" | awk '{printf "%s, ", $0}' | head -c -2
-}
-
-version_gt() { 
-	test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1";
-}
+PKG_DEPENDENCIES="sqlite3 python-dev libldap2-dev libsasl2-dev libssl-dev python3-pip imagemagick"
+#PKG_DEPENDENCIES="sqlite3 python3-pip imagemagick"
+DOSSIER_MEDIA=/home/yunohost.multimedia
+LOG_FILE=/var/log/$app/$app.log
+ACCESS_LOG_FILE=/var/log/$app/$app-access.log
 
 
 #=================================================

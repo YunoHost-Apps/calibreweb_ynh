@@ -1,12 +1,15 @@
 #!/bin/bash
 
+version_gt() { 
+	test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1";
+}
+
 #=================================================
 # GENERIC START
 #=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
 
-source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -23,7 +26,6 @@ is_public=$(ynh_app_setting_get $app is_public)
 final_path=$(ynh_app_setting_get $app final_path)
 language=$(ynh_app_setting_get $app language)
 
-
 #Get settings from database in case it has been changed in the app and save it in settings so that it can be used back afterward
 calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
 calibre_dir=${calibre_dir%/}
@@ -32,7 +34,7 @@ ynh_app_setting_set $app calibre_dir $calibre_dir
 upload=$(sqlite3 $final_path/app.db "SELECT config_uploading FROM settings WHERE ID=1")
 ynh_app_setting_set $app upload $upload
 
-source _settings.sh
+source _common.sh
 
 #=================================================
 # CHECK VERSION
@@ -137,7 +139,7 @@ fi
 #=================================================
 
 # Create a dedicated user (if not existing)
-ynh_script_progression --message="Making sure dedicated system user exists..." --time --weight=1
+ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
 ynh_system_user_create $app
 
 # Set permissions on app files (required to be able to update database)
@@ -148,7 +150,7 @@ chown -R $app: $final_path
 #=================================================
 #build multimedia directory
 #=================================================
-ynh_script_progression --message="Create Multimedia dir..." --time --weight=1
+ynh_script_progression --message="Create Multimedia dir..." --weight=1
 #Create multimedia directory but we do not change the calibre_dir : It's the user to make this choice.
 ynh_multimedia_build_main_dir
 ynh_multimedia_addaccess $app
@@ -156,7 +158,7 @@ ynh_multimedia_addaccess $app
 #=================================================
 #Update database structure
 #=================================================
-ynh_script_progression --message="Update database..." --time --weight=1
+ynh_script_progression --message="Update database..." --weight=1
 ### Verify the checksum of a file, stored by `ynh_store_file_checksum` in the install script.
 ### And create a backup of this file if the checksum is different. So the file will be backed up if the admin had modified it.
 ynh_backup_if_checksum_is_different "$final_path/app.db"
@@ -178,7 +180,7 @@ ynh_store_file_checksum "$final_path/app.db"
 #=================================================
 
 # Use logrotate to manage app-specific logfile(s)
-ynh_script_progression --message="Upgrading logrotate configuration..." --time --weight=1
+ynh_script_progression --message="Upgrading logrotate configuration..." --weight=1
 ynh_use_logrotate --non-append
 
 
@@ -187,7 +189,7 @@ ynh_use_logrotate --non-append
 #=================================================
 
 # Create a dedicated systemd config
-ynh_script_progression --message="Upgrading systemd configuration..." --time --weight=1
+ynh_script_progression --message="Upgrading systemd configuration..." --weight=1
 ynh_add_systemd_config
 
 #=================================================
@@ -222,18 +224,19 @@ fi
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_script_progression --message="Reloading nginx web server..." --time --weight=1
+ynh_script_progression --message="Reloading nginx web server..." --weight=1
 
 ynh_systemd_action --service_name=nginx --action=reload
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..." --time --weight=1
+ynh_script_progression --message="Starting a systemd service..." --weight=2
 
-ynh_systemd_action --service_name=$app --action="start" -l "Starting Tornado server on :8083" -t 20
+ynh_systemd_action --service_name=$app --action="start" -t 20
+sleep 2s
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Upgrade of $app completed" --time --last
+ynh_script_progression --message="Upgrade of $app completed" --last
 

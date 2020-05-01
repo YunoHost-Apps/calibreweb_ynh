@@ -6,15 +6,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-source _common.sh
 source /usr/share/yunohost/helpers
-
-#=================================================
-# MANAGE SCRIPT FAILURE
-#=================================================
-
-# Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
 
 #=================================================
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
@@ -32,7 +24,19 @@ public_library=$7
 if [ $is_public -eq 1 ]; then
 	public_library=1
 fi
-source _settings.sh
+source _common.sh
+
+
+
+source _common.sh
+source /usr/share/yunohost/helpers
+
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
+
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
 
 
 #=================================================
@@ -229,7 +233,8 @@ fi
 #=================================================
 ynh_script_progression --message="Reload nginx and start $app..." --weight=5
 ynh_systemd_action --service_name=nginx --action=reload
-ynh_systemd_action -l "Starting Tornado server on :8083" -t 20
+ynh_systemd_action --service_name=$app --action=start -t 20
+sleep 2s
 
 #=================================================
 # END OF SCRIPT

@@ -1,30 +1,52 @@
---- a/cps/web.py	2020-04-18 11:48:34.000000000 +0200
-+++ b/cps/web.py	2020-04-19 13:42:18.719536869 +0200
-@@ -1206,6 +1206,13 @@
+--- a/cps/web.py	2020-05-01 13:54:41.755888435 +0200
++++ b/cps/web.py"	2020-05-01 14:03:01.337768210 +0200
+@@ -281,6 +281,10 @@
+     if not config.db_configured and request.endpoint not in (
+         'admin.basic_configuration', 'login') and '/static/' not in request.path:
+         return redirect(url_for('admin.basic_configuration'))
++#Début Modif Yunohost 1/4
++    if config.config_login_type == constants.LOGIN_LDAP and services.ldap:
++        import_ldap_users()
++#Fin Modif Yunohost 1/4
+ 
+ 
+ @app.route('/import_ldap_users')
+@@ -313,7 +317,10 @@
+                 log.warning("Could Not Parse LDAP User: %s", user)
+                 continue
+         if ub.session.query(ub.User).filter(ub.User.nickname == user.lower()).first():
+-            log.warning("LDAP User: %s Already in Database", user)
++# Début Modif Yunohost 2/4
++#            log.warning("LDAP User: %s Already in Database", user)
++            log.debug("LDAP User: %s Already in Database", user)
++#Fin Modif Yunohost 2/4
+             continue
+         user_data = services.ldap.get_object_details(user=user,
+                                                      group=None,
+@@ -1216,6 +1223,10 @@
      if not config.db_configured:
          log.debug(u"Redirect to initial configuration")
          return redirect(url_for('admin.basic_configuration'))
++#Début Modif Yunohost 3/4
 +    if config.config_login_type == constants.LOGIN_LDAP and services.ldap:
 +        import_ldap_users()
-+        auth_user = request.headers.get('X-Remote-User')
-+        if auth_user:
-+            user = ub.session.query(ub.User).filter(func.lower(ub.User.nickname) == auth_user.strip().lower()).first()
-+            log.info("Login of user %s", user.nickname)
-+            login_user(user)
++#Fin Modif Yunohost 3/4
      if current_user is not None and current_user.is_authenticated:
          return redirect(url_for('web.index'))
      if config.config_login_type == constants.LOGIN_LDAP and not services.ldap:
-@@ -1284,8 +1291,11 @@
-         logout_user()
+@@ -1290,8 +1301,13 @@
          if feature_support['oauth'] and (config.config_login_type == 2 or config.config_login_type == 3):
              logout_oauth_user()
--    log.debug(u"User logged out")
+     log.debug(u"User logged out")
 -    return redirect(url_for('web.login'))
-+        auth_user = request.headers.get('X-Remote-User')
-+    if auth_user:
+-
++#Début Modif Yunohost 4/4
++#    return redirect(url_for('web.login'))
++    if config.config_login_type == constants.LOGIN_LDAP and services.ldap:
 +        return redirect(request.host_url)
 +    else:
 +        return redirect(url_for('web.login'))
- 
++#Fin Modif Yunohost 4/4
  
  @web.route('/remote/login')
+ @remote_login_required
