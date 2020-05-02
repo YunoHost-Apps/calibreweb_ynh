@@ -67,7 +67,6 @@
                 "name": "language",
                 "type": "string",
                 "optional": true,
-                "type": "string",
                 "ask": {
                     "en": "Select a default language",
                     "fr": "Choisissez une langue par défaut"
