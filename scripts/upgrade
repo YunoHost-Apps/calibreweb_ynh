@@ -93,10 +93,10 @@ if version_gt "0.6.6" $current_upstream_app_version && [ $current_upstream_packa
 	pip install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/requirements.txt
 	chown -R $app: $final_path
 	#set database settings as per conf file : restart server so that app.db is regenerated
-	ynh_systemd_action
+	ynh_systemd_action --service_name=$app --action="start" -line_match="server on " --log_path=$final_path/calibre-web.log -t 20
 	#sleep required on low spec like raspberryPi
 	sleep 5s
-	ynh_systemd_action -a stop
+	ynh_systemd_action --service_name=$app --action="stop"
 	current_upstream_app_version="0.6.6"
 	#remove unwanted entry in settings db
 fi
@@ -164,10 +164,14 @@ ynh_script_progression --message="Update database..." --weight=1
 ynh_backup_if_checksum_is_different "$final_path/app.db"
 
 #set database settings as per conf file : restart server so that app.db is regenerated, then add new ldap & log settings
-ynh_systemd_action
+if [  $current_upstream_app_version == '0.6.6' ] ; then
+        ynh_systemd_action --service_name=$app --action="start" -line_match="server on " --log_path=$final_path/calibre-web.log -t 20
+else
+        ynh_systemd_action --service_name=$app --action="start" -line_match="server on :$port" -t 20
+fi
 #sleep required on low spec like raspberryPi
-sleep 5s
-ynh_systemd_action -a stop
+sleep 2s
+ynh_systemd_action --service_name=$app --action="stop"
 
 conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))), $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
 eval sqlite3 $final_path/app.db "$conf"
@@ -232,8 +236,8 @@ ynh_systemd_action --service_name=nginx --action=reload
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=2
 
-ynh_systemd_action --service_name=$app --action="start" -t 20
-sleep 2s
+ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t 20
+
 #=================================================
 # END OF SCRIPT
 #=================================================

@@ -25,6 +25,7 @@ app=$YNH_APP_INSTANCE_NAME
 final_path=$(ynh_app_setting_get $app final_path)
 path_url=$(ynh_app_setting_get $app path)
 domain=$(ynh_app_setting_get $app domain)
+port=$(ynh_app_setting_get $app port)
 
 #Get settings from database in case it has been changed in the app
 calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
@@ -90,8 +91,8 @@ ynh_backup --src_path="$calibre_dir" --is_big
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=5
 
-ynh_systemd_action --service_name=$app --action="start" -t 20
-sleep 2s
+ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t 20
+
 
 #=================================================
 # END OF SCRIPT
