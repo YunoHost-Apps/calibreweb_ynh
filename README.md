@@ -81,9 +81,13 @@ sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibre
 - [X] rework LDAP integration to create user automatically
 - [X] Package_check integration
 - [X] On backup/remove/upgrade : check for database location to update settings
+- [ ] Update mail settings with yunohost settings
 - [ ] enable magic link
-- [ ] Add cronjob to reload database
+- [ ] Add cronjob to reload database (for nextcloud integration)
 - [ ] OPDS activation
+- [ ] Add action to restart the server
+- [ ] Add action to synchronize users
+- [ ] Add action to deactivate LDAP et retrieve admin password
 
 
 ## LICENSE

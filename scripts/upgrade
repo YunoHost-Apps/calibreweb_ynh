@@ -39,6 +39,7 @@ source _common.sh
 #=================================================
 # CHECK VERSION
 #=================================================
+
 upgrade_type=$(ynh_check_app_version_changed)
 
 current_upstream_package_version=$(ynh_app_upstream_version --manifest="/etc/yunohost/apps/$app/manifest.json") #0.96.0
@@ -59,9 +60,13 @@ fi
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
 ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --weight=10
+
 # Backup the current version of the app
 ynh_backup_before_upgrade
 ynh_clean_setup () {
+
+	ynh_clean_check_starting
+
 	# restore it if the upgrade fails
 	ynh_restore_upgradebackup
 }
@@ -87,15 +92,15 @@ path_url=$(ynh_normalize_url_path $path_url)
 #=================================================
 
 #binaries version is 0.6.0, we need to go throught upgrade to 0.6.6 so that app.db is correctly updated, otherwise database is corrupted
-if version_gt "0.6.6" $current_upstream_app_version && [ $current_upstream_package_version == "0.6.0" ] && [ "$upgrade_type" == "UPGRADE_APP" ]; then
+if version_gt "0.6.6" "$current_upstream_app_version" && [ "$current_upstream_package_version" == "0.6.0" ] && [ "$upgrade_type" == "UPGRADE_APP" ]; then
 	ynh_script_progression --message="Upgrading from $current_upstream_app_version to 0.6.6..." --weight=50
 	ynh_setup_source --dest_dir="$final_path" --source_id="app066"
 	pip install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/requirements.txt
 	chown -R $app: $final_path
 	#set database settings as per conf file : restart server so that app.db is regenerated
-	ynh_systemd_action --service_name=$app --action="start" -line_match="server on " --log_path=$final_path/calibre-web.log -t 20
+	ynh_systemd_action --service_name=$app --action="start" --line_match="server on " --log_path="$final_path/calibre-web.log" -t 20
 	#sleep required on low spec like raspberryPi
-	sleep 5s
+	sleep 2s
 	ynh_systemd_action --service_name=$app --action="stop"
 	current_upstream_app_version="0.6.6"
 	#remove unwanted entry in settings db
@@ -164,13 +169,13 @@ ynh_script_progression --message="Update database..." --weight=1
 ynh_backup_if_checksum_is_different "$final_path/app.db"
 
 #set database settings as per conf file : restart server so that app.db is regenerated, then add new ldap & log settings
-if [  $current_upstream_app_version == '0.6.6' ] ; then
-        ynh_systemd_action --service_name=$app --action="start" -line_match="server on " --log_path=$final_path/calibre-web.log -t 20
+if [ "$current_upstream_app_version" == '0.6.6' ]; then
+        ynh_systemd_action --service_name=$app --action="start" --line_match="server on " --log_path="$final_path/calibre-web.log" -t 20
 else
-        ynh_systemd_action --service_name=$app --action="start" -line_match="server on :$port" -t 20
+        ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" -t 20
 fi
 #sleep required on low spec like raspberryPi
-sleep 2s
+sleep 3s
 ynh_systemd_action --service_name=$app --action="stop"
 
 conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))), $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
