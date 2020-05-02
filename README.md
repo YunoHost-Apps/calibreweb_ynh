@@ -52,6 +52,7 @@ chmod o+rw path/to/library
 * Do not use a Nextcloud folder. It's all right if the folder is an external storage in Nextcloud but not if it's an internal one : Changing the data in the library will cause trouble with the sync
 * "Magic link feature is not yet available
 * Change to library made outside calibreweb are not automatically updated in calibreweb. It is required to disconnect and reconnect to see the changes
+* OPDS is not yet working
 
 ## Links
 
@@ -77,14 +78,17 @@ sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibre
 ## Todo
 - [X] Multiinstance
 - [X] Better Multimedia integration : Integrate in Yunohost.multimedia
-- [X] User and possibly LDAP integration, http auth
+- [X] rework LDAP integration to create user automatically
 - [X] Package_check integration
 - [X] On backup/remove/upgrade : check for database location to update settings
+- [ ] Update mail settings with yunohost settings
 - [ ] enable magic link
-- [ ] Add cronjob to reload database
-- [X] Disable internal update
-- [ ] Check email send
-- [ ] enable OPDS feed
+- [ ] Add cronjob to reload database (for nextcloud integration)
+- [ ] OPDS activation
+- [ ] Add action to restart the server
+- [ ] Add action to synchronize users
+- [ ] Add action to deactivate LDAP et retrieve admin password
+
 
 
 ## LICENSE

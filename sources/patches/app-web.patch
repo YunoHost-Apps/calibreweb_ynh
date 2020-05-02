@@ -1,85 +1,52 @@
---- a/cps/web.py	2019-01-27 08:32:26.000000000 +0100
-+++ b/cps/web.py	2019-02-02 12:38:12.364323004 +0100
-@@ -78,6 +78,9 @@
- import server
- from reverseproxy import ReverseProxied
- from updater import updater_thread
-+#Yunohost LDAP integration - 1
-+vlogout = 0
-+#END Yunohost LDAP integration -1
+--- a/cps/web.py	2020-05-01 13:54:41.755888435 +0200
++++ b/cps/web.py"	2020-05-01 14:03:01.337768210 +0200
+@@ -281,6 +281,10 @@
+     if not config.db_configured and request.endpoint not in (
+         'admin.basic_configuration', 'login') and '/static/' not in request.path:
+         return redirect(url_for('admin.basic_configuration'))
++#Début Modif Yunohost 1/4
++    if config.config_login_type == constants.LOGIN_LDAP and services.ldap:
++        import_ldap_users()
++#Fin Modif Yunohost 1/4
  
- try:
-     from googleapiclient.errors import HttpError
-@@ -2256,10 +2259,36 @@
-         return redirect(url_for('basic_configuration'))
+ 
+ @app.route('/import_ldap_users')
+@@ -313,7 +317,10 @@
+                 log.warning("Could Not Parse LDAP User: %s", user)
+                 continue
+         if ub.session.query(ub.User).filter(ub.User.nickname == user.lower()).first():
+-            log.warning("LDAP User: %s Already in Database", user)
++# Début Modif Yunohost 2/4
++#            log.warning("LDAP User: %s Already in Database", user)
++            log.debug("LDAP User: %s Already in Database", user)
++#Fin Modif Yunohost 2/4
+             continue
+         user_data = services.ldap.get_object_details(user=user,
+                                                      group=None,
+@@ -1216,6 +1223,10 @@
+     if not config.db_configured:
+         log.debug(u"Redirect to initial configuration")
+         return redirect(url_for('admin.basic_configuration'))
++#Début Modif Yunohost 3/4
++    if config.config_login_type == constants.LOGIN_LDAP and services.ldap:
++        import_ldap_users()
++#Fin Modif Yunohost 3/4
      if current_user is not None and current_user.is_authenticated:
-         return redirect(url_for('index'))
-+#Yunohost integration - 2
-+    auth_user = request.headers.get('X-Remote-User')
-+    global vlogout
-+    if auth_user and config.config_use_ldap and not vlogout:
-+        vlogout = 0
-+        user = ub.session.query(ub.User).filter(func.lower(ub.User.nickname) == auth_user.strip().lower()).first()
-+        login_user(user, remember=True)
-+        flash(_(u"you are now logged in as: '%(nickname)s'", nickname=user.nickname), category="success")
-+        return redirect(url_for("index"))
-+#END Yunohost integration - 2
-     if request.method == "POST":
-         form = request.form.to_dict()
-         user = ub.session.query(ub.User).filter(func.lower(ub.User.nickname) == form['username'].strip().lower()).first()
--        if user and check_password_hash(user.password, form['password']) and user.nickname is not "Guest":
-+#Yunohost integration - 3
-+#        if user and check_password_hash(user.password, form['password']) and user.nickname is not "Guest":
-+#END Yunohost integration - 3
-+#Yunohost Integration - 4
-+        if config.config_use_ldap and user:
-+            import ldap
-+            try:
-+                ub.User.try_login(form['username'], form['password'])
-+                login_user(user, remember=True)
-+                flash(_(u"you are now logged in as: '%(nickname)s'", nickname=user.nickname), category="success")
-+                return redirect_back(url_for("index"))
-+            except ldap.INVALID_CREDENTIALS:
-+                ipAdress = request.headers.get('X-Forwarded-For', request.remote_addr)
-+                app.logger.info('LDAP Login failed for user "' + form['username'] + '" IP-adress: ' + ipAdress)
-+                flash(_(u"Wrong Username or Password"), category="error")
-+        elif user and check_password_hash(user.password, form['password']) and user.nickname is not "Guest":
-+#End Yunohost Integration - 4
-             login_user(user, remember=True)
-             flash(_(u"you are now logged in as: '%(nickname)s'", nickname=user.nickname), category="success")
-             return redirect_back(url_for("index"))
-@@ -2280,6 +2309,10 @@
- @login_required
- def logout():
-     if current_user is not None and current_user.is_authenticated:
-+#Yunohost Integration - 5
-+        global vlogout
-+        vlogout = 1
-+#End Yunohost integration - 5
-         logout_user()
-     return redirect(url_for('login'))
+         return redirect(url_for('web.index'))
+     if config.config_login_type == constants.LOGIN_LDAP and not services.ldap:
+@@ -1290,8 +1301,13 @@
+         if feature_support['oauth'] and (config.config_login_type == 2 or config.config_login_type == 3):
+             logout_oauth_user()
+     log.debug(u"User logged out")
+-    return redirect(url_for('web.login'))
+-
++#Début Modif Yunohost 4/4
++#    return redirect(url_for('web.login'))
++    if config.config_login_type == constants.LOGIN_LDAP and services.ldap:
++        return redirect(request.host_url)
++    else:
++        return redirect(url_for('web.login'))
++#Fin Modif Yunohost 4/4
  
-@@ -2987,6 +3020,23 @@
-         if "config_ebookconverter" in to_save:
-             content.config_ebookconverter = int(to_save["config_ebookconverter"])
- 
-+#Yunohost Integration - 6
-+        #LDAP configuration,
-+        if "config_use_ldap" in to_save and to_save["config_use_ldap"] == "on":
-+            if not "config_ldap_provider_url" in to_save or not "config_ldap_dn" in to_save:
-+                ub.session.commit()
-+                flash(_(u'Please enter a LDAP provider and a DN'), category="error")
-+                return render_title_template("config_edit.html", content=config, origin=origin,
-+                                             gdrive=gdriveutils.gdrive_support, gdriveError=gdriveError,
-+                                             goodreads=goodreads_support, title=_(u"Basic Configuration"),
-+                                             page="config")
-+            else:
-+                content.config_use_ldap = 1
-+                content.config_ldap_provider_url = to_save["config_ldap_provider_url"]
-+                content.config_ldap_dn = to_save["config_ldap_dn"]
-+                db_change = True
-+#END Yunohost integration - 6
-+
-         # Remote login configuration
-         content.config_remote_login = ("config_remote_login" in to_save and to_save["config_remote_login"] == "on")
-         if not content.config_remote_login:
+ @web.route('/remote/login')
+ @remote_login_required
