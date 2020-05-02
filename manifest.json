@@ -65,6 +65,7 @@
             },
             {
                 "name": "language",
+                "type": "string",
                 "optional": true,
                 "type": "string",
                 "ask": {
