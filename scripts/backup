@@ -82,7 +82,7 @@ ynh_backup --src_path="/etc/systemd/system/$app.service"
 # BACKUP THE DATA DIRECTORY
 #=================================================
 ynh_script_progression --message="Backing up data directory..."
-
+ynh_print_info "Data directory will be backup up only if BACKUP_CORE_ONLY is unset"
 ynh_backup --src_path="$calibre_dir" --is_big
 
 
