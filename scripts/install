@@ -175,11 +175,12 @@ chown -R $app:$app /var/log/$app
 #=================================================
 ynh_script_progression --message="Setting up database and settings..." --weight=5 
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
-ynh_systemd_action
-
+ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" --log_path="$final_path/calibre-web.log" -t 20
 #sleep required on low spec like raspberryPi
-sleep 5s
-ynh_systemd_action -a stop
+sleep 2s
+#remove unwanted calibre-web.log
+ynh_secure_remove --file="$final_path/calibre-web.log"
+ynh_systemd_action --service_name=$app --action="stop"
 
 
 #set database settings as per conf file
@@ -233,7 +234,7 @@ fi
 #=================================================
 ynh_script_progression --message="Reload nginx and start $app..." --weight=5
 ynh_systemd_action --service_name=nginx --action=reload
-ynh_systemd_action --service_name=$app --action=start -l "server on :$port" -t 20
+ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" -t 20
 
 #=================================================
 # END OF SCRIPT

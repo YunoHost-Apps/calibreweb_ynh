@@ -175,7 +175,9 @@ else
         ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" -t 20
 fi
 #sleep required on low spec like raspberryPi
-sleep 3s
+sleep 2s
+#remove unwanted calibre-web.log
+ynh_secure_remove --file="$final_path/calibre-web.log"
 ynh_systemd_action --service_name=$app --action="stop"
 
 conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))), $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
