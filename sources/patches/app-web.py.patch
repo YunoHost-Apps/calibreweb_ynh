@@ -1,17 +1,18 @@
---- a/cps/web.py	2020-05-01 13:54:41.755888435 +0200
-+++ b/cps/web.py"	2020-05-01 14:03:01.337768210 +0200
-@@ -281,6 +281,10 @@
+--- a/cps/web.py	2020-04-28 15:33:25.000000000 +0200
++++ b/cps/web.py	2020-05-03 14:12:19.028083695 +0200
+@@ -281,7 +281,10 @@
      if not config.db_configured and request.endpoint not in (
          'admin.basic_configuration', 'login') and '/static/' not in request.path:
          return redirect(url_for('admin.basic_configuration'))
+-
 +#Début Modif Yunohost 1/4
 +    if config.config_login_type == constants.LOGIN_LDAP and services.ldap:
 +        import_ldap_users()
 +#Fin Modif Yunohost 1/4
  
- 
  @app.route('/import_ldap_users')
-@@ -313,7 +317,10 @@
+ def import_ldap_users():
+@@ -313,7 +316,10 @@
                  log.warning("Could Not Parse LDAP User: %s", user)
                  continue
          if ub.session.query(ub.User).filter(ub.User.nickname == user.lower()).first():
@@ -23,7 +24,7 @@
              continue
          user_data = services.ldap.get_object_details(user=user,
                                                       group=None,
-@@ -1216,6 +1223,10 @@
+@@ -1217,6 +1223,10 @@
      if not config.db_configured:
          log.debug(u"Redirect to initial configuration")
          return redirect(url_for('admin.basic_configuration'))
@@ -34,7 +35,7 @@
      if current_user is not None and current_user.is_authenticated:
          return redirect(url_for('web.index'))
      if config.config_login_type == constants.LOGIN_LDAP and not services.ldap:
-@@ -1290,8 +1301,13 @@
+@@ -1291,8 +1301,13 @@
          if feature_support['oauth'] and (config.config_login_type == 2 or config.config_login_type == 3):
              logout_oauth_user()
      log.debug(u"User logged out")

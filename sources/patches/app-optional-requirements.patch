@@ -1,5 +1,5 @@
---- a/optional-requirements.txt	2020-04-15 22:03:21.000000000 +0200
-+++ b/optional-requirements.txt	2020-04-16 20:44:43.371235411 +0200
+--- a/optional-requirements.txt	2020-04-28 15:33:25.000000000 +0200
++++ b/optional-requirements.txt	2020-05-03 13:59:23.067375502 +0200
 @@ -1,17 +1,3 @@
 -# GDrive Integration
 -google-api-python-client==1.7.11,<1.8.0
@@ -19,12 +19,12 @@
  goodreads>=0.3.2,<0.4.0
  python-Levenshtein>=0.12.0,<0.13.0
 @@ -20,19 +6,11 @@
- python_ldap>=3.0.0,<3.3.0
- flask-simpleldap>=1.4.0,<1.5.0
+ python-ldap>=3.0.0,<3.3.0
+ Flask-SimpleLDAP>=1.4.0,<1.5.0
  
 -#oauth
--flask-dance>=1.4.0,<3.1.0
--sqlalchemy_utils>=0.33.5,<0.37.0
+-Flask-Dance>=1.4.0,<3.1.0
+-SQLAlchemy-Utils>=0.33.5,<0.37.0
 -
  # extracting metadata
  lxml>=3.8.0,<4.6.0

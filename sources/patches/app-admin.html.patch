@@ -2,7 +2,7 @@
 +++ b/cps/templates/admin.html	2020-04-18 18:21:39.272422475 +0200
 @@ -149,8 +149,6 @@
        </table>
- 
+
        <div class="hidden" id="update_error"> <span>{{update_error}}</span></div>
 -      <div class="btn btn-default" id="check_for_update">{{_('Check for Update')}}</div>
 -      <div class="btn btn-default hidden" id="perform_update" data-toggle="modal" data-target="#StatusDialog">{{_('Perform Update')}}</div>
