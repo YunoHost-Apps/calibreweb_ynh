@@ -48,12 +48,12 @@ current_upstream_package_version="${current_upstream_package_version/".96"/".6"}
 new_upstream_package_version=$(ynh_app_upstream_version) #0.96.0
 new_upstream_package_version="${new_upstream_package_version/".96"/".6"}" #0.6.0
 
-if [ -f $final_path/cps/constants.py ]; then
+if [ -f $final_path/cps/constants.py ]; then #on est dans une version postérieur à la 0.6.0
 	current_upstream_app_version=$(cat $final_path/cps/constants.py | grep STABLE_VERSION)
 	current_upstream_app_version="${current_upstream_app_version/STABLE_VERSION = \{\'version\': \'/""}"
 	current_upstream_app_version="${current_upstream_app_version/\'\}/""}"
-else
-	current_upstream_app_version='0.6.0'
+else #on est encore en 0.6.0
+	current_upstream_app_version='0.6.0' 
 fi
 
 #=================================================
@@ -98,7 +98,7 @@ if version_gt "0.6.6" "$current_upstream_app_version" && [ "$current_upstream_pa
 	pip install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/requirements.txt
 	chown -R $app: $final_path
 	#set database settings as per conf file : restart server so that app.db is regenerated
-	ynh_systemd_action --service_name=$app --action="start" --line_match="server on " --log_path="$final_path/calibre-web.log" -t 20
+	ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server" --log_path="$final_path/calibre-web.log" -t 20
 	#sleep required on low spec like raspberryPi
 	sleep 2s
 	ynh_systemd_action --service_name=$app --action="stop"
