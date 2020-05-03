@@ -98,7 +98,7 @@ if version_gt "0.6.6" "$current_upstream_app_version" && [ "$current_upstream_pa
 	pip install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/requirements.txt
 	chown -R $app: $final_path
 	#set database settings as per conf file : restart server so that app.db is regenerated
-	ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server" --log_path="$final_path/calibre-web.log" -t 20
+	ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server" --log_path="$final_path/calibre-web.log" -t 30
 	#sleep required on low spec like raspberryPi
 	sleep 2s
 	ynh_systemd_action --service_name=$app --action="stop"
@@ -170,9 +170,9 @@ ynh_backup_if_checksum_is_different "$final_path/app.db"
 
 #set database settings as per conf file : restart server so that app.db is regenerated, then add new ldap & log settings
 if [ "$current_upstream_app_version" == '0.6.6' ]; then
-        ynh_systemd_action --service_name=$app --action="start" --line_match="server on " --log_path="$final_path/calibre-web.log" -t 20
+        ynh_systemd_action --service_name=$app --action="start" --line_match="server on " --log_path="$final_path/calibre-web.log" -t 30
 else
-        ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" -t 20
+        ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" -t 30
 fi
 #sleep required on low spec like raspberryPi
 sleep 2s
@@ -243,7 +243,7 @@ ynh_systemd_action --service_name=nginx --action=reload
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=2
 
-ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t 20
+ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t 30
 
 #=================================================
 # END OF SCRIPT

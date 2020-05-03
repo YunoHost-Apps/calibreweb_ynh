@@ -91,7 +91,7 @@ ynh_backup --src_path="$calibre_dir" --is_big
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=5
 
-ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t 20
+ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t 30
 
 
 #=================================================
