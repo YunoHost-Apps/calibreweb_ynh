@@ -86,6 +86,11 @@ chown -R $app: $final_path
 # Define and install dependencies
 ynh_script_progression --message="Reinstalling dependencies..." --weight=15
 ynh_install_app_dependencies $PKG_DEPENDENCIES
+
+#use latest version of pip as per documentation in https://github.com/pypa/get-pip
+#cannot use helper as maintaining the checksum would be a pain in the a***
+curl https://bootstrap.pypa.io/get-pip.py | python3
+
 #pip package not required as already in app directory
 #pip install --target $final_path/vendor -r $final_path/requirements.txt
 
