@@ -15,8 +15,7 @@ Calibre-Web is a web app providing a clean interface for browsing, reading and d
 
 Alternatively, you may use [COPS](https://github.com/YunoHost-Apps/cops_ynh) which also allows access to your Calibre Library, but in read-only mode. 
 
-**Shipped version:** The shipped version is 0.6.7Beta (On going developement), but as the numbering changed in the calibre-web app, it is numbered as 0.96.7 in yunohost.
-0.6.7Beta bring an integrated LDAP support. Once final 0.6.7 release will be published, update will be done only to stable version (0.6.7, 0.6.8...)
+**Shipped version:** The shipped version is 0.6.7, but as the numbering changed in the calibre-web app, it is numbered as 0.96.7 in yunohost.
 
 Users will be synchronized with authorized Yunohost users (having the calibreweb.main authorization group) automatically. In case of issue you may force the sync in the app itself.
 
@@ -96,6 +95,7 @@ sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibre
 - [ ] Add action to restart the server
 - [ ] Add action to synchronize users
 - [ ] Add action to deactivate LDAP et retrieve admin password
+- [ ] Use internal updater to update version?
 
 
 
