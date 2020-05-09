@@ -6,15 +6,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-source _common.sh
 source /usr/share/yunohost/helpers
-
-#=================================================
-# MANAGE SCRIPT FAILURE
-#=================================================
-
-# Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
 
 #=================================================
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
@@ -32,10 +24,25 @@ public_library=$7
 if [ $is_public -eq 1 ]; then
 	public_library=1
 fi
+source _common.sh
+
+
+
+source _common.sh
+source /usr/share/yunohost/helpers
+
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
+
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
+
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
+ynh_script_progression --message="Validating installation parameters..." --weight=5
 
 final_path=/var/www/$app
 test ! -e "$final_path" || ynh_die "This path already contains a folder"
@@ -51,6 +58,7 @@ ynh_webpath_register $app $domain $path_url
 #=================================================
 # STORE SETTINGS FROM MANIFEST
 #=================================================
+ynh_script_progression --message="Storing installation settings..." --weight=5
 
 ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
@@ -67,16 +75,15 @@ ynh_app_setting_set $app is_public $is_public
 # Find a free port
 port=$(ynh_find_port 8083)
 # Open this port
-ynh_print_info "Opening port $port"
+ynh_script_progression --message="Opening port $port..." --weight=5
 yunohost firewall allow --no-upnp TCP $port 2>&1
 ynh_app_setting_set $app port $port
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-
+ynh_script_progression --message="Downloading sources to $final_path..." --weight=10
 ynh_app_setting_set $app final_path $final_path
-ynh_print_info "Downloading sources to $final_path"
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source "$final_path"
 
@@ -84,14 +91,26 @@ ynh_setup_source "$final_path"
 # INSTALL DEPENDENCIES
 #=================================================
 
-ynh_print_info "Installing dependencies and pip packages"
+ynh_script_progression --message="Installing package dependencies..." --weight=15
 ynh_install_app_dependencies $PKG_DEPENDENCIES
-pip install --target $final_path/vendor -r $final_path/requirements.txt
+
+#use latest version of pip as per documentation in https://github.com/pypa/get-pip
+#cannot use helper as maintaining the checksum would be a pain in the a***
+curl https://bootstrap.pypa.io/get-pip.py | python3
+
+ynh_script_progression --message="Installing pip requirements..." --weight=50
+pip3 install --no-cache-dir --target $final_path/vendor -r $final_path/requirements.txt
+
+ynh_script_progression --message="Installing pip additionnal requirements..." --weight=60
+pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/optional-requirements.txt
 
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
 #Cannot use empty string for X-script-name, causes an issue in the python prg
+ynh_script_progression --message="Setting up system configuration..." --weight=5
+
+
 if [ $path_url = "/" ] ; then
 	ynh_replace_string "        proxy_set_header		X-Script-Name" "#       proxy_set_header		X-Script-Name" ../conf/nginx.conf
 fi
@@ -118,7 +137,7 @@ ynh_add_systemd_config
 #=================================================
 # CREATE FILES AND DIRECTORIES
 #=================================================
-ynh_print_info "Creating files and directory"
+ynh_script_progression --message="Creating files and directory..." --weight=5
 #Logic is as follow : if app is set to be publicly accessible, we will assume that the library should be set in "Share" multimedia directory
 # If app is set to be private but access is requested for all user, we will assume the same
 # If app is set to be private but access is limited to the admin user, we will set it inside his own multimedia directory.
@@ -158,56 +177,22 @@ chown -R $app:$app /var/log/$app
 #=================================================
 # SET SQLITE DATABASE SETTINGS
 #=================================================
-
-ynh_print_info "Setting up database and settings"
+ynh_script_progression --message="Setting up database and settings..." --weight=5 
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
-ynh_systemd_action -l "INFO in server: Starting Gevent server"
-
+ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" --log_path="$final_path/calibre-web.log" -t 30
 #sleep required on low spec like raspberryPi
 sleep 2s
-ynh_systemd_action -a stop
+#remove unwanted calibre-web.log
+ynh_secure_remove --file="$final_path/calibre-web.log"
+ynh_systemd_action --service_name=$app --action="stop"
 
 
 #set database settings as per conf file
-conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))) $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
+conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))), $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
 eval sqlite3 $final_path/app.db "$conf"
 
 conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""
 eval sqlite3 $final_path/app.db "$conf"
-
-#mise à jour du mot de passe (je ne sais pas pourquoi, je n'arrive pas à l'intégrer dans le fichier de conf, pb de " et ')
-#ynh_print_OFF
-#had to set it on two lines or package_linter cries like a baby...
-#pass=$(python ../conf/generate_password_hash.py "$pass" $final_path/vendor)
-#sqlite3 $final_path/app.db "UPDATE user SET password='$pass' WHERE ID=1"
-#ynh_print_ON
-
-#Creation des autres utilisateurs
-if [ $public_library -eq 1 ]; then
-	table_schema=$(get_db "user")
-	
-	for i in $(ynh_user_list); do
-		if [ $i = $admin ]; then continue; fi
-		mail=$(ynh_user_get_info $i 'mail')
-		######################################
-		#Build new entry for user
-		######################################
-		insert_user=$table_schema
-		insert_user="${insert_user/id/null}" #so that a new entry is created
-		insert_user="${insert_user/nickname/\'$i\'}"
-		insert_user="${insert_user/role/0}" #standard role
-	#	pass_hash=$(python /etc/yunohost/apps/$app/conf/generate_password_hash.py "$pass_clear" $final_path/vendor)
-	#	insert_user="${insert_user/password/\'$pass_hash\'}" #we get the same pass even if it's not thanks to LDAP, ones never knows...
-		insert_user="${insert_user/email/\'$mail\'}"
-		
-		#######################################
-		# Insert New entry in database
-		#######################################
-		
-		sqlite3 $final_path/app.db "INSERT INTO user ($table_schema) SELECT $insert_user FROM user WHERE ID = 1;"
-	
-	done
-fi
 
 #=================================================
 # SECURE FILES AND DIRECTORIES
@@ -230,7 +215,7 @@ ynh_store_file_checksum "${final_path}/app.db"
 # ADVERTISE SERVICE IN ADMIN PANEL
 #=================================================
 
-yunohost service add $app --log "/var/log/$app/$app.log"
+yunohost service add $app --description "Browse eBook in the web" --log "/var/log/$app/$app.log"
 
 #=================================================
 # SETUP SSOWAT
@@ -240,17 +225,22 @@ yunohost service add $app --log "/var/log/$app/$app.log"
 if [ $is_public -eq 1 ]
 then
 	# unprotected_uris allows SSO credentials to be passed anyway.
-	ynh_app_setting_set $app unprotected_uris "/"
+	#ynh_app_setting_set $app unprotected_uris "/"
+	ynh_permission_update --permission "main" --add visitors
 fi
 if [ $public_library -eq 0 ]; then
 	yunohost app addaccess $app -u $admin
 fi
 
 
-
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_print_info "Reload nginx and start $app"
-systemctl reload nginx
-ynh_systemd_action -l "INFO in server: Starting Gevent server"
+ynh_script_progression --message="Reload nginx and start $app..." --weight=5
+ynh_systemd_action --service_name=nginx --action=reload
+ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" -t 30
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+ynh_script_progression --message="Installation of $app completed" --last

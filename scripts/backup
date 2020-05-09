@@ -5,12 +5,8 @@
 #=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
-if [ ! -e _common.sh ]; then
-	# Get the _common.sh file if it's not in the current directory
-	cp ../settings/scripts/_common.sh ./_common.sh
-	chmod a+rx _common.sh
-fi
-source _common.sh
+
+
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -23,12 +19,13 @@ ynh_abort_if_errors
 #=================================================
 # LOAD SETTINGS
 #=================================================
+ynh_script_progression --message="Loading installation settings..." --weight=1
 
 app=$YNH_APP_INSTANCE_NAME
-
 final_path=$(ynh_app_setting_get $app final_path)
 path_url=$(ynh_app_setting_get $app path)
 domain=$(ynh_app_setting_get $app domain)
+port=$(ynh_app_setting_get $app port)
 
 #Get settings from database in case it has been changed in the app
 calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
@@ -36,19 +33,34 @@ calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM setting
 calibre_dir=${calibre_dir%/}
 ynh_app_setting_set $app calibre_dir $calibre_dir 
 
+source ../settings/scripts/_common.sh
+
+
 #=================================================
 # STANDARD BACKUP STEPS
 #=================================================
+# STOP SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Stopping a systemd service..." --weight=1
+
+ynh_systemd_action --service_name=$app --action="stop"
+
+
+#=================================================
 # BACKUP THE APP MAIN DIR
 #=================================================
+
+ynh_script_progression --message="Backing up the main app directory..." --weight=1
 #This will backup the app.db file at the same time
-ynh_backup "$final_path"
+ynh_backup --src_path="$final_path"
 
 #=================================================
 # BACKUP THE NGINX CONFIGURATION
 #=================================================
 
-ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
+ynh_script_progression --message="Backing up nginx web server configuration..." --weight=1
+
+ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"
 
 
 #=================================================
@@ -56,26 +68,34 @@ ynh_backup "/etc/nginx/conf.d/$domain.d/$app.conf"
 #=================================================
 # BACKUP LOGROTATE
 #=================================================
-
-ynh_backup "/etc/logrotate.d/$app"
+ynh_script_progression --message="Backing up logrotate configuration..." --weight=1
+ynh_backup --src_path="/etc/logrotate.d/$app"
 
 #=================================================
 # BACKUP SYSTEMD
 #=================================================
-
-ynh_backup "/etc/systemd/system/$app.service"
+ynh_script_progression --message="Backing up systemd configuration..." --weight=1
+ynh_backup --src_path="/etc/systemd/system/$app.service"
 
 
 #=================================================
 # BACKUP THE DATA DIRECTORY
 #=================================================
+ynh_script_progression --message="Backing up data directory..."
+ynh_print_info "Data directory will be backup up only if BACKUP_CORE_ONLY is unset"
+ynh_backup --src_path="$calibre_dir" --is_big
 
-backup_core_only=$(ynh_app_setting_get "$app" backup_core_only)
-# If backup_core_only have any value in the settings.yml file, do not backup the data directory
-if [ ! -z $backup_core_only ]
-then
-	ynh_print_info "Backing up the library folder $calibre_dir"
-	ynh_backup "$calibre_dir"
-else
-	ynh_print_info "Data dir will not be saved, because backup_core_only is set." >&2
-fi
+
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Starting a systemd service..." --weight=5
+
+ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t 30
+
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_script_progression --message="Backup script completed for $app. (YunoHost will then actually copy those files to the archive)." --last
