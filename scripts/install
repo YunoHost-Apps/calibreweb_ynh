@@ -6,30 +6,30 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
+source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
 #=================================================
 
+app=$YNH_APP_INSTANCE_NAME
+
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
 admin=$YNH_APP_ARG_ADMIN
 is_public=$YNH_APP_ARG_IS_PUBLIC
 language=$YNH_APP_ARG_LANGUAGE
-app=$YNH_APP_INSTANCE_NAME
-upload=$6
-public_library=$7
+upload=$YNH_APP_ARG_UPLOAD
+public_library=$7YNH_APP_ARG_PUBLIC_LIBRARY
+
 #if app is public, we assume library is public
 if [ $is_public -eq 1 ]; then
 	public_library=1
 fi
-source _common.sh
 
-
-
-source _common.sh
-source /usr/share/yunohost/helpers
+LOG_FILE=/var/log/$app/$app.log
+ACCESS_LOG_FILE=/var/log/$app/$app-access.log
 
 #=================================================
 # MANAGE SCRIPT FAILURE
