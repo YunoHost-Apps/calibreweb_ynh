@@ -28,9 +28,6 @@ if [ $is_public -eq 1 ]; then
 	public_library=1
 fi
 
-LOG_FILE=/var/log/$app/$app.log
-ACCESS_LOG_FILE=/var/log/$app/$app-access.log
-
 #=================================================
 # MANAGE SCRIPT FAILURE
 #=================================================
