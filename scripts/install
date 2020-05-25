@@ -6,7 +6,6 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -21,15 +20,14 @@ admin=$YNH_APP_ARG_ADMIN
 is_public=$YNH_APP_ARG_IS_PUBLIC
 language=$YNH_APP_ARG_LANGUAGE
 upload=$YNH_APP_ARG_UPLOAD
-public_library=$7YNH_APP_ARG_PUBLIC_LIBRARY
+public_library=$YNH_APP_ARG_PUBLIC_LIBRARY
 
 #if app is public, we assume library is public
 if [ $is_public -eq 1 ]; then
 	public_library=1
 fi
 
-LOG_FILE=/var/log/$app/$app.log
-ACCESS_LOG_FILE=/var/log/$app/$app-access.log
+source _common.sh
 
 #=================================================
 # MANAGE SCRIPT FAILURE
@@ -179,7 +177,9 @@ chown -R $app:$app /var/log/$app
 #=================================================
 ynh_script_progression --message="Setting up database and settings..." --weight=5 
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
-ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" --log_path="$final_path/calibre-web.log" -t 30
+#If port 8083 is already in use (ex for second instance), then service start will fail, which is expected : so we do not want
+#to set $port on the line match. "server on" will be displayed in case the port is already in use and should be ok to spot the fact that the database is initialized.
+ynh_systemd_action --service_name=$app --action="start" --line_match="server on " --log_path="$final_path/calibre-web.log" -t 30
 #sleep required on low spec like raspberryPi
 sleep 2s
 #remove unwanted calibre-web.log
