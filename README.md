@@ -15,7 +15,7 @@ Calibre-Web is a web app providing a clean interface for browsing, reading and d
 
 Alternatively, you may use [COPS](https://github.com/YunoHost-Apps/cops_ynh) which also allows access to your Calibre Library, but in read-only mode. 
 
-**Shipped version:** The shipped version is 0.6.7, but as the numbering changed in the calibre-web app, it is numbered as 0.96.7 in yunohost.
+**Shipped version:** The shipped version is 0.6.8, but as the numbering changed in the calibre-web app, it is numbered as 0.96.8 in yunohost.
 
 Users will be synchronized with authorized Yunohost users (having the calibreweb.main authorization group) automatically. In case of issue you may force the sync in the app itself.
 
