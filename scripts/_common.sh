@@ -3,7 +3,7 @@
 pkg_dependencies="sqlite3 libldap2-dev libsasl2-dev python3-dev imagemagick python3-lxml libjpeg-dev"
 #PKG_DEPENDENCIES="sqlite3 python3-pip imagemagick"
 
-python_version=3.5
+python_version=3.5.9
 
 DOSSIER_MEDIA=/home/yunohost.multimedia
 
