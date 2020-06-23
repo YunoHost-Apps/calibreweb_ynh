@@ -6,7 +6,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-
+source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -15,67 +15,63 @@ source /usr/share/yunohost/helpers
 ynh_script_progression --message="Loading installation settings..." --weight=3
 
 app=$YNH_APP_INSTANCE_NAME
-domain=$(ynh_app_setting_get $app domain)
-port=$(ynh_app_setting_get $app port)
-final_path=$(ynh_app_setting_get $app final_path)
-calibre_dir=$(ynh_app_setting_get $app calibre_dir)
 
-source _common.sh
+domain=$(ynh_app_setting_get --app=$app --key=domain)
+port=$(ynh_app_setting_get --app=$app --key=port)
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+calibre_dir=$(ynh_app_setting_get --app=$app --key=calibre_dir)
 
 #=================================================
-# REMOVE SERVICE FROM ADMIN PANEL
+# STANDARD REMOVE
+#=================================================
+# REMOVE SERVICE INTEGRATION IN YUNOHOST
 #=================================================
 
 # Remove the service from the list of services known by Yunohost (added from `yunohost service add`)
 if ynh_exec_warn_less yunohost service status $app >/dev/null
 then
-	ynh_script_progression --message="Removing $app service..." --weight=1
+	ynh_script_progression --message="Removing $app service integration..." --weight=1
 	yunohost service remove $app
 fi
 
 #=================================================
-# STANDARD REMOVE
-#=================================================
 # STOP AND REMOVE SERVICE
 #=================================================
+ynh_script_progression --message="Stopping and removing the systemd service..." --weight=2
 
 # Remove the dedicated systemd config
-ynh_script_progression --message="Stopping and removing the systemd service..." --weight=2
 ynh_remove_systemd_config
-
-
 
 #=================================================
 # REMOVE DEPENDENCIES
 #=================================================
+ynh_script_progression --message="Removing Dependencies..." --weight=5
 
 # Remove metapackage and its dependencies
-ynh_script_progression --message="Removing Dependencies..." --weight=5
 ynh_remove_app_dependencies
-
 
 #=================================================
 # REMOVE APP MAIN DIR
 #=================================================
+ynh_script_progression --message="Removing $final_path..." --weight=1
 
 # Remove the app directory securely
-ynh_script_progression --message="Removing $final_path..." --weight=1
 ynh_secure_remove --file="$final_path"
 
 #=================================================
 # REMOVE NGINX CONFIGURATION
 #=================================================
+ynh_script_progression --message="Removing nginx web server configuration..." --weight=1
 
 # Remove the dedicated nginx config
-ynh_script_progression --message="Removing nginx web server configuration..." --weight=1
 ynh_remove_nginx_config
 
 #=================================================
 # REMOVE LOGROTATE CONFIGURATION
 #=================================================
+ynh_script_progression --message="Removing logrotate configuration..." --weight=1
 
 # Remove the app-specific logrotate config
-ynh_script_progression --message="Removing logrotate configuration..." --weight=1
 ynh_remove_logrotate
 
 #=================================================
@@ -85,20 +81,27 @@ ynh_remove_logrotate
 if yunohost firewall list | grep -q "\- $port$"
 then
 	ynh_script_progression --message="Closing port $port..." --weight=10
-	yunohost firewall disallow TCP $port 2>&1
+	ynh_exec_warn_less yunohost firewall disallow TCP $port 2>&1
 fi
 
+#=================================================
+# SPECIFIC REMOVE
+#=================================================
+# REMOVE VARIOUS FILES
+#=================================================
+ynh_script_progression --message="Removing various files..."
+
 # Remove the log files
-ynh_script_progression --message="Removing log file..." --weight=1
-ynh_secure_remove "/var/log/$app/"
+ynh_secure_remove --file="/var/log/$app/"
 
 #=================================================
 # GENERIC FINALIZATION
 #=================================================
 # REMOVE DEDICATED USER
 #=================================================
-# Delete a system user
 ynh_script_progression --message="Removing the dedicated system user..." --weight=1
+
+# Delete a system user
 ynh_system_user_delete --username=$app
 
 #=================================================
@@ -106,3 +109,9 @@ ynh_system_user_delete --username=$app
 #=================================================
 ynh_script_progression --message="Removal of $app completed" --last
 ynh_print_warn "!!!The library folder $calibre_dir was not deleted. Delete it manually if required!!!"
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_script_progression --message="Removal of $app completed"

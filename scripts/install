@@ -6,13 +6,24 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
+source _common.sh
+source ynh_install_python
+source ynh_multimedia_3
 source /usr/share/yunohost/helpers
+
+#=================================================
+# MANAGE SCRIPT FAILURE
+#=================================================
+
+ynh_clean_setup () {
+	ynh_clean_check_starting
+}
+# Exit if an error occurs during the execution of the script
+ynh_abort_if_errors
 
 #=================================================
 # RETRIEVE ARGUMENTS FROM THE MANIFEST
 #=================================================
-
-app=$YNH_APP_INSTANCE_NAME
 
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
@@ -27,15 +38,7 @@ if [ $is_public -eq 1 ]; then
 	public_library=1
 fi
 
-source _common.sh
-
-#=================================================
-# MANAGE SCRIPT FAILURE
-#=================================================
-
-# Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
-
+app=$YNH_APP_INSTANCE_NAME
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
@@ -43,72 +46,61 @@ ynh_abort_if_errors
 ynh_script_progression --message="Validating installation parameters..." --weight=5
 
 final_path=/var/www/$app
-test ! -e "$final_path" || ynh_die "This path already contains a folder"
+test ! -e "$final_path" || ynh_die --message="This path already contains a folder"
 
-# Normalize the url path syntax
-path_url=$(ynh_normalize_url_path $path_url)
-
-# Check web path availability
-ynh_webpath_available $domain $path_url
 # Register (book) web path
-ynh_webpath_register $app $domain $path_url
+ynh_webpath_register --app=$app --domain=$domain --path_url=$path_url
 
 #=================================================
 # STORE SETTINGS FROM MANIFEST
 #=================================================
 ynh_script_progression --message="Storing installation settings..." --weight=5
 
-ynh_app_setting_set $app domain $domain
-ynh_app_setting_set $app path $path_url
-ynh_app_setting_set $app admin $admin
-ynh_app_setting_set $app is_public $is_public
-
+ynh_app_setting_set --app=$app --key=domain --value=$domain
+ynh_app_setting_set --app=$app --key=path --value=$path_url
+ynh_app_setting_set --app=$app --key=admin --value=$admin
+ynh_app_setting_set --app=$app --key=is_public --value=$is_public
 
 #=================================================
 # STANDARD MODIFICATIONS
 #=================================================
 # FIND AND OPEN A PORT
 #=================================================
+ynh_script_progression --message="Configuring firewall..."
 
-# Find a free port
-port=$(ynh_find_port 8083)
-# Open this port
-ynh_script_progression --message="Opening port $port..." --weight=5
-yunohost firewall allow --no-upnp TCP $port 2>&1
-ynh_app_setting_set $app port $port
+# Find an available port
+port=$(ynh_find_port --port=8083)
+ynh_app_setting_set --app=$app --key=port --value=$port
 
-#=================================================
-# DOWNLOAD, CHECK AND UNPACK SOURCE
-#=================================================
-ynh_script_progression --message="Downloading sources to $final_path..." --weight=10
-ynh_app_setting_set $app final_path $final_path
-# Download, check integrity, uncompress and patch the source from app.src
-ynh_setup_source "$final_path"
+# Optional: Expose this port publicly
+# (N.B. : you only need to do this if the app actually needs to expose the port publicly.
+# If you do this and the app doesn't actually need you are CREATING SECURITY HOLES IN THE SERVER !)
+
+# Open the port
+# ynh_exec_warn_less yunohost firewall allow --no-upnp TCP $port
 
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
-
 ynh_script_progression --message="Installing package dependencies..." --weight=15
-ynh_install_app_dependencies $PKG_DEPENDENCIES
 
-#use latest version of pip as per documentation in https://github.com/pypa/get-pip
-#cannot use helper as maintaining the checksum would be a pain in the a***
-curl https://bootstrap.pypa.io/get-pip.py | python3
+ynh_install_app_dependencies $pkg_dependencies
 
-ynh_script_progression --message="Installing pip requirements..." --weight=50
-pip3 install --no-cache-dir --target $final_path/vendor -r $final_path/requirements.txt
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+ynh_script_progression --message="Setting up source files..." --weight=10
 
-ynh_script_progression --message="Installing pip additionnal requirements..." --weight=60
-pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/optional-requirements.txt
+ynh_app_setting_set --app=$app --key=final_path --value=$final_path
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source --dest_dir="$final_path"
 
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
+ynh_script_progression --message="Configuring nginx web server..." --weight=5
+
 #Cannot use empty string for X-script-name, causes an issue in the python prg
-ynh_script_progression --message="Setting up system configuration..." --weight=5
-
-
 if [ $path_url = "/" ] ; then
 	ynh_replace_string "        proxy_set_header		X-Script-Name" "#       proxy_set_header		X-Script-Name" ../conf/nginx.conf
 fi
@@ -119,24 +111,41 @@ ynh_add_nginx_config
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
+ynh_script_progression --message="Configuring system user..."
 
 # Create a system user
-ynh_system_user_create $app
+ynh_system_user_create --username=$app
+
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+# BUILD CALIBRE-WEB
+#=================================================
+ynh_script_progression --message="Building Calibre-web..." --weight=110
 
 chown -R $app: $final_path
+
+ynh_install_python --python_version=$python_version
+
+pushd $final_path
+	/opt/pyenv/versions/$python_version/bin/pip install --no-cache-dir --target $final_path/vendor -r $final_path/requirements.txt
+	/opt/pyenv/versions/$python_version/bin/pip install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/optional-requirements.txt
+popd
 
 #=================================================
 # SETUP SYSTEMD
 #=================================================
+ynh_script_progression --message="Configuring a systemd service..."
 
 # Create a dedicated systemd config
-ynh_add_systemd_config
+ynh_add_systemd_config --others_var="python_version" 
 
 #=================================================
-# CREATE FILES AND DIRECTORIES
+# CREATE MULTIMEDIA DIRECTORIES
 #=================================================
-ynh_script_progression --message="Creating files and directory..." --weight=5
-#Logic is as follow : if app is set to be publicly accessible, we will assume that the library should be set in "Share" multimedia directory
+ynh_script_progression --message="Creating multimedia directories..." --weight=5
+
+# Logic is as follow : if app is set to be publicly accessible, we will assume that the library should be set in "Share" multimedia directory
 # If app is set to be private but access is requested for all user, we will assume the same
 # If app is set to be private but access is limited to the admin user, we will set it inside his own multimedia directory.
 # Access to the app is managed in the SSOwat part of the script.
@@ -159,26 +168,17 @@ if [ ! -e "$calibre_dir"/metadata.db ]; then
 	chown $app:$app $calibre_dir/*
 fi
 
-ynh_app_setting_set $app calibre_dir $calibre_dir
+ynh_app_setting_set --app=$app --key=calibre_dir --value=$calibre_dir
 
-#=================================================
-# SETUP LOGROTATE
-#=================================================
-
-# Use logrotate to manage application logfile(s)
-ynh_use_logrotate
-chown -R $app:$app /var/log/$app
-
-
-#=================================================
-# SPECIFIC SETUP
 #=================================================
 # SET SQLITE DATABASE SETTINGS
 #=================================================
 ynh_script_progression --message="Setting up database and settings..." --weight=5 
-#we need to start and stop the service so that initial app.db file is created and that we can set default data
-#If port 8083 is already in use (ex for second instance), then service start will fail, which is expected : so we do not want
-#to set $port on the line match. "server on" will be displayed in case the port is already in use and should be ok to spot the fact that the database is initialized.
+
+# we need to start and stop the service so that initial app.db file is created and that we can set default data
+# If port 8083 is already in use (ex for second instance), then service start will fail, which is expected : so we do not want
+# to set $port on the line match. "server on" will be displayed in case the port is already in use and should be ok to spot the fact that the database is initialized.
+
 ynh_systemd_action --service_name=$app --action="start" --line_match="server on " --log_path="$final_path/calibre-web.log" -t 30
 #sleep required on low spec like raspberryPi
 sleep 2s
@@ -195,31 +195,51 @@ conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WH
 eval sqlite3 $final_path/app.db "$conf"
 
 #=================================================
-# SECURE FILES AND DIRECTORIES
-#=================================================
-
-# Set permissions to app files
-#disabled - do not work when calibreweb is not owner
-#chown -R root: $final_path
-#chown $app: $final_path/app.db
-
-
-#=================================================
 # STORE THE CHECKSUM OF THE CONFIG FILE
 #=================================================
+ynh_script_progression --message="Storing the config file checksum..."
 
 # Calculate and store the config file checksum into the app settings
-ynh_store_file_checksum "${final_path}/app.db"
+ynh_store_file_checksum --file="${final_path}/app.db"
 
 #=================================================
-# ADVERTISE SERVICE IN ADMIN PANEL
+# GENERIC FINALIZATION
 #=================================================
+# SECURE FILES AND DIRECTORIES
+#=================================================
+ynh_script_progression --message="Securing files and directories..."
+
+# Set permissions to app files
+chown -R $app: $final_path
+
+#=================================================
+# SETUP LOGROTATE
+#=================================================
+ynh_script_progression --message="Configuring log rotation..."
+
+# Use logrotate to manage application logfile(s)
+ynh_use_logrotate
+chown -R $app:$app /var/log/$app
+
+#=================================================
+# INTEGRATE SERVICE IN YUNOHOST
+#=================================================
+ynh_script_progression --message="Integrating service in YunoHost..."
 
 yunohost service add $app --description "Browse eBook in the web" --log "/var/log/$app/$app.log"
 
 #=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Starting a systemd service..."
+
+# Start a systemd service
+ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" -t 30
+
+#=================================================
 # SETUP SSOWAT
 #=================================================
+ynh_script_progression --message="Configuring SSOwat..."
 
 # Make app public if necessary
 if [ $is_public -eq 1 ]
@@ -232,15 +252,15 @@ if [ $public_library -eq 0 ]; then
 	yunohost app addaccess $app -u $admin
 fi
 
-
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_script_progression --message="Reload nginx and start $app..." --weight=5
+ynh_script_progression --message="Reloading nginx web server..." --weight=5
+
 ynh_systemd_action --service_name=nginx --action=reload
-ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" -t 30
 
 #=================================================
 # END OF SCRIPT
 #=================================================
+
 ynh_script_progression --message="Installation of $app completed" --last

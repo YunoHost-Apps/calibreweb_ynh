@@ -1,15 +1,14 @@
 #!/bin/bash
 
-version_gt() { 
-	test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1";
-}
-
 #=================================================
 # GENERIC START
 #=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
 
+source _common.sh
+source ynh_install_python
+source ynh_multimedia_3
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -18,27 +17,27 @@ source /usr/share/yunohost/helpers
 ynh_script_progression --message="Loading installation settings..." --weight=2
 
 app=$YNH_APP_INSTANCE_NAME
-domain=$(ynh_app_setting_get $app domain)
-port=$(ynh_app_setting_get $app port)
-path_url=$(ynh_app_setting_get $app path)
-admin=$(ynh_app_setting_get $app admin)
-is_public=$(ynh_app_setting_get $app is_public)
-final_path=$(ynh_app_setting_get $app final_path)
-language=$(ynh_app_setting_get $app language)
+
+domain=$(ynh_app_setting_get --app=$app --key=domain)
+port=$(ynh_app_setting_get --app=$app --key=port)
+path_url=$(ynh_app_setting_get --app=$app --key=path)
+admin=$(ynh_app_setting_get --app=$app --key=admin)
+is_public=$(ynh_app_setting_get --app=$app --key=is_public)
+final_path=$(ynh_app_setting_get --app=$app --key=final_path)
+language=$(ynh_app_setting_get --app=$app --key=language)
 
 #Get settings from database in case it has been changed in the app and save it in settings so that it can be used back afterward
 calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
 calibre_dir=${calibre_dir%/}
-ynh_app_setting_set $app calibre_dir $calibre_dir
+ynh_app_setting_set --app=$app --key=calibre_dir --value=$calibre_dir
 
 upload=$(sqlite3 $final_path/app.db "SELECT config_uploading FROM settings WHERE ID=1")
-ynh_app_setting_set $app upload $upload
-
-source _common.sh
+ynh_app_setting_set --app=$app --key=upload --value=$upload
 
 #=================================================
 # CHECK VERSION
 #=================================================
+ynh_script_progression --message="Checking version..."
 
 upgrade_type=$(ynh_check_app_version_changed)
 
@@ -57,6 +56,18 @@ else #on est encore en 0.6.0
 fi
 
 #=================================================
+# ENSURE DOWNWARD COMPATIBILITY
+#=================================================
+ynh_script_progression --message="Ensuring downward compatibility..."
+
+# Remove not needed open port
+if yunohost firewall list | grep -q "\- $port$"
+then
+	ynh_script_progression --message="Closing port $port..." --weight=10
+	ynh_exec_warn_less yunohost firewall disallow TCP $port 2>&1
+fi
+
+#=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
 ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --weight=10
@@ -64,29 +75,29 @@ ynh_script_progression --message="Backing up the app before upgrading (may take 
 # Backup the current version of the app
 ynh_backup_before_upgrade
 ynh_clean_setup () {
-
 	ynh_clean_check_starting
-
 	# restore it if the upgrade fails
 	ynh_restore_upgradebackup
 }
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
-#Stop the app in case database is updated
-ynh_script_progression --message="Stopping a systemd service..." --weight=2
-
-ynh_systemd_action --service_name=$app --action="stop"
-
 #=================================================
 # CHECK THE PATH
 #=================================================
 
 # Normalize the URL path syntax
-path_url=$(ynh_normalize_url_path $path_url)
+path_url=$(ynh_normalize_url_path --path_url=$path_url)
 
 #=================================================
 # STANDARD UPGRADE STEPS
+#=================================================
+# STOP SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Stopping a systemd service..." --weight=2
+
+ynh_systemd_action --service_name=$app --action="stop"
+
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
@@ -109,6 +120,7 @@ fi
 if [ "$upgrade_type" == "UPGRADE_APP" ]
 then
 	ynh_script_progression --message="Upgrading source files from $current_upstream_app_version to $new_upstream_package_version..." --weight=10
+
 	# Download, check integrity, uncompress and patch the source from app.src
 	ynh_setup_source --dest_dir="$final_path"
 fi
@@ -116,8 +128,8 @@ fi
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-
 ynh_script_progression --message="Upgrading nginx web server configuration..." --weight=5
+
 if [ $path_url = "/" ] ; then
 	ynh_replace_string "        proxy_set_header		X-Script-Name" "#       proxy_set_header		X-Script-Name" ../conf/nginx.conf
 fi
@@ -127,50 +139,51 @@ ynh_add_nginx_config
 #=================================================
 # UPGRADE DEPENDENCIES
 #=================================================
+ynh_script_progression --message="Upgrading dependencies..." --weight=15
 
-if [ "$upgrade_type" == "UPGRADE_APP" ]
-then
-	ynh_script_progression --message="Installing package dependencies..." --weight=15
-	ynh_install_app_dependencies $PKG_DEPENDENCIES
-	
-	#use latest version of pip as per documentation in https://github.com/pypa/get-pip
-	#cannot use helper as maintaining the checksum would be a pain in the a***
-	curl https://bootstrap.pypa.io/get-pip.py | python3
+ynh_install_app_dependencies $pkg_dependencies
 
-	ynh_script_progression --message="Installing pip requirements ..." --weight=30
-	pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/requirements.txt
-
-	ynh_script_progression --message="Installing pip additionnal requirements..." --weight=40
-	pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/optional-requirements.txt
-fi
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
+ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
 
 # Create a dedicated user (if not existing)
-ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
-ynh_system_user_create $app
-
-# Set permissions on app files (required to be able to update database)
-chown -R $app: $final_path
+ynh_system_user_create --username=$app
 
 #=================================================
 # SPECIFIC UPGRADE
 #=================================================
-#build multimedia directory
+# BUILD CALIBRE-WEB
 #=================================================
-ynh_script_progression --message="Create Multimedia dir..." --weight=1
+ynh_script_progression --message="Building Calibre-web..." --weight=110
+
+chown -R $app: $final_path
+
+ynh_install_python --python_version=$python_version
+
+pushd $final_path
+	/opt/pyenv/versions/$python_version/bin/pip install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/requirements.txt
+	/opt/pyenv/versions/$python_version/bin/pip install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/optional-requirements.txt
+popd
+
+#=================================================
+# CREATE MULTIMEDIA DIRECTORIES
+#=================================================
+ynh_script_progression --message="Creating multimedia directories..." --weight=1
+
 #Create multimedia directory but we do not change the calibre_dir : It's the user to make this choice.
 ynh_multimedia_build_main_dir
 ynh_multimedia_addaccess $app
 
 #=================================================
-#Update database structure
+# UPDATE DATABASE
 #=================================================
 ynh_script_progression --message="Update database..." --weight=1
+
 ### Verify the checksum of a file, stored by `ynh_store_file_checksum` in the install script.
 ### And create a backup of this file if the checksum is different. So the file will be backed up if the admin had modified it.
-ynh_backup_if_checksum_is_different "$final_path/app.db"
+ynh_backup_if_checksum_is_different --file="$final_path/app.db"
 
 #set database settings as per conf file : restart server so that app.db is regenerated, then add new ldap & log settings
 if [ "$current_upstream_app_version" == '0.6.6' ]; then
@@ -188,37 +201,52 @@ conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settin
 eval sqlite3 $final_path/app.db "$conf"
 
 # Recalculate and store the checksum of the file for the next upgrade.
-ynh_store_file_checksum "$final_path/app.db"
-
-#=================================================
-# SETUP LOGROTATE
-#=================================================
-
-# Use logrotate to manage app-specific logfile(s)
-ynh_script_progression --message="Upgrading logrotate configuration..." --weight=1
-ynh_use_logrotate --non-append
-
+ynh_store_file_checksum --file="$final_path/app.db"
 
 #=================================================
 # SETUP SYSTEMD
 #=================================================
+ynh_script_progression --message="Upgrading systemd configuration..." --weight=1
 
 # Create a dedicated systemd config
-ynh_script_progression --message="Upgrading systemd configuration..." --weight=1
-ynh_add_systemd_config
+ynh_add_systemd_config --others_var="python_version"
 
 #=================================================
 # GENERIC FINALIZATION
 #=================================================
 # SECURE FILES AND DIRECTORIES
 #=================================================
+ynh_script_progression --message="Securing files and directories..."
 
 # Set permissions on app files
 chown -R $app: $final_path
 
 #=================================================
+# SETUP LOGROTATE
+#=================================================
+ynh_script_progression --message="Upgrading logrotate configuration..." --weight=1
+
+# Use logrotate to manage app-specific logfile(s)
+ynh_use_logrotate --non-append
+
+#=================================================
+# INTEGRATE SERVICE IN YUNOHOST
+#=================================================
+ynh_script_progression --message="Integrating service in YunoHost..."
+
+yunohost service add $app --description "Browse eBook in the web" --log "/var/log/$app/$app.log"
+
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+ynh_script_progression --message="Starting a systemd service..." --weight=2
+
+ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t 30
+
+#=================================================
 # SETUP SSOWAT
 #=================================================
+ynh_script_progression --message="Upgrading SSOwat configuration..."
 
 # Make app public if necessary
 if [ $is_public -eq 1 ]
@@ -242,12 +270,6 @@ fi
 ynh_script_progression --message="Reloading nginx web server..." --weight=1
 
 ynh_systemd_action --service_name=nginx --action=reload
-#=================================================
-# START SYSTEMD SERVICE
-#=================================================
-ynh_script_progression --message="Starting a systemd service..." --weight=2
-
-ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t 30
 
 #=================================================
 # END OF SCRIPT

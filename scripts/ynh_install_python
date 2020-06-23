@@ -1,0 +1,151 @@
+#!/bin/bash
+
+# Need also the helper https://github.com/YunoHost-Apps/Experimental_helpers/blob/master/ynh_handle_getopts_args/ynh_handle_getopts_args
+
+pyenv_install_dir="/opt/pyenv"
+# PYENV_ROOT is the directory of pyenv, it needs to be loaded as a environment variable.
+export PYENV_ROOT="$pyenv_install_dir"
+# Required dependencies
+pyenv_dependencies="build-essential libssl1.0-dev|libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git"
+
+# Install python version management
+#
+# [internal]
+#
+# usage: ynh_install_pyenv
+ynh_install_pyenv () {
+  echo "Installation of pyenv - python version management" >&2
+  # Build an app.src for pyenv
+  mkdir -p "../conf"
+  echo "SOURCE_URL=https://github.com/pyenv/pyenv/archive/v1.2.19.tar.gz
+SOURCE_SUM=e93466735ac9c34d68b7d5d71f32c16a2b4b1a6a1adffb85acc4126a3398b9d0" > "../conf/pyenv.src"
+  # Download and extract pyenv
+  ynh_setup_source "$pyenv_install_dir" pyenv
+
+  # Build an app.src for pyenv-virtualenv
+  mkdir -p "../conf"
+  echo "SOURCE_URL=https://github.com/pyenv/pyenv-virtualenv/archive/v1.1.5.tar.gz
+SOURCE_SUM=27ae3de027a6f6dccdca4085225512e559c6b94b31625bd2b357a18890a1e618" > "../conf/pyenv-virtualenv.src"
+  # Download and extract pyenv-virtualenv
+  ynh_setup_source "$pyenv_install_dir/plugins/pyenv-virtualenv" pyenv-virtualenv
+
+  (cd $pyenv_install_dir
+  ./src/configure && make -C src)
+
+# Create shims directory if needed
+if [ ! -d $pyenv_install_dir/shims ] ; then
+  mkdir $pyenv_install_dir/shims
+fi
+}
+
+# Install a specific version of python
+#
+# ynh_install_python will install the version of python provided as argument by using pyenv.
+#
+# pyenv (python version management) stores the target python version in a .python_version file created in the target folder (using pyenv local <version>)
+# It then uses that information for every python user that uses pyenv provided python command
+#
+# This helper creates a /etc/profile.d/pyenv.sh that configures PATH environment for pyenv
+# for every LOGIN user, hence your user must have a defined shell (as opposed to /usr/sbin/nologin)
+#
+# Don't forget to execute python-dependent command in a login environment
+# (e.g. sudo --login option)
+# When not possible (e.g. in systemd service definition), please use direct path
+# to pyenv shims (e.g. $PYENV_ROOT/shims/bundle)
+#
+# usage: ynh_install_python python_version user
+# | arg: -v, --python_version= - Version of python to install.
+#        If possible, prefer to use major version number (e.g. 8 instead of 8.10.0).
+#        The crontab will handle the update of minor versions when needed.
+ynh_install_python () {
+  # Declare an array to define the options of this helper.
+  declare -Ar args_array=( [v]=python_version= )
+  # Use pyenv, https://github.com/pyenv/pyenv to manage the python versions
+  local python_version
+  # Manage arguments with getopts
+  ynh_handle_getopts_args "$@"
+
+  # Create $pyenv_install_dir
+  mkdir -p "$pyenv_install_dir/plugins/pyenv-virtualenv"
+
+  # Load pyenv path in PATH
+  CLEAR_PATH="$pyenv_install_dir/bin:$PATH"
+
+  # Remove /usr/local/bin in PATH in case of python prior installation
+  PATH=$(echo $CLEAR_PATH | sed 's@/usr/local/bin:@@')
+
+  # Move an existing python binary, to avoid to block pyenv
+  #test -x /usr/bin/python && mv /usr/bin/python /usr/bin/python_pyenv
+
+  # If pyenv is not previously setup, install it
+  if ! type pyenv > /dev/null 2>&1
+  then
+    ynh_install_pyenv
+  elif dpkg --compare-versions "$($pyenv_install_dir/bin/pyenv --version | cut -d" " -f2)" lt "1.2.19"
+  then
+    ynh_install_pyenv
+  elif dpkg --compare-versions "$($pyenv_install_dir/plugins/pyenv-virtualenv/bin/pyenv-virtualenv --version | cut -d" " -f2)" lt "1.1.5"
+  then
+    ynh_install_pyenv
+  fi
+
+  # Restore /usr/local/bin in PATH (if needed)
+  PATH=$CLEAR_PATH
+
+  # And replace the old python binary
+  # test -x /usr/bin/python_pyenv && mv /usr/bin/python_pyenv /usr/bin/python
+
+  # Install required dependencies
+  ynh_add_app_dependencies --package="$pyenv_dependencies"
+
+  # Install the requested version of python
+  pyenv install --skip-existing $python_version
+
+  # Store the ID of this app and the version of python requested for it
+  echo "$YNH_APP_ID:$python_version" | tee --append "$pyenv_install_dir/ynh_app_version"
+
+  # Store python_version into the config of this app
+  ynh_app_setting_set --app=$app --key=python_version --value=$python_version
+
+  # Set environment for python users
+  echo  "#pyenv
+export PYENV_ROOT=$pyenv_install_dir
+export PATH=\"$pyenv_install_dir/bin:$PATH\"
+eval \"\$(pyenv init -)\"
+#pyenv" > /etc/profile.d/pyenv.sh
+
+  # Load the right environment for the Installation
+  eval "$(pyenv init -)"
+
+  (cd $final_path
+  pyenv local $python_version)
+}
+
+# Remove the version of python used by the app.
+#
+# This helper will check if another app uses the same version of python,
+# if not, this version of python will be removed.
+# If no other app uses python, pyenv will be also removed.
+#
+# usage: ynh_remove_python
+ynh_remove_python () {
+  python_version=$(ynh_app_setting_get --app=$app --key=python_version)
+
+  # Remove the line for this app
+  sed --in-place "/$YNH_APP_ID:$python_version/d" "$pyenv_install_dir/ynh_app_version"
+
+  # If no other app uses this version of python, remove it.
+  if ! grep --quiet "$python_version" "$pyenv_install_dir/ynh_app_version"
+  then
+    $pyenv_install_dir/bin/pyenv uninstall --force $python_version
+  fi
+
+  # Remove pyenv environment configuration
+  rm /etc/profile.d/pyenv.sh
+
+  # If no other app uses pyenv, remove pyenv and dedicated group
+  if [ ! -s "$pyenv_install_dir/ynh_app_version" ]
+  then
+    ynh_secure_remove --file="$pyenv_install_dir"
+  fi
+}

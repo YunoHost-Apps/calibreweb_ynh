@@ -1,10 +1,10 @@
-
 # Calibre-web for YunoHost
-[![Integration level](https://dash.yunohost.org/integration/calibreweb.svg)](https://ci-apps.yunohost.org/jenkins/job/calibreweb%20%28Community%29/lastBuild/consoleFull)  
-[![Install calibreweb with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=calibreweb)
 
-> *This package allow you to install calibreweb quickly and simply on a YunoHost server.  
-If you don't have YunoHost, please see [here](https://yunohost.org/#/install) to know how to install and enjoy it.*
+[![Integration level](https://dash.yunohost.org/integration/calibreweb.svg)](https://dash.yunohost.org/appci/app/calibreweb) ![](https://ci-apps.yunohost.org/ci/badges/calibreweb.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/calibreweb.maintain.svg)  
+[![Install Calibre-web with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=calibreweb)
+
+> *This package allows you to install Calibre-web quickly and simply on a YunoHost server.  
+If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/install) to learn how to install it.*
 
 ## Overview
 This is an implementation of [Calibre-web](https://github.com/janeczku/calibre-web) for Yunohost.
@@ -47,7 +47,12 @@ yunohost app setting calibreweb do_not_backup_data -v 1
 
 By default, removing the app will **never** delete the library.
 
-## Known Limitations
+#### Supported architectures
+
+* x86-64 - [![Build Status](https://ci-apps.yunohost.org/ci/logs/calibreweb%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/calibreweb/)
+* ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/calibreweb%20%28Apps%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/calibreweb/)
+
+## Limitations
 
 * Authorization access to library to be done manually after install if Calibre library was already existing, for example :
 ```
@@ -68,20 +73,20 @@ chmod o+rw path/to/library
 
 ---
 
-Developers info
+Developer info
 ----------------
 
-Please do your pull request to the [testing branch](https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing).
+Please send your pull request to the [testing branch](https://github.com/YunoHost-Apps/calibreweb_ynh/tree/testing).
 
 To try the testing branch, please proceed like that.
 ```
-sudo yunohost app install https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing --debug
+sudo yunohost app install https://github.com/YunoHost-Apps/calibreweb_ynh/tree/testing --debug
 or
-sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing --debug
+sudo yunohost app upgrade calibreweb -u https://github.com/YunoHost-Apps/calibreweb_ynh/tree/testing --debug
 ```
 
-
 ## Todo
+
 - [X] Multiinstance
 - [X] Better Multimedia integration : Integrate in Yunohost.multimedia
 - [X] rework LDAP integration to create user automatically
@@ -96,8 +101,6 @@ sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibre
 - [ ] Add action to synchronize users
 - [ ] Add action to deactivate LDAP et retrieve admin password
 - [ ] Use internal updater to update version?
-
-
 
 ## LICENSE
 Package and software are GPL 3.0
