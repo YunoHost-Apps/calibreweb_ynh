@@ -1,3 +1,3 @@
-SOURCE_URL=https://github.com/janeczku/calibre-web/releases/download/0.6.7/calibre-web-0.6.7.zip
-SOURCE_SUM=0c803df4b49993987a7f317c47ba38e680e45712b49da3cb7eb6c66f57379f30
+SOURCE_URL=https://github.com/janeczku/calibre-web/releases/download/0.6.8/calibre-web-0.6.8.zip
+SOURCE_SUM=41ff00685893bad9794102d20a757c221704f10976f8aa7e6a0fecc817c329bf
 SOURCE_FORMAT=zip
