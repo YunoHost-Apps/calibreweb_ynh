@@ -1,3 +1,6 @@
 SOURCE_URL=https://github.com/janeczku/calibre-web/releases/download/0.6.8/calibre-web-0.6.8.zip
 SOURCE_SUM=41ff00685893bad9794102d20a757c221704f10976f8aa7e6a0fecc817c329bf
+SOURCE_SUM_PRG=sha256sum
 SOURCE_FORMAT=zip
+SOURCE_IN_SUBDIR=true
+SOURCE_FILENAME=

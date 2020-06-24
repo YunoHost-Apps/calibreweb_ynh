@@ -2,43 +2,30 @@
 # First Run of complete test
 	; Manifest
 		domain="domain.tld"	(DOMAIN)
-		path="/calibre"	(PATH)
+		path="/path"	(PATH)
 		calibre_path="/home/yunohost.app/calibreweb"
 		admin="john"	(USER)
-		language="en"
 		is_public=0	(PUBLIC|public=1|private=0)
+		language="en"
 		upload=1
-		password="a very long password"
+		public_library=1
 	; Checks
 		pkg_linter=1
 		setup_sub_dir=1
 		setup_root=1
+		setup_nourl=0
 		setup_private=1
 		setup_public=1
 		upgrade=1
 		upgrade=1	from_commit=11f5b96df7d8850beff47f9904745fa53a6f7ed9
 		backup_restore=1
 		multi_instance=1
-		port_already_use=1 (8083)
+		# This test is no longer necessary since the version 2.7 (PR: https://github.com/YunoHost/yunohost/pull/304), you can still do it if your app could be installed with this version.
+		# incorrect_path=1
+		port_already_use=0
 		change_url=1
-#;; Failed upgrade
-#Run to trigger an error during upgrade to check backup_restore
-#	; pre-install
-#		touch /tmp/upgrade_error
-#	; Manifest
-#		domain="domain.tld"	(DOMAIN)
-#		path="/calibre"	(PATH)
-#		calibre_path="/home/yunohost.app/calibreweb"
-#		admin="john"	(USER)
-#		language="en"
-#		is_public=0	(PUBLIC|public=1|private=0)
-#		upload=1
-#		password="a very long password"
-#	; Checks
-#		setup_sub_dir=1
-#		setup_root=1
-#		upgrade=1	from_commit=3b9c5041e4fa73cb965368379f2b83d076c65341
 ;;; Levels
+	# If the level 5 (Package linter) is forced to 1. Please add justifications here.
 	Level 5=auto
 ;;; Options
 Email=nicolas@aubonalbanais.ovh

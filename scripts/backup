@@ -28,7 +28,6 @@ ynh_script_progression --message="Loading installation settings..." --weight=1
 app=$YNH_APP_INSTANCE_NAME
 
 final_path=$(ynh_app_setting_get --app=$app --key=final_path)
-path_url=$(ynh_app_setting_get --app=$app --key=path)
 domain=$(ynh_app_setting_get --app=$app --key=domain)
 port=$(ynh_app_setting_get --app=$app --key=port)
 
@@ -36,7 +35,7 @@ port=$(ynh_app_setting_get --app=$app --key=port)
 calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
 #Save it in settings so that it can be used back afterward
 calibre_dir=${calibre_dir%/}
-ynh_app_setting_set $app calibre_dir $calibre_dir 
+ynh_app_setting_set --app=$app --key=calibre_dir --value=$calibre_dir 
 
 #=================================================
 # DECLARE DATA AND CONF FILES TO BACKUP

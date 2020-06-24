@@ -60,6 +60,9 @@ ynh_app_setting_set --app=$app --key=domain --value=$domain
 ynh_app_setting_set --app=$app --key=path --value=$path_url
 ynh_app_setting_set --app=$app --key=admin --value=$admin
 ynh_app_setting_set --app=$app --key=is_public --value=$is_public
+ynh_app_setting_set --app=$app --key=language --value=$language
+ynh_app_setting_set --app=$app --key=upload --value=$upload
+ynh_app_setting_set --app=$app --key=public_library --value=$public_library
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -100,9 +103,9 @@ ynh_setup_source --dest_dir="$final_path"
 #=================================================
 ynh_script_progression --message="Configuring nginx web server..." --weight=5
 
-#Cannot use empty string for X-script-name, causes an issue in the python prg
+# Cannot use empty string for X-script-name, causes an issue in the python prg
 if [ $path_url = "/" ] ; then
-	ynh_replace_string "        proxy_set_header		X-Script-Name" "#       proxy_set_header		X-Script-Name" ../conf/nginx.conf
+	ynh_replace_string --match_string="proxy_set_header X-Script-Name __PATH__;" --replace_string="#proxy_set_header X-Script-Name __PATH__;" --target_file=../conf/nginx.conf
 fi
 
 # Create a dedicated nginx config
@@ -245,7 +248,7 @@ ynh_script_progression --message="Configuring SSOwat..."
 if [ $is_public -eq 1 ]
 then
 	# unprotected_uris allows SSO credentials to be passed anyway.
-	#ynh_app_setting_set $app unprotected_uris "/"
+	# ynh_app_setting_set --app=$app --key=unprotected_uris --value="/"
 	ynh_permission_update --permission "main" --add visitors
 fi
 if [ $public_library -eq 0 ]; then

@@ -105,13 +105,9 @@ ynh_script_progression --message="Removing the dedicated system user..." --weigh
 ynh_system_user_delete --username=$app
 
 #=================================================
-# MESSAGE TO USER
-#=================================================
-ynh_script_progression --message="Removal of $app completed" --last
-ynh_print_warn "!!!The library folder $calibre_dir was not deleted. Delete it manually if required!!!"
-
-#=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Removal of $app completed"
+ynh_script_progression --message="Removal of $app completed" --last
+
+ynh_print_warn "!!!The library folder $calibre_dir was not deleted. Delete it manually if required!!!"
