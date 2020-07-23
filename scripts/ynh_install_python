@@ -1,10 +1,13 @@
 #!/bin/bash
 
 # Need also the helper https://github.com/YunoHost-Apps/Experimental_helpers/blob/master/ynh_handle_getopts_args/ynh_handle_getopts_args
-
+pyenv_version=1.2.19
+pyenv_virtualenv_version=1.1.5
 pyenv_install_dir="/opt/pyenv"
+
 # PYENV_ROOT is the directory of pyenv, it needs to be loaded as a environment variable.
 export PYENV_ROOT="$pyenv_install_dir"
+
 # Required dependencies
 pyenv_dependencies="build-essential libssl1.0-dev|libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git"
 
@@ -17,14 +20,14 @@ ynh_install_pyenv () {
   echo "Installation of pyenv - python version management" >&2
   # Build an app.src for pyenv
   mkdir -p "../conf"
-  echo "SOURCE_URL=https://github.com/pyenv/pyenv/archive/v1.2.19.tar.gz
+  echo "SOURCE_URL=https://github.com/pyenv/pyenv/archive/v${pyenv_version}.tar.gz
 SOURCE_SUM=e93466735ac9c34d68b7d5d71f32c16a2b4b1a6a1adffb85acc4126a3398b9d0" > "../conf/pyenv.src"
   # Download and extract pyenv
   ynh_setup_source "$pyenv_install_dir" pyenv
 
   # Build an app.src for pyenv-virtualenv
   mkdir -p "../conf"
-  echo "SOURCE_URL=https://github.com/pyenv/pyenv-virtualenv/archive/v1.1.5.tar.gz
+  echo "SOURCE_URL=https://github.com/pyenv/pyenv-virtualenv/archive/v${pyenv_virtualenv_version}.tar.gz
 SOURCE_SUM=27ae3de027a6f6dccdca4085225512e559c6b94b31625bd2b357a18890a1e618" > "../conf/pyenv-virtualenv.src"
   # Download and extract pyenv-virtualenv
   ynh_setup_source "$pyenv_install_dir/plugins/pyenv-virtualenv" pyenv-virtualenv
@@ -55,7 +58,7 @@ fi
 #
 # usage: ynh_install_python python_version user
 # | arg: -v, --python_version= - Version of python to install.
-#        If possible, prefer to use major version number (e.g. 8 instead of 8.10.0).
+#        If possible, prefer to use major version number (e.g. 3 instead of 3.7.3).
 #        The crontab will handle the update of minor versions when needed.
 ynh_install_python () {
   # Declare an array to define the options of this helper.
@@ -81,10 +84,10 @@ ynh_install_python () {
   if ! type pyenv > /dev/null 2>&1
   then
     ynh_install_pyenv
-  elif dpkg --compare-versions "$($pyenv_install_dir/bin/pyenv --version | cut -d" " -f2)" lt "1.2.19"
+  elif dpkg --compare-versions "$($pyenv_install_dir/bin/pyenv --version | cut -d" " -f2)" lt $pyenv_version
   then
     ynh_install_pyenv
-  elif dpkg --compare-versions "$($pyenv_install_dir/plugins/pyenv-virtualenv/bin/pyenv-virtualenv --version | cut -d" " -f2)" lt "1.1.5"
+  elif dpkg --compare-versions "$($pyenv_install_dir/plugins/pyenv-virtualenv/bin/pyenv-virtualenv --version | cut -d" " -f2)" lt $pyenv_virtualenv_version
   then
     ynh_install_pyenv
   fi
