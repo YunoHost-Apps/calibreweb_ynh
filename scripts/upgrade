@@ -59,7 +59,7 @@ fi
 #Close unwanted open port in firewall
 if yunohost firewall list | grep -q "\- $port$"
 then
-	ynh_script_progression --message="Closing port $port..." --weight=10
+	ynh_script_progression --message="Closing port $port as it shouldn't be open..."
 	yunohost firewall disallow TCP $port 2>&1
 fi
 
