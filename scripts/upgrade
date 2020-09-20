@@ -56,6 +56,14 @@ else #on est encore en 0.6.0
 	current_upstream_app_version='0.6.0' 
 fi
 
+#Close unwanted open port in firewall
+if yunohost firewall list | grep -q "\- $port$"
+then
+	ynh_script_progression --message="Closing port $port as it shouldn't be open..."
+	yunohost firewall disallow TCP $port 2>&1
+fi
+
+
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================

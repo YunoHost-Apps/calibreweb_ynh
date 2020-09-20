@@ -67,14 +67,12 @@ ynh_app_setting_set $app is_public $is_public
 #=================================================
 # STANDARD MODIFICATIONS
 #=================================================
-# FIND AND OPEN A PORT
+# FIND AN AVAILABLE PORT
 #=================================================
 
 # Find a free port
 port=$(ynh_find_port 8083)
-# Open this port
-ynh_script_progression --message="Opening port $port..." --weight=5
-yunohost firewall allow --no-upnp TCP $port 2>&1
+ynh_script_progression --message="Setting port $port..." --weight=5
 ynh_app_setting_set $app port $port
 
 #=================================================
