@@ -15,7 +15,7 @@ Calibre-Web is a web app providing a clean interface for browsing, reading and d
 
 Alternatively, you may use [COPS](https://github.com/YunoHost-Apps/cops_ynh) which also allows access to your Calibre Library, but in read-only mode. 
 
-**Shipped version:** The shipped version is 0.6.8, but as the numbering changed in the calibre-web app, it is numbered as 0.96.8 in yunohost.
+**Shipped version:** The shipped version is 0.6.9, but as the numbering changed in the calibre-web app, it is numbered as 0.96.9 in yunohost.
 
 Users will be synchronized with authorized Yunohost users (having the calibreweb.main authorization group) automatically. In case of issue you may force the sync in the app itself.
 
@@ -71,13 +71,13 @@ chmod o+rw path/to/library
 Developers info
 ----------------
 
-Please do your pull request to the [testing branch](https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing).
+Please do your pull request to the [testing branch](https://github.com/Yunohost-Apps/calibreweb_ynh/tree/testing).
 
 To try the testing branch, please proceed like that.
 ```
-sudo yunohost app install https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing --debug
+sudo yunohost app install https://github.com/Yunohost-Apps/calibreweb_ynh/tree/testing --debug
 or
-sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing --debug
+sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibreweb_ynh/tree/testing --debug
 ```
 
 
