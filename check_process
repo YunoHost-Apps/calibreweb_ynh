@@ -38,8 +38,6 @@
 #		setup_sub_dir=1
 #		setup_root=1
 #		upgrade=1	from_commit=3b9c5041e4fa73cb965368379f2b83d076c65341
-;;; Levels
-	Level 5=auto
 ;;; Options
 Email=nicolas@aubonalbanais.ovh
 Notification=none
@@ -47,3 +45,4 @@ Notification=none
 	; commit=11f5b96df7d8850beff47f9904745fa53a6f7ed9
 		name=Version 0.96.0~ynh4
 		manifest_arg=domain=DOMAIN&path=PATH&admin=USER&password=pass&is_public=1&
+		

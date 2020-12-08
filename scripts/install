@@ -6,6 +6,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
+source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -27,15 +28,12 @@ if [ $is_public -eq 1 ]; then
 	public_library=1
 fi
 
-source _common.sh
-
 #=================================================
 # MANAGE SCRIPT FAILURE
 #=================================================
 
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
-
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
@@ -44,9 +42,6 @@ ynh_script_progression --message="Validating installation parameters..." --weigh
 
 final_path=/var/www/$app
 test ! -e "$final_path" || ynh_die "This path already contains a folder"
-
-# Normalize the url path syntax
-path_url=$(ynh_normalize_url_path $path_url)
 
 # Check web path availability
 ynh_webpath_available $domain $path_url
@@ -62,7 +57,6 @@ ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
 ynh_app_setting_set $app admin $admin
 ynh_app_setting_set $app is_public $is_public
-
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -193,16 +187,6 @@ conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WH
 eval sqlite3 $final_path/app.db "$conf"
 
 #=================================================
-# SECURE FILES AND DIRECTORIES
-#=================================================
-
-# Set permissions to app files
-#disabled - do not work when calibreweb is not owner
-#chown -R root: $final_path
-#chown $app: $final_path/app.db
-
-
-#=================================================
 # STORE THE CHECKSUM OF THE CONFIG FILE
 #=================================================
 
@@ -210,10 +194,10 @@ eval sqlite3 $final_path/app.db "$conf"
 ynh_store_file_checksum "${final_path}/app.db"
 
 #=================================================
-# ADVERTISE SERVICE IN ADMIN PANEL
+# INTEGRATE SERVICE IN YUNOHOST
 #=================================================
 
-yunohost service add $app --description "Browse eBook in the web" --log "/var/log/$app/$app.log"
+yunohost service add $app --description="Browse eBook in the web" --log="/var/log/$app/$app.log"
 
 #=================================================
 # SETUP SSOWAT
@@ -229,7 +213,6 @@ fi
 if [ $public_library -eq 0 ]; then
 	yunohost app addaccess $app -u $admin
 fi
-
 
 #=================================================
 # RELOAD NGINX

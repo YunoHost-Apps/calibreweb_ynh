@@ -8,13 +8,13 @@
     },
     "version": "0.96.9~ynh5",
     "url": "https://github.com/janeczku/calibre-web",
-    "license": "free",
+    "license": "GPL-3.0-only",
     "maintainer": {
         "name": "Krakinou",
         "email": "misterl56@hotmail.com"
     },
     "requirements": {
-        "yunohost": ">= 3.7.1"
+        "yunohost": ">= 3.8.1"
     },
     "multi_instance": true,
     "services": [

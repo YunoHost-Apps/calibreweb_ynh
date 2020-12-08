@@ -10,6 +10,7 @@ version_gt() {
 # IMPORT GENERIC HELPERS
 #=================================================
 
+source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -33,8 +34,6 @@ ynh_app_setting_set $app calibre_dir $calibre_dir
 
 upload=$(sqlite3 $final_path/app.db "SELECT config_uploading FROM settings WHERE ID=1")
 ynh_app_setting_set $app upload $upload
-
-source _common.sh
 
 #=================================================
 # CHECK VERSION
@@ -85,13 +84,6 @@ ynh_abort_if_errors
 ynh_script_progression --message="Stopping a systemd service..." --weight=2
 
 ynh_systemd_action --service_name=$app --action="stop"
-
-#=================================================
-# CHECK THE PATH
-#=================================================
-
-# Normalize the URL path syntax
-path_url=$(ynh_normalize_url_path $path_url)
 
 #=================================================
 # STANDARD UPGRADE STEPS
@@ -225,6 +217,12 @@ ynh_add_systemd_config
 chown -R $app: $final_path
 
 #=================================================
+# INTEGRATE SERVICE IN YUNOHOST
+#=================================================
+
+yunohost service add $app --description="Browse eBook in the web" --log="/var/log/$app/$app.log"
+
+#=================================================
 # SETUP SSOWAT
 #=================================================
 
@@ -262,4 +260,3 @@ ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t
 #=================================================
 
 ynh_script_progression --message="Upgrade of $app completed" --last
-
