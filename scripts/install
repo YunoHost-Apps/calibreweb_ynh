@@ -6,7 +6,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-source _common.sh
+
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -22,6 +22,11 @@ is_public=$YNH_APP_ARG_IS_PUBLIC
 language=$YNH_APP_ARG_LANGUAGE
 upload=$YNH_APP_ARG_UPLOAD
 public_library=$YNH_APP_ARG_PUBLIC_LIBRARY
+
+#Source common.sh required to be after var initialization as some variables are updated in it that are then used in the script
+#when initializing the conf file of the app
+source _common.sh
+
 
 #if app is public, we assume library is public
 if [ $is_public -eq 1 ]; then
