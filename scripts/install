@@ -176,7 +176,7 @@ ynh_script_progression --message="Setting up database and settings..." --weight=
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
 #If port 8083 is already in use (ex for second instance), then service start will fail, which is expected : so we do not want
 #to set $port on the line match. "server on" will be displayed in case the port is already in use and should be ok to spot the fact that the database is initialized.
-ynh_systemd_action --service_name=$app --action="start" --line_match="server on " --log_path="$final_path/calibre-web.log" -t 30
+ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" --log_path="$final_path/calibre-web.log" -t 30
 #sleep required on low spec like raspberryPi
 sleep 2s
 #remove unwanted calibre-web.log
@@ -216,7 +216,7 @@ then
 	ynh_permission_update --permission "main" --add visitors
 fi
 if [ $public_library -eq 0 ]; then
-	yunohost app addaccess $app -u $admin
+	ynh_permission_update --permission "main" --add $admin
 fi
 
 #=================================================
@@ -224,7 +224,7 @@ fi
 #=================================================
 ynh_script_progression --message="Reload nginx and start $app..." --weight=5
 ynh_systemd_action --service_name=nginx --action=reload
-ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" -t 30
+ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" -t 30
 
 #=================================================
 # END OF SCRIPT
