@@ -180,7 +180,7 @@ ynh_backup_if_checksum_is_different "$final_path/app.db"
 if [ "$current_upstream_app_version" == '0.6.6' ]; then
         ynh_systemd_action --service_name=$app --action="start" --line_match="server on " --log_path="$final_path/calibre-web.log" -t 30
 else
-        ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" -t 30
+        ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" -t 30
 fi
 #sleep required on low spec like raspberryPi
 sleep 2s
@@ -257,7 +257,7 @@ ynh_systemd_action --service_name=nginx --action=reload
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=2
 
-ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t 30
+ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" -t 30
 
 #=================================================
 # END OF SCRIPT
