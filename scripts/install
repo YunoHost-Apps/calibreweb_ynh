@@ -6,6 +6,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
+
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -22,12 +23,15 @@ language=$YNH_APP_ARG_LANGUAGE
 upload=$YNH_APP_ARG_UPLOAD
 public_library=$YNH_APP_ARG_PUBLIC_LIBRARY
 
+#Source common.sh required to be after var initialization as some variables are updated in it that are then used in the script
+#when initializing the conf file of the app
+source _common.sh
+
+
 #if app is public, we assume library is public
 if [ $is_public -eq 1 ]; then
 	public_library=1
 fi
-
-source _common.sh
 
 #=================================================
 # MANAGE SCRIPT FAILURE
@@ -36,7 +40,6 @@ source _common.sh
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
-
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
 #=================================================
@@ -44,9 +47,6 @@ ynh_script_progression --message="Validating installation parameters..." --weigh
 
 final_path=/var/www/$app
 test ! -e "$final_path" || ynh_die "This path already contains a folder"
-
-# Normalize the url path syntax
-path_url=$(ynh_normalize_url_path $path_url)
 
 # Check web path availability
 ynh_webpath_available $domain $path_url
@@ -62,7 +62,6 @@ ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
 ynh_app_setting_set $app admin $admin
 ynh_app_setting_set $app is_public $is_public
-
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -177,7 +176,7 @@ ynh_script_progression --message="Setting up database and settings..." --weight=
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
 #If port 8083 is already in use (ex for second instance), then service start will fail, which is expected : so we do not want
 #to set $port on the line match. "server on" will be displayed in case the port is already in use and should be ok to spot the fact that the database is initialized.
-ynh_systemd_action --service_name=$app --action="start" --line_match="server on " --log_path="$final_path/calibre-web.log" -t 30
+ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" --log_path="$final_path/calibre-web.log" -t 30
 #sleep required on low spec like raspberryPi
 sleep 2s
 #remove unwanted calibre-web.log
@@ -193,16 +192,6 @@ conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WH
 eval sqlite3 $final_path/app.db "$conf"
 
 #=================================================
-# SECURE FILES AND DIRECTORIES
-#=================================================
-
-# Set permissions to app files
-#disabled - do not work when calibreweb is not owner
-#chown -R root: $final_path
-#chown $app: $final_path/app.db
-
-
-#=================================================
 # STORE THE CHECKSUM OF THE CONFIG FILE
 #=================================================
 
@@ -210,10 +199,10 @@ eval sqlite3 $final_path/app.db "$conf"
 ynh_store_file_checksum "${final_path}/app.db"
 
 #=================================================
-# ADVERTISE SERVICE IN ADMIN PANEL
+# INTEGRATE SERVICE IN YUNOHOST
 #=================================================
 
-yunohost service add $app --description "Browse eBook in the web" --log "/var/log/$app/$app.log"
+yunohost service add $app --description="Browse eBook in the web" --log="/var/log/$app/$app.log"
 
 #=================================================
 # SETUP SSOWAT
@@ -227,16 +216,15 @@ then
 	ynh_permission_update --permission "main" --add visitors
 fi
 if [ $public_library -eq 0 ]; then
-	yunohost app addaccess $app -u $admin
+	ynh_permission_update --permission "main" --add $admin
 fi
-
 
 #=================================================
 # RELOAD NGINX
 #=================================================
 ynh_script_progression --message="Reload nginx and start $app..." --weight=5
 ynh_systemd_action --service_name=nginx --action=reload
-ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" -t 30
+ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" -t 30
 
 #=================================================
 # END OF SCRIPT

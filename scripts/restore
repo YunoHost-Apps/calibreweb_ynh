@@ -19,6 +19,7 @@ ynh_abort_if_errors
 # LOAD SETTINGS
 #=================================================
 ynh_script_progression --message="Loading settings..." --weight=1
+
 app=$YNH_APP_INSTANCE_NAME
 
 domain=$(ynh_app_setting_get $app domain)
@@ -27,6 +28,9 @@ final_path=$(ynh_app_setting_get $app final_path)
 calibre_dir=$(ynh_app_setting_get $app calibre_dir)
 is_public=$(ynh_app_setting_get $app is_public)
 port=$(ynh_app_setting_get $app port)
+
+#Source common.sh required to be after var initialization as some variables are updated in it that are then used in the script
+#when initializing the conf file of the app
 source ../settings/scripts/_common.sh
 
 #=================================================
@@ -99,13 +103,13 @@ curl https://bootstrap.pypa.io/get-pip.py | python3
 ynh_script_progression --message="Restoring the systemd configuration..." --weight=1
 
 ynh_restore_file --origin_path="/etc/systemd/system/$app.service"
-systemctl enable $app.service
+systemctl enable $app.service --quiet
 
 #=================================================
 # INTEGRATE SERVICE IN YUNOHOST
 #=================================================
 
-yunohost service add $app --description "Browse eBook in the web" --log "/var/log/$app/$app.log"
+yunohost service add $app --description="Browse eBook in the web" --log="/var/log/$app/$app.log"
 
 #=================================================
 # RESTORE THE LOGROTATE CONFIGURATION
@@ -169,7 +173,7 @@ ynh_systemd_action --service_name=nginx --action=reload
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=2
 
-ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t 30
+ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" -t 30
 
 #=================================================
 # END OF SCRIPT

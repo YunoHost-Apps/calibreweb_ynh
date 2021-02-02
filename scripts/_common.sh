@@ -1,12 +1,11 @@
 #!/bin/bash
 
 PKG_DEPENDENCIES="sqlite3 libldap2-dev libsasl2-dev python3-dev imagemagick python3-lxml libjpeg-dev"
-#PKG_DEPENDENCIES="sqlite3 python3-pip imagemagick"
 DOSSIER_MEDIA=/home/yunohost.multimedia
 
+#These var are used in init_calibre_db_settings conf file
 LOG_FILE=/var/log/$app/$app.log
 ACCESS_LOG_FILE=/var/log/$app/$app-access.log
-
 #=================================================
 # EXPERIMENTAL HELPERS
 # TO BE DELETED WHEN RELEASED
@@ -27,7 +26,7 @@ ynh_multimedia_build_main_dir () {
         local checksum="806a827ba1902d6911095602a9221181"
 
         # Download yunohost.multimedia scripts
-        wget -nv https://github.com/Yunohost-Apps/yunohost.multimedia/archive/${ynh_media_release}.tar.gz 
+        wget -nv https://github.com/Yunohost-Apps/yunohost.multimedia/archive/${ynh_media_release}.tar.gz 2>&1
 
         # Check the control sum
         echo "${checksum} ${ynh_media_release}.tar.gz" | md5sum -c --status \
