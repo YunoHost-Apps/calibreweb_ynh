@@ -191,8 +191,14 @@ ynh_systemd_action --service_name=$app --action="stop"
 conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))), $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
 eval sqlite3 $final_path/app.db "$conf"
 
+#Update Imagick policy as per https://github.com/janeczku/calibre-web/wiki/FAQ#what-to-do-if-cover-pictures-are-not-extracted-from-pdf-files
+ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern="PDF" />" \
+		--replace_string="<policy domain="coder" rights="read" pattern="PDF" />" \
+		--target_file="/etc/ImageMagick-6/policy.xml"
+
 # Recalculate and store the checksum of the file for the next upgrade.
 ynh_store_file_checksum "$final_path/app.db"
+
 
 #=================================================
 # SETUP LOGROTATE
