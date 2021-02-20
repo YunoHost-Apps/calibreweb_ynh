@@ -87,6 +87,13 @@ then
 	yunohost firewall disallow TCP $port 2>&1
 fi
 
+#Restore Imagick policy
+if [ -z /etc/ImageMagick-6/policy.xml ]; then
+	ynh_replace_string --match_string="<policy domain="coder" rights="read" pattern="PDF" />" \
+			--replace_string="<policy domain="coder" rights="none" pattern="PDF" />" \
+			--target_file="/etc/ImageMagick-6/policy.xml"
+fi
+
 # Remove the log files
 ynh_script_progression --message="Removing log file..." --weight=1
 ynh_secure_remove "/var/log/$app/"
