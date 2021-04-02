@@ -1,5 +1,5 @@
---- ./source/optional-requirements.txt	2021-01-18 22:32:21.629010296 +0100
-+++ ./source/optional-requirements.txt	2021-01-18 23:43:53.721141321 +0100
+--- a/optional-requirements.txt	2021-01-18 22:32:21.629010296 +0100
++++ b/optional-requirements.txt	2021-01-18 23:43:53.721141321 +0100
 @@ -1,16 +1,6 @@
  # GDrive Integration
 -google-api-python-client>=1.7.11,<1.8.0
