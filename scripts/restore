@@ -66,6 +66,7 @@ ynh_script_progression --message="Recreating the dedicated system user..." --wei
 # Create the dedicated user (if not existing)
 ynh_system_user_create --username=$app
 
+
 #=================================================
 # RESTORE THE APP MAIN DIR
 #=================================================
@@ -81,6 +82,7 @@ ynh_restore_file --origin_path="$final_path"
 chown -R $app: $final_path
 
 #=================================================
+
 # SPECIFIC RESTORATION
 #=================================================
 # REINSTALL DEPENDENCIES
@@ -127,25 +129,37 @@ chown -R $app:$app /var/log/$app
 # RESTORE THE DATA DIRECTORY
 #=================================================
 
-ynh_script_progression --message="Restoring data directory..." --weight=2
+ynh_script_progression --message="Restoring data directory if required..." --weight=2
 # The data directory will be restored only if it exists in the backup archive
 # So only if it was backup previously.
-
-if [ -d "$YNH_BACKUP_DIR/apps/$app/backup/$calibre_dir" ]
-then
+#if [ -d "$YNH_BACKUP_DIR/apps/$app/backup/$calibre_dir" ] && [ ! tail "$calibre_dir" | grep "yunohost.multimedia" ]; then
 	ynh_restore_file --origin_path="$calibre_dir" --not_mandatory
-else
-	if [ ! -e "$calibre_dir" ]; then
-		ynh_print_info "Create calibre library folder $calibre_dir"
-		mkdir -p $calibre_dir
-		chown -R $app:$app $calibre_dir
-	fi
-#Check if metadata.db file exists. If not create it (empty library)
-	if [ ! -e "$calibre_dir"/metadata.db ]; then
-		cp -a ../settings/conf/metadata.db.empty $calibre_dir/metadata.db
-		chown $app:$app $calibre_dir/*
-	fi
+#fi
+
+#=================================================
+# RESTORE THE MULTIMEDIA DIR IF NOT EXISTING
+#=================================================
+ynh_script_progression --message="Restoring the multimedia directory..." --weight=5
+ynh_multimedia_build_main_dir
+ynh_multimedia_addaccess $app
+
+#=================================================
+# INITIALIZE DATA IF NOT EXISTING
+#=================================================
+
+if [ ! -e "$calibre_dir" ]; then
+	ynh_print_info "Create calibre library folder $calibre_dir"
+	mkdir -p $calibre_dir
+	chown -R $app:$app $calibre_dir
 fi
+#Check if metadata.db file exists. If not create it (empty library)
+if [ ! -e "$calibre_dir"/metadata.db ]; then
+	cp -a ../settings/conf/metadata.db.empty $calibre_dir/metadata.db
+	chown $app:$app $calibre_dir/*
+fi
+
+
+
 
 #Update Imagick policy as per https://github.com/janeczku/calibre-web/wiki/FAQ#what-to-do-if-cover-pictures-are-not-extracted-from-pdf-files
 ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern="PDF" />" \
