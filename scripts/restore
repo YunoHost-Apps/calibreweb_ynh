@@ -66,23 +66,18 @@ ynh_script_progression --message="Recreating the dedicated system user..." --wei
 # Create the dedicated user (if not existing)
 ynh_system_user_create --username=$app
 
-
 #=================================================
 # RESTORE THE APP MAIN DIR
 #=================================================
 ynh_script_progression --message="Restoring the app main directory..." --weight=1
-
 ynh_restore_file --origin_path="$final_path"
 
 #=================================================
 # RESTORE USER RIGHTS
 #=================================================
-
-# Restore permissions on app files
 chown -R $app: $final_path
 
 #=================================================
-
 # SPECIFIC RESTORATION
 #=================================================
 # REINSTALL DEPENDENCIES
@@ -158,9 +153,9 @@ if [ ! -e "$calibre_dir"/metadata.db ]; then
 	chown $app:$app $calibre_dir/*
 fi
 
-
-
-
+#===================================================
+# SPECIFIC SETUP
+#===================================================
 #Update Imagick policy as per https://github.com/janeczku/calibre-web/wiki/FAQ#what-to-do-if-cover-pictures-are-not-extracted-from-pdf-files
 ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern="PDF" />" \
 		--replace_string="<policy domain="coder" rights="read" pattern="PDF" />" \
