@@ -84,7 +84,7 @@
                 "optional": true,
                 "ask": {
                     "en": "Do you want to allow uploading of books?",
-                    "fr": "Voulez vous autoriser l'upload de livres?"
+                    "fr": "Voulez vous autoriser le téléversement de livres?"
                 },
                 "help":{
                 	"en":"You may change it later in the app",
