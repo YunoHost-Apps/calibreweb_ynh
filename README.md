@@ -15,7 +15,7 @@ Calibre-Web is a web app providing a clean interface for browsing, reading and d
 
 Alternatively, you may use [COPS](https://github.com/YunoHost-Apps/cops_ynh) which also allows access to your Calibre Library, but in read-only mode. 
 
-**Shipped version:** The shipped version is 0.6.10 - Florence, but as the numbering changed in the calibre-web app, it is numbered as 0.96.10 in yunohost.
+**Shipped version:** The shipped version is 0.6.11 - Jasmin, but as the numbering changed in the calibre-web app, it is numbered as 0.96.11 in yunohost.
 
 Users will be synchronized with authorized Yunohost users (having the calibreweb.main authorization group) automatically. In case of issue you may force the sync in the app itself.
 
@@ -49,7 +49,7 @@ By default, removing the app will **never** delete the library.
 
 ## Known Limitations
 
-* Authorization access to library to be done manually after install if Calibre library was already existing, for example :
+* Authorization access to library to be done manually after install if Calibre library was already existing (except in yunohost.multimedia directory), for example :
 ```
 chown -R calibreweb: path/to/library
 or
