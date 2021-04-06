@@ -121,6 +121,7 @@ ynh_add_nginx_config
 ynh_system_user_create $app
 
 chown -R $app: $final_path
+chmod 740 $final_path
 
 #=================================================
 # SETUP SYSTEMD
