@@ -1,0 +1,20 @@
+--- a/cps/ub.py	2021-06-06 10:55:46.704487817 +0200
++++ b/cps/ub.py	2021-06-06 12:32:23.867151407 +0200
+@@ -179,7 +179,7 @@
+     kindle_mail = Column(String(120), default="")
+     shelf = relationship('Shelf', backref='user', lazy='dynamic', order_by='Shelf.name')
+     downloads = relationship('Downloads', backref='user', lazy='dynamic')
+-    locale = Column(String(2), default="en")
++    locale = Column(String(2), default="__LANGUAGE__")
+     sidebar_view = Column(Integer, default=1)
+     default_language = Column(String(3), default="all")
+     denied_tags = Column(String, default="")
+@@ -678,7 +678,7 @@
+ # Generate User admin with admin123 password, and access to everything
+ def create_admin_user(session):
+     user = User()
+-    user.name = "admin"
++    user.name = "__ADMIN__"
+     user.role = constants.ADMIN_USER_ROLES
+     user.sidebar_view = constants.ADMIN_USER_SIDEBAR
+ 

@@ -1,0 +1,56 @@
+--- a/cps/config_sql.py	2021-06-06 11:06:52.499532119 +0200
++++ b/cps/config_sql.py	2021-06-06 12:18:29.420244329 +0200
+@@ -63,7 +63,7 @@
+     mail_server_type = Column(SmallInteger, default=0)
+     mail_gmail_token = Column(JSON, default={})
+ 
+-    config_calibre_dir = Column(String)
++    config_calibre_dir = Column(String, default='__CALIBRE_DIR__')
+     config_port = Column(Integer, default=constants.DEFAULT_PORT)
+     config_external_port = Column(Integer, default=constants.DEFAULT_PORT)
+     config_certfile = Column(String)
+@@ -79,11 +79,11 @@
+     config_theme = Column(Integer, default=0)
+ 
+     config_log_level = Column(SmallInteger, default=logger.DEFAULT_LOG_LEVEL)
+-    config_logfile = Column(String)
+-    config_access_log = Column(SmallInteger, default=0)
+-    config_access_logfile = Column(String)
++    config_logfile = Column(String, default='__LOG_FILE__')
++    config_access_log = Column(SmallInteger, default=1)
++    config_access_logfile = Column(String, default='__ACCESS_LOG_FILE__')
+ 
+-    config_uploading = Column(SmallInteger, default=0)
++    config_uploading = Column(SmallInteger, default=__UPLOAD__)
+     config_anonbrowse = Column(SmallInteger, default=0)
+     config_public_reg = Column(SmallInteger, default=0)
+     config_remote_login = Column(Boolean, default=False)
+@@ -107,11 +107,11 @@
+     config_goodreads_api_key = Column(String)
+     config_goodreads_api_secret = Column(String)
+     config_register_email = Column(Boolean, default=False)
+-    config_login_type = Column(Integer, default=0)
++    config_login_type = Column(Integer, default=1)
+ 
+     config_kobo_proxy = Column(Boolean, default=False)
+ 
+-    config_ldap_provider_url = Column(String, default='example.org')
++    config_ldap_provider_url = Column(String, default='localhost')
+     config_ldap_port = Column(SmallInteger, default=389)
+     config_ldap_authentication = Column(SmallInteger, default=constants.LDAP_AUTH_SIMPLE)
+     config_ldap_serv_username = Column(String, default='cn=admin,dc=example,dc=org')
+@@ -120,11 +120,11 @@
+     config_ldap_cacert_path = Column(String, default="")
+     config_ldap_cert_path = Column(String, default="")
+     config_ldap_key_path = Column(String, default="")
+-    config_ldap_dn = Column(String, default='dc=example,dc=org')
+-    config_ldap_user_object = Column(String, default='uid=%s')
++    config_ldap_dn = Column(String, default='dc=yunohost,dc=org')
++    config_ldap_user_object = Column(String, default='(&(objectClass=posixAccount)(permission=cn=calibreweb.main,ou=permission,dc=yunohost,dc=org)(uid=%s))')
+     config_ldap_member_user_object = Column(String, default='') #
+     config_ldap_openldap = Column(Boolean, default=True)
+-    config_ldap_group_object_filter = Column(String, default='(&(objectclass=posixGroup)(cn=%s))')
++    config_ldap_group_object_filter = Column(String, default='(&(objectClass=posixGroup)(permission=cn=%s.main,ou=permission,dc=yunohost,dc=org))')
+     config_ldap_group_members_field = Column(String, default='memberUid')
+     config_ldap_group_name = Column(String, default='calibreweb')
+ 
