@@ -1,5 +1,5 @@
---- ./ori/constants.py	2021-05-22 14:08:46.000000000 +0200
-+++ ./new/constants.py	2021-06-06 11:02:36.060353942 +0200
+--- a/cps/constants.py	2021-05-22 14:08:46.000000000 +0200
++++ b/cps/constants.py	2021-06-06 11:02:36.060353942 +0200
 @@ -25,7 +25,7 @@
  HOME_CONFIG = os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.HOMEDIR'))
  
