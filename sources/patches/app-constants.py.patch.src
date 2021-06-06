@@ -1,0 +1,26 @@
+--- ./ori/constants.py	2021-05-22 14:08:46.000000000 +0200
++++ ./new/constants.py	2021-06-06 11:02:36.060353942 +0200
+@@ -25,7 +25,7 @@
+ HOME_CONFIG = os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.HOMEDIR'))
+ 
+ #In executables updater is not available, so variable is set to False there
+-UPDATER_AVAILABLE = True
++UPDATER_AVAILABLE = False
+ 
+ # Base dir is parent of current file, necessary if called from different folder
+ if sys.version_info < (3, 0):
+@@ -127,12 +127,12 @@
+ DEFAULT_MAIL_SERVER = "mail.example.org"
+ 
+ DEFAULT_PASSWORD    = "admin123"  # nosec
+-DEFAULT_PORT        = 8083
++DEFAULT_PORT        = __PORT__
+ env_CALIBRE_PORT = os.environ.get("CALIBRE_PORT", DEFAULT_PORT)
+ try:
+     DEFAULT_PORT = int(env_CALIBRE_PORT)
+ except ValueError:
+-    print('Environment variable CALIBRE_PORT has invalid value (%s), faling back to default (8083)' % env_CALIBRE_PORT)
++    print('Environment variable CALIBRE_PORT has invalid value (%s), faling back to default (__PORT__)' % env_CALIBRE_PORT)
+ del env_CALIBRE_PORT
+ 
+ 
