@@ -27,10 +27,17 @@ public_library=$YNH_APP_ARG_PUBLIC_LIBRARY
 #when initializing the conf file of the app
 source _common.sh
 
-
 #if app is public, we assume library is public
 if [ $is_public -eq 1 ]; then
 	public_library=1
+fi
+
+if [ $is_public -eq 1 ]; then 						#app is public, library is public
+	calibre_dir=$DOSSIER_MEDIA/share/eBook
+elif [ $is_public -eq 0 ] && [ $public_library -eq 1 ]; then  #app is private, library is public
+	calibre_dir=$DOSSIER_MEDIA/share/eBook
+else 												#app is private, library is private
+	calibre_dir=$DOSSIER_MEDIA/$admin/eBook
 fi
 
 #=================================================
@@ -79,6 +86,12 @@ ynh_app_setting_set $app port $port
 #=================================================
 ynh_script_progression --message="Downloading sources to $final_path..." --weight=10
 ynh_app_setting_set $app final_path $final_path
+
+#Set settings constant initializer of the app
+ynh_add_config --template="../sources/patches/app-config_sql.py.patch.src" --destination="../sources/patches/app-config_sql.py.patch"
+ynh_add_config --template="../sources/patches/app-ub.py.patch.src" --destination="../sources/patches/app-ub.py.patch"
+ynh_add_config --template="../sources/patches/app-constants.py.patch.src" --destination="../sources/patches/app-constants.py.patch"
+
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source "$final_path"
 
@@ -143,13 +156,6 @@ ynh_script_progression --message="Creating files and directory..." --weight=5
 ynh_multimedia_build_main_dir
 ynh_multimedia_addaccess $app
 
-if [ $is_public -eq 1 ]; then 						#app is public, library is public
-	calibre_dir=$DOSSIER_MEDIA/share/eBook
-elif [ $is_public -eq 0 ] && [ $public_library -eq 1 ]; then  #app is private, library is public
-	calibre_dir=$DOSSIER_MEDIA/share/eBook
-else 												#app is private, library is private
-	calibre_dir=$DOSSIER_MEDIA/$admin/eBook
-fi
 
 #Check if metadata.db file exists. If not create it (empty library)
 if [ ! -e "$calibre_dir"/metadata.db ]; then
@@ -177,20 +183,20 @@ ynh_script_progression --message="Setting up database and settings..." --weight=
 #we need to start and stop the service so that initial app.db file is created and that we can set default data
 #If port 8083 is already in use (ex for second instance), then service start will fail, which is expected : so we do not want
 #to set $port on the line match. "server on" will be displayed in case the port is already in use and should be ok to spot the fact that the database is initialized.
-ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" --log_path="$final_path/calibre-web.log" -t 30
+#ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" --log_path="$final_path/calibre-web.log" -t 30
 #sleep required on low spec like raspberryPi
-sleep 2s
+#sleep 2s
 #remove unwanted calibre-web.log
-ynh_secure_remove --file="$final_path/calibre-web.log"
-ynh_systemd_action --service_name=$app --action="stop"
+#ynh_secure_remove --file="$final_path/calibre-web.log"
+#ynh_systemd_action --service_name=$app --action="stop"
 
 
 #set database settings as per conf file
-conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))), $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
-eval sqlite3 $final_path/app.db "$conf"
+#conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))), $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
+#eval sqlite3 $final_path/app.db "$conf"
 
-conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""
-eval sqlite3 $final_path/app.db "$conf"
+#conf="\"UPDATE user SET $(. <(echo -E echo $(<../conf/init_calibre_db_user))) WHERE ID=1\""
+#eval sqlite3 $final_path/app.db "$conf"
 
 #Update Imagick policy as per https://github.com/janeczku/calibre-web/wiki/FAQ#what-to-do-if-cover-pictures-are-not-extracted-from-pdf-files
 ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern="PDF" />" \
@@ -204,7 +210,7 @@ ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern=
 #=================================================
 
 # Calculate and store the config file checksum into the app settings
-ynh_store_file_checksum "${final_path}/app.db"
+#ynh_store_file_checksum "${final_path}/app.db"
 
 #=================================================
 # INTEGRATE SERVICE IN YUNOHOST
