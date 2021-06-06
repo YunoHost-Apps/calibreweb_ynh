@@ -95,7 +95,7 @@ fi
 # If language was set delete it
 if [ ! -z "$language" ]; then
 	ynh_app_setting_delete --app=$app --key=language
-#fi
+fi
 
 #binaries version is 0.6.0, we need to go throught upgrade to 0.6.6 so that app.db is correctly updated, otherwise database is corrupted
 #set database settings as per conf file : restart server so that app.db is regenerated, then add new ldap & log settings
