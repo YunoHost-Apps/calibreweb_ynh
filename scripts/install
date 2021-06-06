@@ -99,7 +99,7 @@ ynh_setup_source "$final_path"
 # INSTALL DEPENDENCIES
 #=================================================
 
-ynh_script_progression --message="Installing package dependencies..." --weight=15
+ynh_script_progression --message="Installing package dependencies..." --weight=30
 ynh_install_app_dependencies $PKG_DEPENDENCIES
 
 #use latest version of pip as per documentation in https://github.com/pypa/get-pip
