@@ -58,7 +58,7 @@ chmod o+rw path/to/library
 * Do not use a Nextcloud folder. It's all right if the folder is an external storage in Nextcloud but not if it's an internal one : Changing the data in the library will cause trouble with the sync
 * "Magic link feature is not yet available
 * Change to library made outside calibreweb are not automatically updated in calibreweb. It is required to disconnect and reconnect to see the changes : Do not open a database both in calibre & calibreweb!
-
+* Kobo Sync doesn’t work when Calibre is installed on a subdomain. This issue is caused by nginx. However, it works great when installed on a path e.g. `https://domain.tld/calibreweb`
 
 ## Links
 
