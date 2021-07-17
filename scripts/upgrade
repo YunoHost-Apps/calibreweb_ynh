@@ -26,6 +26,10 @@ is_public=$(ynh_app_setting_get $app is_public)
 final_path=$(ynh_app_setting_get $app final_path)
 language=$(ynh_app_setting_get $app language)
 
+#Source common.sh required to be after var initialization as some variables are updated in it that are then used in the script
+#when initializing the conf file of the app
+source _common.sh
+
 #Get settings from database in case it has been changed in the app and save it in settings so that it can be used back afterward
 calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
 calibre_dir=${calibre_dir%/}
@@ -33,8 +37,6 @@ ynh_app_setting_set $app calibre_dir $calibre_dir
 
 upload=$(sqlite3 $final_path/app.db "SELECT config_uploading FROM settings WHERE ID=1")
 ynh_app_setting_set $app upload $upload
-
-source _common.sh
 
 #=================================================
 # CHECK VERSION
@@ -55,6 +57,7 @@ if [ -f $final_path/cps/constants.py ]; then #on est dans une version postérieu
 else #on est encore en 0.6.0
 	current_upstream_app_version='0.6.0' 
 fi
+
 
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
@@ -79,19 +82,23 @@ ynh_script_progression --message="Stopping a systemd service..." --weight=2
 ynh_systemd_action --service_name=$app --action="stop"
 
 #=================================================
-# CHECK THE PATH
+# ENSURE DOWNWARD COMPATIBILITY
 #=================================================
+ynh_script_progression --message="Downward Compatibility checks..." --weight=1
+#Close unwanted open port in firewall
+if yunohost firewall list | grep -q "\- $port$"
+then
+	ynh_script_progression --message="Closing port $port as it shouldn't be open..."
+	yunohost firewall disallow TCP $port 2>&1
+fi
 
-# Normalize the URL path syntax
-path_url=$(ynh_normalize_url_path $path_url)
-
-#=================================================
-# STANDARD UPGRADE STEPS
-#=================================================
-# DOWNLOAD, CHECK AND UNPACK SOURCE
-#=================================================
+# If language was set delete it
+if [ ! -z "$language" ]; then
+	ynh_app_setting_delete --app=$app --key=language
+fi
 
 #binaries version is 0.6.0, we need to go throught upgrade to 0.6.6 so that app.db is correctly updated, otherwise database is corrupted
+#set database settings as per conf file : restart server so that app.db is regenerated, then add new ldap & log settings
 if version_gt "0.6.6" "$current_upstream_app_version" && [ "$current_upstream_package_version" == "0.6.0" ] && [ "$upgrade_type" == "UPGRADE_APP" ]; then
 	ynh_script_progression --message="Upgrading from $current_upstream_app_version to 0.6.6..." --weight=50
 	ynh_setup_source --dest_dir="$final_path" --source_id="app066"
@@ -102,13 +109,28 @@ if version_gt "0.6.6" "$current_upstream_app_version" && [ "$current_upstream_pa
 	#sleep required on low spec like raspberryPi
 	sleep 2s
 	ynh_systemd_action --service_name=$app --action="stop"
+	conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))), $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
+    eval sqlite3 $final_path/app.db "$conf"
 	current_upstream_app_version="0.6.6"
-	#remove unwanted entry in settings db
 fi
+
+#=================================================
+# STANDARD UPGRADE STEPS
+#=================================================
+# DOWNLOAD, CHECK AND UNPACK SOURCE
+#=================================================
+
+
 
 if [ "$upgrade_type" == "UPGRADE_APP" ]
 then
 	ynh_script_progression --message="Upgrading source files from $current_upstream_app_version to $new_upstream_package_version..." --weight=10
+
+	#Set settings constant initializer of the app
+	ynh_add_config --template="../sources/patches/app-config_sql.py.patch.src" --destination="../sources/patches/app-config_sql.py.patch"
+	ynh_add_config --template="../sources/patches/app-ub.py.patch.src" --destination="../sources/patches/app-ub.py.patch"
+	ynh_add_config --template="../sources/patches/app-constants.py.patch.src" --destination="../sources/patches/app-constants.py.patch"
+	
 	# Download, check integrity, uncompress and patch the source from app.src
 	ynh_setup_source --dest_dir="$final_path"
 fi
@@ -164,31 +186,13 @@ ynh_script_progression --message="Create Multimedia dir..." --weight=1
 ynh_multimedia_build_main_dir
 ynh_multimedia_addaccess $app
 
-#=================================================
-#Update database structure
-#=================================================
-ynh_script_progression --message="Update database..." --weight=1
-### Verify the checksum of a file, stored by `ynh_store_file_checksum` in the install script.
-### And create a backup of this file if the checksum is different. So the file will be backed up if the admin had modified it.
-ynh_backup_if_checksum_is_different "$final_path/app.db"
+#Update Imagick policy as per https://github.com/janeczku/calibre-web/wiki/FAQ#what-to-do-if-cover-pictures-are-not-extracted-from-pdf-files
+ynh_script_progression --message="Update Imagick policy..." --weight=1
 
-#set database settings as per conf file : restart server so that app.db is regenerated, then add new ldap & log settings
-if [ "$current_upstream_app_version" == '0.6.6' ]; then
-        ynh_systemd_action --service_name=$app --action="start" --line_match="server on " --log_path="$final_path/calibre-web.log" -t 30
-else
-        ynh_systemd_action --service_name=$app --action="start" --line_match="server on :$port" -t 30
-fi
-#sleep required on low spec like raspberryPi
-sleep 2s
-#remove unwanted calibre-web.log
-ynh_secure_remove --file="$final_path/calibre-web.log"
-ynh_systemd_action --service_name=$app --action="stop"
+ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern="PDF" />" \
+		--replace_string="<policy domain="coder" rights="read" pattern="PDF" />" \
+		--target_file="/etc/ImageMagick-6/policy.xml"
 
-conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))), $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
-eval sqlite3 $final_path/app.db "$conf"
-
-# Recalculate and store the checksum of the file for the next upgrade.
-ynh_store_file_checksum "$final_path/app.db"
 
 #=================================================
 # SETUP LOGROTATE
@@ -215,6 +219,12 @@ ynh_add_systemd_config
 
 # Set permissions on app files
 chown -R $app: $final_path
+
+#=================================================
+# INTEGRATE SERVICE IN YUNOHOST
+#=================================================
+
+yunohost service add $app --description="Browse eBook in the web" --log="/var/log/$app/$app.log"
 
 #=================================================
 # SETUP SSOWAT
@@ -247,11 +257,10 @@ ynh_systemd_action --service_name=nginx --action=reload
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=2
 
-ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t 30
+ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" -t 30
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
 ynh_script_progression --message="Upgrade of $app completed" --last
-

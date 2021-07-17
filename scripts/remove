@@ -6,7 +6,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-
+source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -20,7 +20,6 @@ port=$(ynh_app_setting_get $app port)
 final_path=$(ynh_app_setting_get $app final_path)
 calibre_dir=$(ynh_app_setting_get $app calibre_dir)
 
-source _common.sh
 
 #=================================================
 # REMOVE SERVICE FROM ADMIN PANEL
@@ -86,6 +85,13 @@ if yunohost firewall list | grep -q "\- $port$"
 then
 	ynh_script_progression --message="Closing port $port..." --weight=10
 	yunohost firewall disallow TCP $port 2>&1
+fi
+
+#Restore Imagick policy
+if [ -z /etc/ImageMagick-6/policy.xml ]; then
+	ynh_replace_string --match_string="<policy domain="coder" rights="read" pattern="PDF" />" \
+			--replace_string="<policy domain="coder" rights="none" pattern="PDF" />" \
+			--target_file="/etc/ImageMagick-6/policy.xml"
 fi
 
 # Remove the log files

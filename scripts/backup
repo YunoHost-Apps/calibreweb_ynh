@@ -6,7 +6,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-
+source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -19,7 +19,7 @@ ynh_abort_if_errors
 #=================================================
 # LOAD SETTINGS
 #=================================================
-ynh_script_progression --message="Loading installation settings..." --weight=1
+ynh_print_info --message="Loading installation settings..."
 
 app=$YNH_APP_INSTANCE_NAME
 final_path=$(ynh_app_setting_get $app final_path)
@@ -31,26 +31,17 @@ port=$(ynh_app_setting_get $app port)
 calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
 #Save it in settings so that it can be used back afterward
 calibre_dir=${calibre_dir%/}
-ynh_app_setting_set $app calibre_dir $calibre_dir 
-
-source ../settings/scripts/_common.sh
-
+ynh_app_setting_set $app calibre_dir $calibre_dir
 
 #=================================================
-# STANDARD BACKUP STEPS
+# DECLARE DATA AND CONF FILES TO BACKUP
 #=================================================
-# STOP SYSTEMD SERVICE
-#=================================================
-ynh_script_progression --message="Stopping a systemd service..." --weight=1
-
-ynh_systemd_action --service_name=$app --action="stop"
-
+ynh_print_info --message="Declaring files to be backed up..."
 
 #=================================================
 # BACKUP THE APP MAIN DIR
 #=================================================
 
-ynh_script_progression --message="Backing up the main app directory..." --weight=1
 #This will backup the app.db file at the same time
 ynh_backup --src_path="$final_path"
 
@@ -58,44 +49,30 @@ ynh_backup --src_path="$final_path"
 # BACKUP THE NGINX CONFIGURATION
 #=================================================
 
-ynh_script_progression --message="Backing up nginx web server configuration..." --weight=1
-
 ynh_backup --src_path="/etc/nginx/conf.d/$domain.d/$app.conf"
-
 
 #=================================================
 # SPECIFIC BACKUP
 #=================================================
 # BACKUP LOGROTATE
 #=================================================
-ynh_script_progression --message="Backing up logrotate configuration..." --weight=1
+
 ynh_backup --src_path="/etc/logrotate.d/$app"
 
 #=================================================
 # BACKUP SYSTEMD
 #=================================================
-ynh_script_progression --message="Backing up systemd configuration..." --weight=1
-ynh_backup --src_path="/etc/systemd/system/$app.service"
 
+ynh_backup --src_path="/etc/systemd/system/$app.service"
 
 #=================================================
 # BACKUP THE DATA DIRECTORY
 #=================================================
-ynh_script_progression --message="Backing up data directory..."
-ynh_print_info "Data directory will be backup up only if BACKUP_CORE_ONLY is unset"
+
 ynh_backup --src_path="$calibre_dir" --is_big
-
-
-#=================================================
-# START SYSTEMD SERVICE
-#=================================================
-ynh_script_progression --message="Starting a systemd service..." --weight=5
-
-ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t 30
-
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Backup script completed for $app. (YunoHost will then actually copy those files to the archive)." --last
+ynh_print_info --message="Backup script completed for $app. (YunoHost will then actually copy those files to the archive)."

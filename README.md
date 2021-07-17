@@ -1,7 +1,7 @@
-
 # Calibre-web for YunoHost
-[![Integration level](https://dash.yunohost.org/integration/calibreweb.svg)](https://ci-apps.yunohost.org/jenkins/job/calibreweb%20%28Community%29/lastBuild/consoleFull)  
-[![Install calibreweb with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=calibreweb)
+
+[![Integration level](https://dash.yunohost.org/integration/calibreweb.svg)](https://dash.yunohost.org/appci/app/calibreweb) ![](https://ci-apps.yunohost.org/ci/badges/calibreweb.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/calibreweb.maintain.svg)  
+[![Install calibreweb with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=calibreweb)
 
 > *This package allow you to install calibreweb quickly and simply on a YunoHost server.  
 If you don't have YunoHost, please see [here](https://yunohost.org/#/install) to know how to install and enjoy it.*
@@ -15,7 +15,7 @@ Calibre-Web is a web app providing a clean interface for browsing, reading and d
 
 Alternatively, you may use [COPS](https://github.com/YunoHost-Apps/cops_ynh) which also allows access to your Calibre Library, but in read-only mode. 
 
-**Shipped version:** The shipped version is 0.6.7, but as the numbering changed in the calibre-web app, it is numbered as 0.96.7 in yunohost.
+**Shipped version:** The shipped version is 0.6.12 - Pilar, but as the numbering changed in the calibre-web app, it is numbered as 0.96.12 in yunohost.
 
 Users will be synchronized with authorized Yunohost users (having the calibreweb.main authorization group) automatically. In case of issue you may force the sync in the app itself.
 
@@ -49,7 +49,7 @@ By default, removing the app will **never** delete the library.
 
 ## Known Limitations
 
-* Authorization access to library to be done manually after install if Calibre library was already existing, for example :
+* Authorization access to library to be done manually after install if Calibre library was already existing (except in yunohost.multimedia directory), for example :
 ```
 chown -R calibreweb: path/to/library
 or
@@ -58,7 +58,7 @@ chmod o+rw path/to/library
 * Do not use a Nextcloud folder. It's all right if the folder is an external storage in Nextcloud but not if it's an internal one : Changing the data in the library will cause trouble with the sync
 * "Magic link feature is not yet available
 * Change to library made outside calibreweb are not automatically updated in calibreweb. It is required to disconnect and reconnect to see the changes : Do not open a database both in calibre & calibreweb!
-* Yunohost install use the Tornado server which limits the upload size of a single file to 200Mo. 
+* Kobo Sync doesn’t work when Calibre is installed on a subdomain. This issue is caused by nginx. However, it works great when installed on a path e.g. `https://domain.tld/calibreweb`
 
 ## Links
 
@@ -68,16 +68,15 @@ chmod o+rw path/to/library
 
 ---
 
-Developers info
-----------------
+## Developers info
 
-Please do your pull request to the [testing branch](https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing).
+Please do your pull request to the [testing branch](https://github.com/Yunohost-Apps/calibreweb_ynh/tree/testing).
 
 To try the testing branch, please proceed like that.
 ```
-sudo yunohost app install https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing --debug
+sudo yunohost app install https://github.com/Yunohost-Apps/calibreweb_ynh/tree/testing --debug
 or
-sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibreweb_ynh/tree/Testing --debug
+sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibreweb_ynh/tree/testing --debug
 ```
 
 
@@ -92,6 +91,7 @@ sudo yunohost app upgrade calibreweb -u https://github.com/Yunohost-Apps/calibre
 - [ ] Add cronjob to reload database (for nextcloud integration)
 - [X] OPDS activation
 - [ ] Add config-panel option to trigger do_not_backup_data
+- [ ] Add config-panel to manage max upload size
 - [ ] Add action to restart the server
 - [ ] Add action to synchronize users
 - [ ] Add action to deactivate LDAP et retrieve admin password

@@ -26,6 +26,9 @@ ynh_script_progression --message="Loading installation settings..." --weight=1
 # Needed for helper "ynh_add_nginx_config"
 final_path=$(ynh_app_setting_get $app final_path)
 port=$(ynh_app_setting_get $app port)
+
+#Source common.sh required to be after var initialization as some variables are updated in it that are then used in the script
+#when initializing the conf file of the app
 source _common.sh
 
 #=================================================
@@ -120,7 +123,7 @@ fi
 #=================================================
 ynh_script_progression --message="Starting a systemd service..." --weight=2
 
-ynh_systemd_action --service_name=$app --action="start" -l "server on :$port" -t 30
+ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" -t 30
 
 #=================================================
 # RELOAD NGINX
