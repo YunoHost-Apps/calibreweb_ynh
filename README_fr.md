@@ -27,18 +27,18 @@ Explorer, lire et télécharger des eBooks à partir d'une base de données Cali
 ### Post installation
 
 Les utilisateurs appartenant au groupe d'autorisation calibreweb.main peuvent être synchronisé automatiquement depuis l'application en utilisant la fonction "Importer les utilisateurs LDAP".
-Lorsque les utilisateurs sont supprimés dans Yunohost, ils sont également supprimé dans calibreweb.
+Lorsque les utilisateurs sont supprimés dans Yunohost, ils sont également supprimés dans Calibreweb.
 
 
 ### Gestion de la bibliothèque
 
 * La **bibliothèque** sera placée dans `/home/yunohost.multimedia/share/eBook` sauf si simultanément :
- - calibreweb est paramétré comme une application privée
- - La bibliothèque calibreweb est paramétrée comme une bilbiothèque privée
+	 - Calibreweb est paramétré comme une application privée
+	 - La bibliothèque Calibreweb est paramétrée comme une bilbiothèque privée
 
-Dans ce cas, la bibliothèque sera placée dans `/home/yunohost.multimedia/[admin]/eBook`. Le répertoire de la bibliothèque peut ensuite être déplacée directement dans l'application par l'administrateur.
+Dans ce cas, la bibliothèque sera placée dans `/home/yunohost.multimedia/[admin]/eBook`. Le répertoire de la bibliothèque peut ensuite être déplacé directement dans l'application par l'administrateur.
 
-* Par défaut, le processus de backup de Yunohost **archivera** la bibliothèque calibreweb.
+* Par défaut, le processus de backup de Yunohost **archivera** la bibliothèque Calibreweb.
 Vous pouvez le désactiver avec cette commande:
 ```
 yunohost app setting calibreweb do_not_backup_data -v 1
@@ -47,7 +47,7 @@ yunohost app setting calibreweb do_not_backup_data -v 1
 * Par défaut, supprimer l'application **ne supprimera jamais** la bibliothèque.
 
 
-* Si la bibliothèque existait avant l'installation de calibreweb, les accès à celle-ci doivent être géré manuellement (sauf pour celle dans yunohost.multimedia directory). Par exemple :
+* Si la bibliothèque existait avant l'installation de Calibreweb, les accès à celle-ci doivent être géré manuellement (sauf pour celle dans yunohost.multimedia directory). Par exemple :
 ```
 chown -R calibreweb: chemin/vers/bibliothèque
 ou
@@ -62,13 +62,12 @@ Egalement, il se peut que l'activation de l'accès anonyme soit nécessaire pour
 ### Version
 
 La numérotation est modifiée dans yunohost par rapport à Calibre-web: la version 0.X.Y devient 0.9X.Y dans yunohost. Cela provient du fait que Calibre-web n'était pas versionné lors des premiers packages.
-Users will be synchronized with authorized Yunohost users (having the calibreweb.main authorization group) automatically. In case of issue you may force the sync in the app itself.
 
 ### Problèmes connus
 
 * Ne pas utiliser un répertoire Nextcloud pour y installer la bibliothèque: Cela fonctionnera s'il s'agit d'un stockage externe à Nextcloud, mais pas dans le cas d'un répertoire interne qui causerait des problèmes lors des synchronisations. 
 * La fonction "Magic link" n'est pas disponible
-* Les changements fait à la bibliothèque en dehors de calibreweb ne sont pas automatiquement vu par calibreweb : Il est nécessaire de se déconnecter puis reconnecter ou redémarrer le service pour que les modifications soient visibles : N'utilisez donc pas simultanément Calibre et Calibreweb sur la même bibliothèque!
+* Les changements fait à la bibliothèque en dehors de Calibreweb ne sont pas automatiquement vu par Calibreweb : Il est nécessaire de se déconnecter puis reconnecter ou redémarrer le service pour que les modifications soient visibles : N'utilisez donc pas simultanément Calibre et Calibreweb sur la même bibliothèque!
 * La synchronisation Kobo ne fonctionne pas quand Calibreweb est installée dans un sous-domaine. Ce problème est causé par nginx. Par contre, cela fonctionne très bien quand installé dans un répertoire, par exemple `https://domain.tld/calibreweb`
 
 ## Todo
