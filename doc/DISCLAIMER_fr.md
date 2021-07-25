@@ -8,8 +8,8 @@ Lorsque les utilisateurs sont supprimés dans Yunohost, ils sont également supp
 ### Gestion de la bibliothèque
 
 * La **bibliothèque** sera placée dans `/home/yunohost.multimedia/share/eBook` sauf si simultanément :
-		 - Calibreweb est paramétré comme une application privée
-		 - La bibliothèque Calibreweb est paramétrée comme une bilbiothèque privée
+  - Calibreweb est paramétré comme une application privée
+  - La bibliothèque Calibreweb est paramétrée comme une bilbiothèque privée
 
 Dans ce cas, la bibliothèque sera placée dans `/home/yunohost.multimedia/[admin]/eBook`. Le répertoire de la bibliothèque peut ensuite être déplacé directement dans l'application par l'administrateur.
 
