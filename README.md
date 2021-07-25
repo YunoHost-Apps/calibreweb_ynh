@@ -28,13 +28,13 @@ Browsing, reading and downloading eBooks using a Calibre database
 ## Disclaimers / important information
 
 
-###Post install
+### Post install
 
 Users having the calibreweb.main authorization group can be automatically sync from within the app, by using the "Import LDAP user" function.
 Deletion of a Yunohost User will delete the according calibreweb-user.
 
 
-###Library management
+### Library management
 
 * **Library** will be placed in `/home/yunohost.multimedia/share/eBook` folder except if both :
  - calibreweb is set as a private application
@@ -58,12 +58,12 @@ or
 chmod o+rw path/to/library
 ``` 
 
-###OPDS
+### OPDS
 
 For **OPDS** to work, most OPDS-readers will require the app must be set in public mode.
 Also, you may have to activate the "anonym browsing" for some reader to access book covers or download books ([source](https://github.com/janeczku/calibre-web/wiki/FAQ#which-opds-readers-work-with-calibre-web)).
 
-###Versionning
+### Versionning
 
 Version number in Yunohost is different from the upstream Calibre-web app : version 0.X.Y becomes 0.9.X.Y in Yunohost. This is due to the fact that Calibre-web was not versionned when first packages were built.
 
@@ -74,7 +74,7 @@ Version number in Yunohost is different from the upstream Calibre-web app : vers
 * Change to library made outside calibreweb are not automatically updated in calibreweb. It is required to disconnect and reconnect to see the changes : Do not open a database both in calibre & calibreweb!
 * Kobo Sync doesn’t work when Calibreweb is installed on a subdomain. This issue is caused by nginx. However, it works great when installed on a path e.g. `https://domain.tld/calibreweb`
 
-## Todo
+### Todo
 - [ ] Update mail settings with yunohost settings
 - [ ] enable magic link
 - [ ] Add cronjob to reload database (for nextcloud integration)

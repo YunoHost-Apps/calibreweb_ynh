@@ -24,13 +24,13 @@ Explorer, lire et télécharger des eBooks à partir d'une base de données Cali
 ## Avertissements / informations importantes
 
 
-###Post installation
+### Post installation
 
 Les utilisateurs appartenant au groupe d'autorisation calibreweb.main peuvent être synchronisé automatiquement depuis l'application en utilisant la fonction "Importer les utilisateurs LDAP".
 Lorsque les utilisateurs sont supprimés dans Yunohost, ils sont également supprimé dans calibreweb.
 
 
-###Gestion de la bibliothèque
+### Gestion de la bibliothèque
 
 * La **bibliothèque** sera placée dans `/home/yunohost.multimedia/share/eBook` sauf si simultanément :
  - calibreweb est paramétré comme une application privée
@@ -54,12 +54,12 @@ ou
 chmod o+rw chemin/vers/bibliothèque
 ``` 
 
-###OPDS
+### OPDS
 
 Pour que l'**OPDS** fonctionne, la plupart des lecteurs OPDS exigent que l'application soit en accès publique.
 Egalement, il se peut que l'activation de l'accès anonyme soit nécessaire pour accéder aux bibliothèque ou télécharger les livres sur certains lecteurs : ([source](https://github.com/janeczku/calibre-web/wiki/FAQ#which-opds-readers-work-with-calibre-web)).
 
-###Version
+### Version
 
 La numérotation est modifiée dans yunohost par rapport à Calibre-web: la version 0.X.Y devient 0.9X.Y dans yunohost. Cela provient du fait que Calibre-web n'était pas versionné lors des premiers packages.
 Users will be synchronized with authorized Yunohost users (having the calibreweb.main authorization group) automatically. In case of issue you may force the sync in the app itself.
