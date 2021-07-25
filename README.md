@@ -37,8 +37,8 @@ Deletion of a Yunohost User will delete the according calibreweb-user.
 ### Library management
 
 * **Library** will be placed in `/home/yunohost.multimedia/share/eBook` folder except if both :
-	- calibreweb is set as a private application
-	- calibreweb library is set as a public library
+		- calibreweb is set as a private application
+		- calibreweb library is set as a public library
 
 In this case the library will be set in `/home/yunohost.multimedia/[admin]/eBook` folder. Library folder can always be changed manually in the application settings by the administrator.
 
