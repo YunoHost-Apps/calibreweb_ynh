@@ -115,9 +115,9 @@ if version_gt "0.6.6" "$current_upstream_app_version" && [ "$current_upstream_pa
 fi
 
 #LDAP settings were wrongly set in version prior to 0.6.13 and we could not retrieve LDAP users. This will change the settings to correct values 
-if sqlite3 app.db "SELECT config_ldap_group_object_filter FROM settings" \
+if sqlite3 $final_path/app.db "SELECT config_ldap_group_object_filter FROM settings" \
 	| grep -xq "(&(objectClass=posixGroup)(permission=cn=%s.main,ou=permission,dc=yunohost,dc=org))" ; then 
-	eval sqlite3 ./app.db "UPDATE settings SET config_ldap_group_object_filter='(&(objectClass=posixGroup)(cn=%s.main))' WHERE ID=1"
+	eval sqlite3 $final_path/app.db "\"UPDATE settings SET config_ldap_group_object_filter='(&(objectClass=posixGroup)(cn=%s.main))' WHERE ID=1\""
 fi
 
 #=================================================
