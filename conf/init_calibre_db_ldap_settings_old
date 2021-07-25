@@ -1,3 +1,4 @@
+#To be deleted in future release
 config_login_type=1,
 config_ldap_provider_url=\'localhost\',
 config_ldap_port=389,
