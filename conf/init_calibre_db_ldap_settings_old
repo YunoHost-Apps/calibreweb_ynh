@@ -1,3 +1,4 @@
+#To be deleted in future release
 config_login_type=1,
 config_ldap_provider_url=\'localhost\',
 config_ldap_port=389,
@@ -5,6 +6,6 @@ config_ldap_authentication=0,
 config_ldap_dn=\'dc=yunohost,dc=org\',
 config_ldap_user_object=\'\(\&\(objectClass=posixAccount\)\(permission=cn=calibreweb.main,ou=permission,dc=yunohost,dc=org\)\(uid=%s\)\)\',
 config_ldap_openldap=1,
-config_ldap_group_object_filter=\'\(\&\(objectClass=posixGroup\)\(permission=cn=%s.main,ou=permission,dc=yunohost,dc=org\)\)\',
+config_ldap_group_object_filter=\'\(\&\(objectClass=posixGroup\)\(cn=%s.main\)\)\',
 config_ldap_group_members_field=\'memberUid\',
 config_ldap_group_name=\'calibreweb\'

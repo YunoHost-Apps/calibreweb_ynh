@@ -50,7 +50,7 @@
      config_ldap_member_user_object = Column(String, default='') #
      config_ldap_openldap = Column(Boolean, default=True)
 -    config_ldap_group_object_filter = Column(String, default='(&(objectclass=posixGroup)(cn=%s))')
-+    config_ldap_group_object_filter = Column(String, default='(&(objectClass=posixGroup)(permission=cn=%s.main,ou=permission,dc=yunohost,dc=org))')
++    config_ldap_group_object_filter = Column(String, default='(&(objectClass=posixGroup)(cn=%s.main))')
      config_ldap_group_members_field = Column(String, default='memberUid')
      config_ldap_group_name = Column(String, default='calibreweb')
  

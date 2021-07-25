@@ -111,4 +111,4 @@ ynh_system_user_delete --username=$app
 # MESSAGE TO USER
 #=================================================
 ynh_script_progression --message="Removal of $app completed" --last
-ynh_print_warn "!!!The library folder $calibre_dir was not deleted. Delete it manually if required!!!"
+ynh_print_info "The library folder $calibre_dir was not deleted. Delete it manually if required"

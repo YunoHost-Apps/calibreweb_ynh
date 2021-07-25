@@ -17,7 +17,7 @@
 		setup_public=1
 		upgrade=1
 #Last version
-		upgrade=1	from_commit=daf9f864b4f4adde4130c9d000ecc87f5d44ca42
+		upgrade=1	from_commit=df304aadd7767a3e38bfc6d4da45ce8a94ebc749
 #v0.6.6
 #		upgrade=1	from_commit=11f5b96df7d8850beff47f9904745fa53a6f7ed9
 		backup_restore=1
