@@ -17,7 +17,7 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 
 Browsing, reading and downloading eBooks using a Calibre database
 
-**Shipped version:** 0.6.13
+**Shipped version:** 0.6.14
 
 
 

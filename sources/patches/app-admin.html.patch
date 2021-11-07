@@ -1,15 +1,15 @@
---- a/cps/templates/admin.html	2021-05-22 14:08:46.000000000 +0200
-+++ b/cps/templates/admin.html	2021-06-06 12:43:44.886680839 +0200
-@@ -184,11 +184,7 @@
+--- a/cps/templates/admin.html	2021-10-31 11:31:53.000000000 +0100
++++ b/cps/templates/admin.html	2021-11-05 19:22:28.554122091 +0100
+@@ -185,12 +185,6 @@
          </tbody>
        </table>
  
 -      {%  if feature_support['updater'] %}
+-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 -      <div class="hidden" id="update_error"> <span>{{update_error}}</span></div>
 -      <div class="btn btn-primary" id="check_for_update">{{_('Check for Update')}}</div>
 -      <div class="btn btn-primary hidden" id="perform_update" data-toggle="modal" data-target="#StatusDialog">{{_('Perform Update')}}</div>
 -      {%  endif %}
-+
      </div>
    </div>
  </div>
