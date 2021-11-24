@@ -1,12 +1,12 @@
 ;; Complete Test
 # First Run of complete test
 	; Manifest
-		domain="domain.tld"	(DOMAIN)
-		path="/calibre"	(PATH)
+		domain="domain.tld"
+		path="/calibre"
 		calibre_path="/home/yunohost.app/calibreweb"
-		admin="john"	(USER)
+		admin="john"
 		language="en"
-		is_public=0	(PUBLIC|public=1|private=0)
+		is_public=0
 		upload=1
 		password="a very long password"
 	; Checks
