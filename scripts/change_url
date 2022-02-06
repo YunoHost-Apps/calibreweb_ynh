@@ -100,7 +100,7 @@ then
 	path_url="$new_path"
 	#Cannot use empty string for X-script-name, causes an issue in the python prg
 	if [ $path_url = "/" ] ; then
-		ynh_replace_string "        proxy_set_header		X-Script-Name" "#       proxy_set_header		X-Script-Name" ../conf/nginx.conf
+		ynh_replace_string "        proxy_set_header	X-Script-Name" "#       proxy_set_header	X-Script-Name" ../conf/nginx.conf
 	fi
 	# Create a dedicated nginx config
 	ynh_add_nginx_config

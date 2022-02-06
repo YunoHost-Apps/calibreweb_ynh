@@ -22,7 +22,6 @@ domain=$(ynh_app_setting_get $app domain)
 port=$(ynh_app_setting_get $app port)
 path_url=$(ynh_app_setting_get $app path)
 admin=$(ynh_app_setting_get $app admin)
-is_public=$(ynh_app_setting_get $app is_public)
 final_path=$(ynh_app_setting_get $app final_path)
 language=$(ynh_app_setting_get $app language)
 
@@ -120,6 +119,14 @@ if sqlite3 $final_path/app.db "SELECT config_ldap_group_object_filter FROM setti
 	eval sqlite3 $final_path/app.db "\"UPDATE settings SET config_ldap_group_object_filter='(&(objectClass=posixGroup)(cn=%s.main))' WHERE ID=1\""
 fi
 
+# Cleaning legacy permissions
+if ynh_legacy_permissions_exists; then
+	ynh_legacy_permissions_delete_all
+
+	ynh_app_setting_delete --app=$app --key=is_public
+fi
+
+
 #=================================================
 # STANDARD UPGRADE STEPS
 #=================================================
@@ -147,7 +154,7 @@ fi
 
 ynh_script_progression --message="Upgrading nginx web server configuration..." --weight=5
 if [ $path_url = "/" ] ; then
-	ynh_replace_string "        proxy_set_header		X-Script-Name" "#       proxy_set_header		X-Script-Name" ../conf/nginx.conf
+	ynh_replace_string "        proxy_set_header	X-Script-Name" "#       proxy_set_header	X-Script-Name" ../conf/nginx.conf
 fi
 # Create a dedicated nginx config
 ynh_add_nginx_config
@@ -231,26 +238,6 @@ chown -R $app: $final_path
 #=================================================
 
 yunohost service add $app --description="Browse eBook in the web" --log="/var/log/$app/$app.log"
-
-#=================================================
-# SETUP SSOWAT
-#=================================================
-
-# Make app public if necessary
-if [ $is_public -eq 1 ]
-then
-	# unprotected_uris allows SSO credentials to be passed anyway
-	#ynh_app_setting_set $app unprotected_uris "/"
-	ynh_permission_update --permission "main" --add visitors
-fi
-
-#=================================================
-# PACKAGE_CHECK
-#=================================================
-#This line of code is just used to caused an error in upgrade to be tested by package_check 
-if [ -e /tmp/upgrade_error ]; then
-	ynh_die
-fi
 
 #=================================================
 # RELOAD NGINX
