@@ -18,7 +18,7 @@ app=$YNH_APP_INSTANCE_NAME
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
 admin=$YNH_APP_ARG_ADMIN
-is_public=$YNH_APP_ARG_IS_PUBLIC
+public=$YNH_APP_ARG_IS_PUBLIC
 language=$YNH_APP_ARG_LANGUAGE
 upload=$YNH_APP_ARG_UPLOAD
 public_library=$YNH_APP_ARG_PUBLIC_LIBRARY
@@ -28,13 +28,13 @@ public_library=$YNH_APP_ARG_PUBLIC_LIBRARY
 source _common.sh
 
 #if app is public, we assume library is public
-if [ $is_public -eq 1 ]; then
+if [ $public -eq 1 ]; then
 	public_library=1
 fi
 
-if [ $is_public -eq 1 ]; then 						#app is public, library is public
+if [ $public -eq 1 ]; then 						#app is public, library is public
 	calibre_dir=$DOSSIER_MEDIA/share/eBook
-elif [ $is_public -eq 0 ] && [ $public_library -eq 1 ]; then  #app is private, library is public
+elif [ $public -eq 0 ] && [ $public_library -eq 1 ]; then  #app is private, library is public
 	calibre_dir=$DOSSIER_MEDIA/share/eBook
 else 												#app is private, library is private
 	calibre_dir=$DOSSIER_MEDIA/$admin/eBook
@@ -68,7 +68,6 @@ ynh_script_progression --message="Storing installation settings..." --weight=5
 ynh_app_setting_set $app domain $domain
 ynh_app_setting_set $app path $path_url
 ynh_app_setting_set $app admin $admin
-ynh_app_setting_set $app is_public $is_public
 
 #=================================================
 # STANDARD MODIFICATIONS
