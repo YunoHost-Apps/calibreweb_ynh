@@ -6,10 +6,10 @@
         "en": "Browsing, reading and downloading eBooks using a Calibre database",
         "fr": "Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre"
     },
-    "version": "0.96.14~ynh1",
+    "version": "0.96.16~ynh1",
     "url": "https://github.com/janeczku/calibre-web",
     "upstream": {
-        "version": "0.6.14",
+        "version": "0.6.16",
         "license": "GPL-3.0-only",
         "admindoc": "https://github.com/janeczku/calibre-web/wiki",
         "code": "https://github.com/janeczku/calibre-web"
@@ -20,7 +20,7 @@
         "email": "misterl56@hotmail.com"
     },
     "requirements": {
-        "yunohost": ">= 4.2.0"
+        "yunohost": ">= 4.3.0"
     },
     "multi_instance": true,
     "services": [
@@ -30,8 +30,7 @@
         "install" : [
             {
                 "name": "domain",
-                "type": "domain",
-                "example": "example.com"
+                "type": "domain"
             },
             {
                 "name": "path",
@@ -41,8 +40,7 @@
             },
             {
                 "name": "admin",
-                "type": "user",
-                "example": "johndoe"
+                "type": "user"
             },
             {
                 "name": "is_public",

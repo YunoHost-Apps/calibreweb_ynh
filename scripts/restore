@@ -26,7 +26,6 @@ domain=$(ynh_app_setting_get $app domain)
 path_url=$(ynh_app_setting_get $app path)
 final_path=$(ynh_app_setting_get $app final_path)
 calibre_dir=$(ynh_app_setting_get $app calibre_dir)
-is_public=$(ynh_app_setting_get $app is_public)
 port=$(ynh_app_setting_get $app port)
 
 #Source common.sh required to be after var initialization as some variables are updated in it that are then used in the script
@@ -37,10 +36,8 @@ source ../settings/scripts/_common.sh
 # CHECK IF THE APP CAN BE RESTORED
 #=================================================
 ynh_script_progression --message="Validating restoration parameters..." --weight=1
-ynh_webpath_available $domain $path_url \
-	|| ynh_die "Path not available: ${domain}${path_url}"
-test ! -d $final_path \
-	|| ynh_die "There is already a directory: $final_path "
+
+test ! -d $final_path || ynh_die "There is already a directory: $final_path "
 
 #=================================================
 # STANDARD RESTORATION STEPS
@@ -165,17 +162,6 @@ ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern=
 
 # Remove the option backup_core_only if it's in the settings.yml file
 ynh_app_setting_delete $app backup_core_only
-
-#=================================================
-# SETUP SSOWAT
-#=================================================
-
-# Make app public if necessary
-if [ $is_public -eq 1 ]
-then
-	# unprotected_uris allows SSO credentials to be passed anyway.
-	ynh_permission_update --permission "main" --add visitors
-fi
 
 #=================================================
 # GENERIC FINALIZATION
