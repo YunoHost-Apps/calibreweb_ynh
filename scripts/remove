@@ -60,6 +60,7 @@ ynh_remove_app_dependencies
 # Remove the app directory securely
 ynh_script_progression --message="Removing $final_path..." --weight=1
 ynh_secure_remove --file="$final_path"
+
 #=================================================
 # REMOVE DATA DIR
 #=================================================
