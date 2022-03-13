@@ -6,9 +6,9 @@ app=$1
 users=$2  # Tous les utilisateurs autorisés sur l'app. Séparés par des virgules.
 
 if [ echo "$users" | grep visitors ]; then
-	if [ tail /etc/yunohost/apps/$app/conf/nginx.conf | grep "#       proxy_set_header	X-Remote-User" ]; then
+	if [ tail /etc/yunohost/apps/$app/conf/nginx.conf | grep "        proxy_set_header	X-Remote-User" ]; then
 		#app is made public
-		ynh_replace_string "#       proxy_set_header	X-Remote-User" "        proxy_set_header	X-Remote-User" /etc/yunohost/apps/$app/conf/nginx.conf
+		ynh_replace_string "        proxy_set_header	X-Remote-User" "#       proxy_set_header	X-Remote-User" /etc/yunohost/apps/$app/conf/nginx.conf
 		ynh_add_nginx_config
 		ynh_systemd_action --service_name=nginx --action=reload
 	fi

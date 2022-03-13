@@ -120,7 +120,7 @@ if [ $path_url = "/" ] ; then
 	ynh_replace_string "        proxy_set_header	X-Script-Name" "#        proxy_set_header	X-Script-Name" ../conf/nginx.conf
 fi
 
-if [ $is_public -eq 1 ]; then
+if [ $is_public -eq 0 ]; then
 	ynh_replace_string "#       proxy_set_header	X-Remote-User" "        proxy_set_header	X-Remote-User" ../conf/nginx.conf
 fi
 
