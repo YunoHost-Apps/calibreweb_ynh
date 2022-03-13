@@ -44,7 +44,7 @@ Vous pouvez le désactiver avec cette commande:
 yunohost app setting calibreweb do_not_backup_data -v 1
 ```
 
-* Par défaut, supprimer l'application **ne supprimera jamais** la bibliothèque.
+* Par défaut, supprimer l'application **ne supprimera jamais** la bibliothèque. Cependant, vous pouvez utilisez l'option ````purge```` depuis la ligne de commande qui supprimera la bibliothèque avec l'application.
 
 
 * Si la bibliothèque existait avant l'installation de Calibreweb, les accès à celle-ci doivent être géré manuellement (sauf pour celle dans yunohost.multimedia directory). Par exemple :
@@ -69,6 +69,7 @@ La numérotation est modifiée dans yunohost par rapport à Calibre-web: la vers
 * La fonction "Magic link" n'est pas disponible
 * Les changements fait à la bibliothèque en dehors de Calibreweb ne sont pas automatiquement vu par Calibreweb : Il est nécessaire de se déconnecter puis reconnecter ou redémarrer le service pour que les modifications soient visibles : N'utilisez donc pas simultanément Calibre et Calibreweb sur la même bibliothèque!
 * La synchronisation Kobo ne fonctionne pas quand Calibreweb est installée dans un sous-domaine. Ce problème est causé par nginx. Par contre, cela fonctionne très bien quand installé dans un répertoire, par exemple `https://domain.tld/calibreweb`
+* L'identification automagique des utilisateurs déjà loggé dans yunohost ne peut se faire, pour des raisons de sécurité, que si l'application n'est pas déclarée en "public". Si l'application est public, vous devrez vous réauthentifier à chaque fois.
 
 ## Todo
 - [ ] Mise à jour des réglages mails
