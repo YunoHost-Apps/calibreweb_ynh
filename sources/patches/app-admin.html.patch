@@ -1,5 +1,5 @@
---- a/cps/templates/admin.html	2022-01-24 19:18:40.000000000 +0100
-+++ b/cps/templates/admin.html	2022-01-26 23:47:53.669309039 +0100
+--- a/cps/templates/admin.html	2022-03-06 16:10:41.000000000 +0100
++++ b/cps/templates/admin.html	2022-03-08 20:59:38.344889625 +0100
 @@ -189,11 +189,6 @@
          </tbody>
        </table>

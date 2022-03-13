@@ -1,6 +1,6 @@
---- a/optional-requirements.txt	2022-01-24 19:18:40.000000000 +0100
-+++ b/optional-requirements.txt	2022-01-26 23:46:47.077607055 +0100
-@@ -1,20 +1,5 @@
+--- a/optional-requirements.txt	2022-03-06 16:10:41.000000000 +0100
++++ b/optional-requirements.txt	2022-03-08 21:08:06.964027001 +0100
+@@ -1,19 +1,5 @@
  # GDrive Integration
 -google-api-python-client>=1.7.11,<2.37.0
  gevent>20.6.0,<22.0.0
@@ -13,7 +13,6 @@
 -PyDrive2>=1.3.1,<1.11.0
 -PyYAML>=3.12
 -rsa>=3.4.2,<4.9.0
--six>=1.10.0,<1.17.0
 -
 -# Gmail
 -google-auth-oauthlib>=0.4.3,<0.5.0
@@ -21,7 +20,7 @@
  
  # goodreads
  goodreads>=0.3.2,<0.4.0
-@@ -24,10 +9,6 @@
+@@ -23,10 +9,6 @@
  python-ldap>=3.0.0,<3.5.0
  Flask-SimpleLDAP>=1.4.0,<1.5.0
  
@@ -30,5 +29,5 @@
 -SQLAlchemy-Utils>=0.33.5,<0.39.0
 -
  # metadata extraction
- rarfile>=2.7
+ rarfile>=3.2
  scholarly>=1.2.0,<1.6
