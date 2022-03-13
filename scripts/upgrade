@@ -126,6 +126,12 @@ if ynh_legacy_permissions_exists; then
 	ynh_app_setting_delete --app=$app --key=is_public
 fi
 
+#Activate reverse proxy authentication
+if sqlite3 $final_path/app.db "SELECT config_allow_reverse_proxy_header_login FROM settings" \
+	| grep -xq "0" ; then 
+	eval sqlite3 $final_path/app.db "\"UPDATE settings SET config_allow_reverse_proxy_header_login='1' WHERE ID=1\""
+	eval sqlite3 $final_path/app.db "\"UPDATE settings SET config_reverse_proxy_login_header_name='X-Remote-User' WHERE ID=1\""
+fi
 
 #=================================================
 # STANDARD UPGRADE STEPS
@@ -155,6 +161,10 @@ fi
 ynh_script_progression --message="Upgrading nginx web server configuration..." --weight=5
 if [ $path_url = "/" ] ; then
 	ynh_replace_string "        proxy_set_header	X-Script-Name" "#       proxy_set_header	X-Script-Name" ../conf/nginx.conf
+fi
+
+if [ ynh_permission_has_user --permission="main" --user=visitors ]; then
+	ynh_replace_string "#       proxy_set_header	X-Remote-User" "        proxy_set_header	X-Remote-User" ../conf/nginx.conf
 fi
 # Create a dedicated nginx config
 ynh_add_nginx_config

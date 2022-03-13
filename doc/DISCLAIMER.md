@@ -19,7 +19,7 @@ You may deactivate backup of the library with
 yunohost app setting calibreweb do_not_backup_data -v 1
 ```
 
-* By default, removing the app will **never** delete the library.
+* By default, removing the app will **never** delete the library. However, you can use the ```purge``` option from the command line to delete the library along wiht the app.
 
 
 * Authorization access to library to be done manually after install if Calibre library was already existing (except in yunohost.multimedia directory), for example :
@@ -44,6 +44,7 @@ Version number in Yunohost is different from the upstream Calibre-web app : vers
 * "Magic link feature is not yet available
 * Change to library made outside Calibreweb are not automatically updated in Calibreweb. It is required to disconnect and reconnect to see the changes : Do not open a database both in Calibre & Calibreweb!
 * Kobo Sync doesn’t work when Calibreweb is installed on a subdomain. This issue is caused by nginx. However, it works great when installed on a path e.g. `https://domain.tld/calibreweb`
+* For security reasons, the automagic identification of the user already logged in Yunohost can only happen if the app is not made public. If the app is made public, you will have to reauthenticate.
 
 ### Todo
 - [ ] Update mail settings with yunohost settings

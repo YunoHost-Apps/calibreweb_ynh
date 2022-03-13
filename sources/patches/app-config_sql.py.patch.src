@@ -1,5 +1,5 @@
 --- a/cps/config_sql.py	2022-03-06 16:10:41.000000000 +0100
-+++ b/cps/config_sql.py	2022-03-08 21:04:33.966228954 +0100
++++ b/cps/config_sql.py	2022-03-13 22:01:35.831261229 +0100
 @@ -61,7 +61,7 @@
      mail_server_type = Column(SmallInteger, default=0)
      mail_gmail_token = Column(JSON, default={})
@@ -54,3 +54,14 @@
      config_ldap_group_members_field = Column(String, default='memberUid')
      config_ldap_group_name = Column(String, default='calibreweb')
  
+@@ -138,8 +138,8 @@
+ 
+     config_updatechannel = Column(Integer, default=constants.UPDATE_STABLE)
+ 
+-    config_reverse_proxy_login_header_name = Column(String)
+-    config_allow_reverse_proxy_header_login = Column(Boolean, default=False)
++    config_reverse_proxy_login_header_name = Column(String, default='X-Remote-User')
++    config_allow_reverse_proxy_header_login = Column(Boolean, default=True)
+ 
+     def __repr__(self):
+         return self.__class__.__name__
