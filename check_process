@@ -19,7 +19,7 @@
 #Last version
 		upgrade=1	from_commit=79c6c4ad03f62d2ed4f4180ac6b7dac1c117a62a
 #v0.6.6
-#		upgrade=1	from_commit=11f5b96df7d8850beff47f9904745fa53a6f7ed9
+#		upgrade=0	from_commit=11f5b96df7d8850beff47f9904745fa53a6f7ed9
 		backup_restore=1
 		multi_instance=1
 		port_already_use=1 (8083)
