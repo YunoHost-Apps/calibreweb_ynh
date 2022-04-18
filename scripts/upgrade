@@ -160,6 +160,17 @@ fi
 ynh_add_nginx_config
 
 #=================================================
+# CREATE DEDICATED USER
+#=================================================
+
+# Create a dedicated user (if not existing)
+ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
+ynh_system_user_create --username="$app" --home_dir="$final_path" --use_shell
+# Set permissions on app files (required to be able to update database)
+chown -R $app: $final_path
+
+
+#=================================================
 # UPGRADE DEPENDENCIES
 #=================================================
 
@@ -168,26 +179,30 @@ then
 	ynh_script_progression --message="Installing package dependencies..." --weight=15
 	ynh_install_app_dependencies $PKG_DEPENDENCIES
 	
-	#use latest version of pip as per documentation in https://github.com/pypa/get-pip
-	#cannot use helper as maintaining the checksum would be a pain in the a***
-	ynh_exec_quiet curl https://bootstrap.pypa.io/get-pip.py | python3
+	#Use venv to install pip requirements - Inspired from https://github.com/YunoHost-Apps/pyinventory_ynh/blob/master/scripts/install
+	ynh_script_progression --message="Installing pip requirements..." --weight=70
+	# Always recreate everything fresh with current python version
+	if [ -d "${final_path}/venv" ] ; then
+		ynh_secure_remove "${final_path}/venv"
+	fi
 
-	ynh_script_progression --message="Installing pip requirements ..." --weight=30
-	pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/requirements.txt
 
-	ynh_script_progression --message="Installing pip additionnal requirements..." --weight=40
-	pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/optional-requirements.txt
+	# Skip pip because of: https://github.com/YunoHost/issues/issues/1960
+	python3 -m venv --without-pip "${final_path}/venv"
+	chown -R "$app:" "$final_path"
+
+	#run source in a 'sub shell'
+	(
+		set +o nounset
+		source "${final_path}/venv/bin/activate"
+		set -o nounset
+		ynh_exec_as $app $final_path/venv/bin/python3 -m ensurepip
+		ynh_exec_as $app $final_path/venv/bin/pip3 install --upgrade wheel pip setuptools
+		ynh_exec_as $app $final_path/venv/bin/pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r "$final_path/requirements.txt"
+		ynh_exec_as $app $final_path/venv/bin/pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r "$final_path/optional-requirements.txt"
+	)
 fi
-#=================================================
-# CREATE DEDICATED USER
-#=================================================
 
-# Create a dedicated user (if not existing)
-ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
-ynh_system_user_create $app
-
-# Set permissions on app files (required to be able to update database)
-chown -R $app: $final_path
 
 #=================================================
 # SPECIFIC UPGRADE
