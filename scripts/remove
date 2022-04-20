@@ -49,7 +49,7 @@ ynh_remove_systemd_config
 #=================================================
 
 # Remove metapackage and its dependencies
-ynh_script_progression --message="Removing Dependencies..." --weight=5
+ynh_script_progression --message="Removing Dependencies..." --weight=25
 ynh_remove_app_dependencies
 
 

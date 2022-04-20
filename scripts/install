@@ -93,21 +93,42 @@ ynh_add_config --template="../sources/patches/app-constants.py.patch.src" --dest
 ynh_setup_source "$final_path"
 
 #=================================================
+# CREATE DEDICATED USER
+#=================================================
+ynh_script_progression --message="Configuring system user..." --weight=1
+# Create a system user
+ynh_system_user_create --username="$app" --home_dir="$final_path" --use_shell
+
+
+#=================================================
 # INSTALL DEPENDENCIES
 #=================================================
 
 ynh_script_progression --message="Installing package dependencies..." --weight=80
 ynh_install_app_dependencies $PKG_DEPENDENCIES
 
-#use latest version of pip as per documentation in https://github.com/pypa/get-pip
-#cannot use helper as maintaining the checksum would be a pain in the a***
-ynh_exec_quiet curl https://bootstrap.pypa.io/get-pip.py | python3
+#Use venv to install pip requirements - Inspired from https://github.com/YunoHost-Apps/pyinventory_ynh/blob/master/scripts/install
+ynh_script_progression --message="Installing pip requirements..." --weight=70
+# Always recreate everything fresh with current python version
+if [ -d "${final_path}/venv" ] ; then
+	ynh_secure_remove "${final_path}/venv"
+fi
 
-ynh_script_progression --message="Installing pip requirements..." --weight=40
-pip3 install --no-cache-dir --target $final_path/vendor -r $final_path/requirements.txt
+# Skip pip because of: https://github.com/YunoHost/issues/issues/1960
+python3 -m venv --without-pip "${final_path}/venv"
+chown -R "$app:" "$final_path"
 
-ynh_script_progression --message="Installing pip additionnal requirements..." --weight=40
-pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/optional-requirements.txt
+#run source in a 'sub shell'
+(
+	set +o nounset
+	source "${final_path}/venv/bin/activate"
+	set -o nounset
+	ynh_exec_as $app $final_path/venv/bin/python3 -m ensurepip
+	ynh_exec_as $app $final_path/venv/bin/pip3 install --upgrade wheel pip setuptools
+	ynh_exec_as $app $final_path/venv/bin/pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r "$final_path/requirements.txt"
+	ynh_exec_as $app $final_path/venv/bin/pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r "$final_path/optional-requirements.txt"
+)
+
 
 #=================================================
 # NGINX CONFIGURATION
@@ -123,15 +144,6 @@ fi
 # Create a dedicated nginx config
 ynh_add_nginx_config
 
-#=================================================
-# CREATE DEDICATED USER
-#=================================================
-
-# Create a system user
-ynh_system_user_create $app
-
-chown -R $app: $final_path
-chmod 740 $final_path
 
 #=================================================
 # SETUP SYSTEMD
@@ -194,6 +206,16 @@ ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern=
 #=================================================
 
 yunohost service add $app --description="Browse eBook in the web" --log="/var/log/$app/$app.log"
+
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
+# SECURE FILES AND DIRECTORIES
+#=================================================
+
+chown -R $app: $final_path
+chmod 740 $final_path
 
 #=================================================
 # SETUP SSOWAT
