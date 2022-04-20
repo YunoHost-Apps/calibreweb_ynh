@@ -1,4 +1,4 @@
-;; Complete Test
+;; Complete Test 
 # First Run of complete test
 	; Manifest
 		domain="domain.tld"
@@ -17,9 +17,7 @@
 		setup_public=1
 		upgrade=1
 #Last version
-		upgrade=1	from_commit=79c6c4ad03f62d2ed4f4180ac6b7dac1c117a62a
-#v0.6.6
-#		upgrade=1	from_commit=11f5b96df7d8850beff47f9904745fa53a6f7ed9
+		upgrade=1	from_commit=581a4e1de5caa7aa19a64f63348b174b7602753
 		backup_restore=1
 		multi_instance=1
 		port_already_use=1 (8083)
@@ -27,8 +25,4 @@
 ;;; Options
 Email=nicolas@aubonalbanais.ovh
 Notification=none
-;;; Upgrade options
-	; commit=11f5b96df7d8850beff47f9904745fa53a6f7ed9
-		name=Version 0.96.0~ynh4
-		manifest_arg=domain=DOMAIN&path=PATH&admin=USER&password=pass&is_public=1&
 		

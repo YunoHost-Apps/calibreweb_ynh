@@ -1,8 +1,8 @@
---- a/optional-requirements.txt	2022-03-06 16:10:41.000000000 +0100
-+++ b/optional-requirements.txt	2022-03-08 21:08:06.964027001 +0100
+--- a/optional-requirements.txt	2022-04-03 20:17:34.000000000 +0200
++++ b/optional-requirements.txt	2022-04-18 12:10:55.761291352 +0200
 @@ -1,19 +1,5 @@
  # GDrive Integration
--google-api-python-client>=1.7.11,<2.37.0
+-google-api-python-client>=1.7.11,<2.43.0
  gevent>20.6.0,<22.0.0
 -greenlet>=0.4.17,<1.2.0
 -httplib2>=0.9.2,<0.21.0
@@ -15,8 +15,8 @@
 -rsa>=3.4.2,<4.9.0
 -
 -# Gmail
--google-auth-oauthlib>=0.4.3,<0.5.0
--google-api-python-client>=1.7.11,<2.37.0
+-google-auth-oauthlib>=0.4.3,<0.6.0
+-google-api-python-client>=1.7.11,<2.43.0
  
  # goodreads
  goodreads>=0.3.2,<0.4.0
@@ -30,4 +30,11 @@
 -
  # metadata extraction
  rarfile>=3.2
- scholarly>=1.2.0,<1.6
+ scholarly>=1.2.0,<1.7
+@@ -42,3 +24,6 @@
+ 
+ # Kobo integration
+ jsonschema>=3.2.0,<4.5.0
++
++#readded to avoid 2.2 from dependencies
++werkzeug<2.1.0
