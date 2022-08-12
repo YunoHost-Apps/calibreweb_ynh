@@ -198,8 +198,8 @@ then
 		set -o nounset
 		ynh_exec_as $app $final_path/venv/bin/python3 -m ensurepip
 		ynh_exec_as $app $final_path/venv/bin/pip3 install --upgrade wheel pip setuptools
-		ynh_exec_as $app $final_path/venv/bin/pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r "$final_path/requirements.txt"
-		ynh_exec_as $app $final_path/venv/bin/pip3 install --no-cache-dir --upgrade --target $final_path/vendor -r "$final_path/optional-requirements.txt"
+		ynh_exec_as $app $final_path/venv/bin/pip3 install --no-cache-dir --upgrade -r "$final_path/requirements.txt"
+		ynh_exec_as $app $final_path/venv/bin/pip3 install --no-cache-dir --upgrade -r "$final_path/optional-requirements.txt"
 	)
 fi
 
