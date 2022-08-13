@@ -1,6 +1,6 @@
---- a/cps/config_sql.py	2022-03-06 16:10:41.000000000 +0100
-+++ b/cps/config_sql.py	2022-03-08 21:04:33.966228954 +0100
-@@ -61,7 +61,7 @@
+--- a/cps/config_sql.py	2022-08-12 13:48:46.980029500 +0200
++++ b/cps/config_sql.py	2022-08-12 13:51:56.223434627 +0200
+@@ -62,7 +62,7 @@
      mail_server_type = Column(SmallInteger, default=0)
      mail_gmail_token = Column(JSON, default={})
  
@@ -9,7 +9,7 @@
      config_calibre_uuid = Column(String)
      config_port = Column(Integer, default=constants.DEFAULT_PORT)
      config_external_port = Column(Integer, default=constants.DEFAULT_PORT)
-@@ -78,11 +78,11 @@
+@@ -79,11 +79,11 @@
      config_theme = Column(Integer, default=0)
  
      config_log_level = Column(SmallInteger, default=logger.DEFAULT_LOG_LEVEL)
@@ -25,7 +25,7 @@
      config_anonbrowse = Column(SmallInteger, default=0)
      config_public_reg = Column(SmallInteger, default=0)
      config_remote_login = Column(Boolean, default=False)
-@@ -108,11 +108,11 @@
+@@ -109,11 +109,11 @@
      config_goodreads_api_key = Column(String)
      config_goodreads_api_secret = Column(String)
      config_register_email = Column(Boolean, default=False)
@@ -39,7 +39,7 @@
      config_ldap_port = Column(SmallInteger, default=389)
      config_ldap_authentication = Column(SmallInteger, default=constants.LDAP_AUTH_SIMPLE)
      config_ldap_serv_username = Column(String, default='cn=admin,dc=example,dc=org')
-@@ -121,11 +121,11 @@
+@@ -122,11 +122,11 @@
      config_ldap_cacert_path = Column(String, default="")
      config_ldap_cert_path = Column(String, default="")
      config_ldap_key_path = Column(String, default="")
@@ -47,7 +47,7 @@
 -    config_ldap_user_object = Column(String, default='uid=%s')
 +    config_ldap_dn = Column(String, default='dc=yunohost,dc=org')
 +    config_ldap_user_object = Column(String, default='(&(objectClass=posixAccount)(permission=cn=calibreweb.main,ou=permission,dc=yunohost,dc=org)(uid=%s))')
-     config_ldap_member_user_object = Column(String, default='') #
+     config_ldap_member_user_object = Column(String, default='')
      config_ldap_openldap = Column(Boolean, default=True)
 -    config_ldap_group_object_filter = Column(String, default='(&(objectclass=posixGroup)(cn=%s))')
 +    config_ldap_group_object_filter = Column(String, default='(&(objectClass=posixGroup)(cn=%s.main))')
