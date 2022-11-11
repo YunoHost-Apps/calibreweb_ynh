@@ -138,6 +138,7 @@ fi
 if ! ynh_permission_exists --permission="Kobo sync"
 then
 	# API Authorization with dedicated URL
+	ynh_print_warn --message="This version has now a dedicated Kobo sync authorization, please review group and permission"
 	ynh_permission_create --permission="Kobo sync" --url="$domain/kobo" --allowed="visitors"
 fi
 

@@ -93,6 +93,7 @@ ynh_add_config --template="../sources/patches/app-constants.py.patch.src" --dest
 ynh_setup_source "$final_path"
 
 #install kepubify converter
+ynh_script_progression --message="Installing kepubify..." --weight=1
 ynh_add_config --template="../conf/appkepubify.src.default" --destination="../conf/appkepubify.src"
 ynh_setup_source --dest_dir="/opt/kepubify" --source_id="appkepubify"
 
