@@ -18,8 +18,6 @@ If you don't have YunoHost, please consult [the guide](https://yunohost.org/#/in
 Browsing, reading and downloading eBooks using a Calibre database
 
 **Shipped version:** 0.6.19
-
-
 ## Screenshots
 
 ![Screenshot of Calibre-web](./doc/screenshots/screenshot.png)
