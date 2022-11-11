@@ -73,6 +73,14 @@ then
 fi
 
 #=================================================
+# REMOVE KEPUBIFY DIR
+#=================================================
+
+# Remove the data directory if --purge option is used
+ynh_script_progression --message="Removing kepubify directory..." --weight=1
+ynh_secure_remove --file="/opt/kepubify"
+
+#=================================================
 # REMOVE NGINX CONFIGURATION
 #=================================================
 

@@ -126,6 +126,13 @@ if ynh_legacy_permissions_exists; then
 	ynh_app_setting_delete --app=$app --key=is_public
 fi
 
+#Adding kepubify converter
+if [ -z $(sqlite3 $final_path/app.db "SELECT config_kepubifypath FROM settings") ]; then
+	ynh_add_config --template="../conf/appkepubify.src.default" --destination="../conf/appkepubify.src"
+	ynh_setup_source --dest_dir="/opt/kepubify" --source_id="appkepubify"
+	chmod 770 /opt/kepubify/kepubify-linux-$mach
+	eval sqlite3 $final_path/app.db "\"UPDATE settings SET config_kepubifypath='/opt/kepubify/kepubify-linux-$mach' WHERE ID=1\""
+fi
 
 #=================================================
 # STANDARD UPGRADE STEPS
@@ -247,6 +254,7 @@ ynh_add_systemd_config
 
 # Set permissions on app files
 chown -R $app: $final_path
+chown -R $app: /opt/kepubify
 
 #=================================================
 # INTEGRATE SERVICE IN YUNOHOST
