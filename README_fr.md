@@ -17,9 +17,7 @@ Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour
 
 Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre
 
-**Version incluse :** 0.6.19
-
-
+**Version incluse :** 0.6.19
 ## Captures d'écran
 
 ![Capture d'écran de Calibre-web](./doc/screenshots/screenshot.png)
@@ -56,6 +54,13 @@ chown -R calibreweb: chemin/vers/bibliothèque
 ou
 chmod o+rw chemin/vers/bibliothèque
 ``` 
+
+### Synchronisation Kobo
+
+Calibre-web possède [une fonction de synchronisation avec les liseuses Kobo](https://github.com/janeczku/calibre-web/wiki/Kobo-Integration). Vous pouvez activer cette fonctionnalité depuis le menu d'administration de l'application. Il faut paramétrer le port 443 comme port externe du serveur.
+Une permission spécifique "Kobo sync" est créée lors de l'installation de l'application afin de ne pas avoir à exposer l'application entière.
+
+[Kepubify](https://pgaskin.net/kepubify/) est également installé en tant que convertisseur par défaut vers le format kepub : Cela signifie que l'intégralité de votre bibliothèque sera convertie en format kepub lorsque vous créerez le jeton de synchronisation pour la première fois (ceci n'affecte pas les epubs existant). Cela peut prendre un certain temps : Par exemple, j'ai environ 10K livres dans ma bibliothèque calibre, et la conversion a durée environ 3-4h sur un Raspberry Pi 4 .
 
 ### OPDS
 

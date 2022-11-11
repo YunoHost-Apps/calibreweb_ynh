@@ -1,0 +1,4 @@
+SOURCE_URL=https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-__MACH__
+SOURCE_SUM=__SHA256__
+SOURCE_EXTRACT=false
+SOURCE_FILENAME=kepubify-linux-__MACH__

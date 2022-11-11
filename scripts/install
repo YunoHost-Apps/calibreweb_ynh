@@ -92,6 +92,11 @@ ynh_add_config --template="../sources/patches/app-constants.py.patch.src" --dest
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source "$final_path"
 
+#install kepubify converter
+ynh_script_progression --message="Installing kepubify..." --weight=1
+ynh_add_config --template="../conf/appkepubify.src.default" --destination="../conf/appkepubify.src"
+ynh_setup_source --dest_dir="/opt/kepubify" --source_id="appkepubify"
+
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
@@ -216,6 +221,8 @@ yunohost service add $app --description="Browse eBook in the web" --log="/var/lo
 
 chown -R $app: $final_path
 chmod 740 $final_path
+chown -R $app: /opt/kepubify
+chmod 770 /opt/kepubify/kepubify-linux-$mach
 
 #=================================================
 # SETUP SSOWAT
@@ -231,6 +238,9 @@ fi
 if [ $public_library -eq 0 ]; then
 	ynh_permission_update --permission "main" --add $admin
 fi
+
+#Kobo sync permission
+ynh_permission_create --permission="Kobo sync" --url="$domain/kobo" --allowed="visitors"
 
 #=================================================
 # RELOAD NGINX
