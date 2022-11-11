@@ -238,6 +238,9 @@ if [ $public_library -eq 0 ]; then
 	ynh_permission_update --permission "main" --add $admin
 fi
 
+#Kobo sync permission
+ynh_permission_create --permission="Kobo sync" --url="$domain/kobo" --allowed="visitors"
+
 #=================================================
 # RELOAD NGINX
 #=================================================

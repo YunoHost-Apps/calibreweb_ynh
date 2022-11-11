@@ -134,6 +134,13 @@ if [ -z $(sqlite3 $final_path/app.db "SELECT config_kepubifypath FROM settings")
 	eval sqlite3 $final_path/app.db "\"UPDATE settings SET config_kepubifypath='/opt/kepubify/kepubify-linux-$mach' WHERE ID=1\""
 fi
 
+# Create the permission "kobo_sync" only if it doesn't exist.
+if ! ynh_permission_exists --permission="Kobo sync"
+then
+	# API Authorization with dedicated URL
+	ynh_permission_create --permission="Kobo sync" --url="$domain/kobo" --allowed="visitors"
+fi
+
 #=================================================
 # STANDARD UPGRADE STEPS
 #=================================================
