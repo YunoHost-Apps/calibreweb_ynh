@@ -139,7 +139,11 @@ if ! ynh_permission_exists --permission="Kobo sync"
 then
 	# API Authorization with dedicated URL
 	ynh_print_warn --message="This version has now a dedicated Kobo sync authorization, please review group and permission"
-	ynh_permission_create --permission="Kobo sync" --url="$domain/kobo" --allowed="visitors"
+	ynh_permission_create --permission="Kobo sync" --label="Kobo Sync" --url="re:$domain$path_url\/kobo\/.*$" --allowed="visitors" "all_users" --show_tile="false" --protected="true"
+else
+	##TO BE DELETED - error in testing has led to bad permission settings
+	ynh_permission_delete --permission="Kobo sync"
+	ynh_permission_create --permission="Kobo sync" --label="Kobo Sync" --url="re:$domain$path_url\/kobo\/.*$" --allowed="visitors" "all_users" --show_tile="false" --protected="true"
 fi
 
 #=================================================
