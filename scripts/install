@@ -240,7 +240,7 @@ if [ $public_library -eq 0 ]; then
 fi
 
 #Kobo sync permission
-ynh_permission_create --permission="Kobo sync" --label="Kobo Sync" --url="re:$domain$path_url\/kobo\/.*$" --allowed="visitors" "all_users" --show_tile="false" --protected="true"
+ynh_permission_create --permission="Kobo sync" --label="Kobo Sync" --url="$domain$path_url/kobo" --allowed="visitors" "all_users" --show_tile="false" --protected="true"
 
 #=================================================
 # RELOAD NGINX
