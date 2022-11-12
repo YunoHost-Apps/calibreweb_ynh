@@ -6,7 +6,7 @@
         "en": "Browsing, reading and downloading eBooks using a Calibre database",
         "fr": "Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre"
     },
-    "version": "0.96.19~ynh2",
+    "version": "0.96.19~ynh3",
     "url": "https://github.com/janeczku/calibre-web",
     "upstream": {
         "version": "0.6.19",
