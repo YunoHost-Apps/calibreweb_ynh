@@ -70,6 +70,13 @@ ynh_script_progression --message="Restoring the app main directory..." --weight=
 ynh_restore_file --origin_path="$final_path"
 
 #=================================================
+# RESTORE THE KEPUBIFY BINARIES
+#=================================================
+ynh_script_progression --message="Restoring Kepubify..." --weight=1
+ynh_restore_file --origin_path="/opt/kepubify"
+
+
+#=================================================
 # RESTORE USER RIGHTS
 #=================================================
 chown -R $app: $final_path

@@ -46,6 +46,12 @@ ynh_print_info --message="Declaring files to be backed up..."
 ynh_backup --src_path="$final_path"
 
 #=================================================
+# BACKUP THE KEPUBIFY BINARY
+#=================================================
+
+ynh_backup --src_path="/opt/kepubify"
+
+#=================================================
 # BACKUP THE NGINX CONFIGURATION
 #=================================================
 
