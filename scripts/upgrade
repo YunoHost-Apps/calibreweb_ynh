@@ -130,7 +130,7 @@ fi
 if [ -z $(sqlite3 $final_path/app.db "SELECT config_kepubifypath FROM settings") ]; then
 	eval sqlite3 $final_path/app.db "\"UPDATE settings SET config_kepubifypath='/opt/kepubify/kepubify-linux-$mach' WHERE ID=1\""
 fi
-if [ ! -d /opt/kepubify ]
+if [ ! -d /opt/kepubify ]; then
 	ynh_add_config --template="../conf/appkepubify.src.default" --destination="../conf/appkepubify.src"
 	ynh_setup_source --dest_dir="/opt/kepubify" --source_id="appkepubify"
 	chmod 770 /opt/kepubify/kepubify-linux-$mach
