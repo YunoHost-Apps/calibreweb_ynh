@@ -249,7 +249,9 @@ ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern=
 
 # Use logrotate to manage app-specific logfile(s)
 ynh_script_progression --message="Upgrading logrotate configuration..." --weight=1
-ynh_use_logrotate --non-append
+ynh_use_logrotate --logfile="/var/log/$app/$app.log" --nonappend
+ynh_use_logrotate --logfile="/var/log/$app/$app-access.log" --nonappend
+
 
 
 #=================================================

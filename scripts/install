@@ -184,7 +184,8 @@ ynh_app_setting_set $app calibre_dir $calibre_dir
 #=================================================
 
 # Use logrotate to manage application logfile(s)
-ynh_use_logrotate
+ynh_use_logrotate --logfile="/var/log/$app/$app.log"
+ynh_use_logrotate --logfile="/var/log/$app/$app-access.log"
 chown -R $app:$app /var/log/$app
 
 
