@@ -1,5 +1,5 @@
---- a/cps/config_sql.py	2022-08-12 13:48:46.980029500 +0200
-+++ b/cps/config_sql.py	2022-08-12 13:51:56.223434627 +0200
+--- a/cps/config_sql.py	2022-11-10 20:01:25.834187046 +0100
++++ b/cps/config_sql.py	2022-11-09 23:48:08.351335088 +0100
 @@ -62,7 +62,7 @@
      mail_server_type = Column(SmallInteger, default=0)
      mail_gmail_token = Column(JSON, default={})
@@ -39,7 +39,7 @@
      config_ldap_port = Column(SmallInteger, default=389)
      config_ldap_authentication = Column(SmallInteger, default=constants.LDAP_AUTH_SIMPLE)
      config_ldap_serv_username = Column(String, default='cn=admin,dc=example,dc=org')
-@@ -122,11 +122,11 @@
+@@ -122,15 +122,15 @@
      config_ldap_cacert_path = Column(String, default="")
      config_ldap_cert_path = Column(String, default="")
      config_ldap_key_path = Column(String, default="")
@@ -54,3 +54,16 @@
      config_ldap_group_members_field = Column(String, default='memberUid')
      config_ldap_group_name = Column(String, default='calibreweb')
  
+-    config_kepubifypath = Column(String, default=None)
++    config_kepubifypath = Column(String, default='/opt/kepubify/kepubify-linux-__MACH__')
+     config_converterpath = Column(String, default=None)
+     config_calibre = Column(String)
+     config_rarfile_location = Column(String, default=None)
+@@ -269,6 +269,7 @@
+     def set_from_dictionary(self, dictionary, field, convertor=None, default=None, encode=None):
+         """Possibly updates a field of this object.
+         The new value, if present, is grabbed from the given dictionary, and optionally passed through a convertor.
++
+         :returns: `True` if the field has changed value
+         """
+         new_value = dictionary.get(field, default)

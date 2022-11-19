@@ -126,6 +126,27 @@ if ynh_legacy_permissions_exists; then
 	ynh_app_setting_delete --app=$app --key=is_public
 fi
 
+#Adding kepubify converter
+if [ -z $(sqlite3 $final_path/app.db "SELECT config_kepubifypath FROM settings") ]; then
+	eval sqlite3 $final_path/app.db "\"UPDATE settings SET config_kepubifypath='/opt/kepubify/kepubify-linux-$mach' WHERE ID=1\""
+fi
+if [ ! -d /opt/kepubify ]; then
+	ynh_add_config --template="../conf/appkepubify.src.default" --destination="../conf/appkepubify.src"
+	ynh_setup_source --dest_dir="/opt/kepubify" --source_id="appkepubify"
+	chmod 770 /opt/kepubify/kepubify-linux-$mach
+fi
+
+# Create the permission "kobo_sync" only if it doesn't exist.
+if ! ynh_permission_exists --permission="Kobo sync"
+then
+	# API Authorization with dedicated URL
+	ynh_print_warn --message="This version has now a dedicated Kobo sync authorization, please review group and permission"
+	ynh_permission_create --permission="Kobo sync" --label="Kobo Sync" --url="$domain$path_url/kobo" --allowed="visitors" "all_users" --show_tile="false" --protected="true"
+else
+	##TO BE DELETED - error in testing has led to bad permission settings
+	ynh_permission_delete --permission="Kobo sync"
+	ynh_permission_create --permission="Kobo sync" --label="Kobo Sync" --url="$domain$path_url/kobo" --allowed="visitors" "all_users" --show_tile="false" --protected="true"
+fi
 
 #=================================================
 # STANDARD UPGRADE STEPS
@@ -228,7 +249,9 @@ ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern=
 
 # Use logrotate to manage app-specific logfile(s)
 ynh_script_progression --message="Upgrading logrotate configuration..." --weight=1
-ynh_use_logrotate --non-append
+ynh_use_logrotate --logfile="/var/log/$app/$app.log" --nonappend
+ynh_use_logrotate --logfile="/var/log/$app/$app-access.log" --nonappend
+
 
 
 #=================================================
@@ -247,6 +270,7 @@ ynh_add_systemd_config
 
 # Set permissions on app files
 chown -R $app: $final_path
+chown -R $app: /opt/kepubify
 
 #=================================================
 # INTEGRATE SERVICE IN YUNOHOST
