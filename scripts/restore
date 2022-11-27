@@ -104,7 +104,7 @@ systemctl enable $app.service --quiet
 # INTEGRATE SERVICE IN YUNOHOST
 #=================================================
 
-yunohost service add $app --description="Browse eBook in the web" --log="/var/log/$app/$app.log"
+yunohost service add $app --description="Browse eBook in the web" --log="$log_file"
 
 #=================================================
 # RESTORE THE LOGROTATE CONFIGURATION
@@ -162,6 +162,22 @@ ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern=
 
 # Remove the option backup_core_only if it's in the settings.yml file
 ynh_app_setting_delete $app backup_core_only
+
+
+#=================================================
+# RESTORE THE FAIL2BAN CONFIGURATION
+#=================================================
+ynh_script_progression --message="Restoring the Fail2Ban configuration..." --weight=7
+
+ynh_restore_file --origin_path="/etc/fail2ban/jail.d/$app.conf"
+ynh_restore_file --origin_path="/etc/fail2ban/filter.d/$app.conf"
+
+if [ ! -f "$log_file" ]; then
+	touch "$log_file"
+	chown $app: "$log_file"
+fi
+
+ynh_systemd_action --action=restart --service_name=fail2ban
 
 #=================================================
 # GENERIC FINALIZATION

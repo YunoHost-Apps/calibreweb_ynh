@@ -184,8 +184,8 @@ ynh_app_setting_set $app calibre_dir $calibre_dir
 #=================================================
 
 # Use logrotate to manage application logfile(s)
-ynh_use_logrotate --logfile="/var/log/$app/$app.log"
-ynh_use_logrotate --logfile="/var/log/$app/$app-access.log"
+ynh_use_logrotate --logfile="$log_file"
+ynh_use_logrotate --logfile="/var/log/$app/$access_log_file"
 chown -R $app:$app /var/log/$app
 
 
@@ -211,7 +211,7 @@ ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern=
 # INTEGRATE SERVICE IN YUNOHOST
 #=================================================
 
-yunohost service add $app --description="Browse eBook in the web" --log="/var/log/$app/$app.log"
+yunohost service add $app --description="Browse eBook in the web" --log="$log_file"
 
 
 #=================================================
@@ -224,6 +224,20 @@ chown -R $app: $final_path
 chmod 740 $final_path
 chown -R $app: /opt/kepubify
 chmod 770 /opt/kepubify/kepubify-linux-$mach
+
+#=================================================
+# SETUP FAIL2BAN
+#=================================================
+ynh_script_progression --message="Configuring Fail2Ban..." --weight=8
+
+# Make sure a log file exists (mostly for CI tests)
+if [ ! -f "$log_file" ]; then
+	touch "$log_file"
+	chown $app: "$log_file"
+fi
+
+# Create a dedicated Fail2Ban config
+ynh_add_fail2ban_config --logpath="$log_file" --failregex="^.*LDAP Login failed for user .* IP-address: <HOST>.*$" --max_retry=5
 
 #=================================================
 # SETUP SSOWAT
