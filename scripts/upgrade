@@ -249,8 +249,8 @@ ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern=
 
 # Use logrotate to manage app-specific logfile(s)
 ynh_script_progression --message="Upgrading logrotate configuration..." --weight=1
-ynh_use_logrotate --logfile="/var/log/$app/$app.log" --nonappend
-ynh_use_logrotate --logfile="/var/log/$app/$app-access.log" --nonappend
+ynh_use_logrotate --logfile="$log_file" --nonappend
+ynh_use_logrotate --logfile="$access_log_file" --nonappend
 
 
 
@@ -276,7 +276,23 @@ chown -R $app: /opt/kepubify
 # INTEGRATE SERVICE IN YUNOHOST
 #=================================================
 
-yunohost service add $app --description="Browse eBook in the web" --log="/var/log/$app/$app.log"
+yunohost service add $app --description="Browse eBook in the web" --log="$log_file"
+
+#=================================================
+# SETUP FAIL2BAN
+#=================================================
+ynh_script_progression --message="Configuring Fail2Ban..." --weight=8
+
+
+# Make sure a log file exists (mostly for CI tests)
+if [ ! -f "$log_file" ]; then
+	touch "$log_file"
+	chown $app: "$log_file"
+fi
+
+# Create a dedicated Fail2Ban config
+ynh_add_fail2ban_config --logpath="$log_file" --failregex="^.*LDAP Login failed for user .* IP-address: <HOST>.*$" --max_retry=5
+
 
 #=================================================
 # RELOAD NGINX
