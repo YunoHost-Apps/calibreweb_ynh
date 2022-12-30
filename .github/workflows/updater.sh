@@ -1,17 +1,6 @@
 #!/bin/bash
 
-#=================================================
-# PACKAGE UPDATING HELPER
-#=================================================
-
-# This script is meant to be run by GitHub Actions
-# The YunoHost-Apps organisation offers a template Action to run this script periodically
-# Since each app is different, maintainers can adapt its contents so as to perform
-# automatic actions when a new upstream release is detected.
-
-# Remove this exit command when you are ready to run this Action
-exit 1
-#=================================================
+==========================================
 # FETCHING LATEST RELEASE AND ITS ASSETS
 #=================================================
 
