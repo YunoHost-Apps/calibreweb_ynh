@@ -13,8 +13,7 @@ version=$(curl --silent "https://api.github.com/repos/$repo/releases" | jq -r '.
 assets=($(curl --silent "https://api.github.com/repos/$repo/releases" | jq -r '[ .[] | select(.tag_name=="'$version'").assets[].browser_download_url ] | join(" ") | @sh' | tr -d "'"))
 
 #fetching info for kepubify
-current_version_kepubify=$(sed -n '1p' ./conf/appkepubify.src.default | sed 's/^SOURCE_URL=https:\/\/github.com\/pgaskin\/kepubify\/releases\/download\/v//;s/\/kepubify-linux-__MACH__//'
-4.0.4)
+current_version_kepubify=$(sed -n '1p' ./conf/appkepubify.src.default | sed 's/^SOURCE_URL=https:\/\/github.com\/pgaskin\/kepubify\/releases\/download\/v//;s/\/kepubify-linux-__MACH__//')
 repo_kepubify="pgaskin/kepubify"
 version_kepubify=$(curl --silent "https://api.github.com/repos/$repo_kepubify/releases" | jq -r '.[] | select( .prerelease != true ) | .tag_name' | sort -V | tail -1)
 assets_kepubify=($(curl --silent "https://api.github.com/repos/$repo_kepubify/releases" | jq -r '[ .[] | select(.tag_name=="'$version_kepubify'").assets[].browser_download_url ] | join(" ") | @sh' | tr -d "'"))
