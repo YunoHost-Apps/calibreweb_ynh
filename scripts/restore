@@ -92,6 +92,29 @@ chmod 740 $final_path
 ynh_script_progression --message="Reinstalling dependencies..." --weight=15
 ynh_install_app_dependencies $PKG_DEPENDENCIES
 
+#Use venv to install pip requirements - Inspired from https://github.com/YunoHost-Apps/pyinventory_ynh/blob/master/scripts/install
+ynh_script_progression --message="Reinstalling pip requirements..." --weight=70
+# Always recreate everything fresh with current python version
+# When reinstalling on a new yunohost, this is required 
+if [ -d "${final_path}/venv" ] ; then
+	ynh_secure_remove "${final_path}/venv"
+fi
+
+# Skip pip because of: https://github.com/YunoHost/issues/issues/1960
+python3 -m venv --without-pip "${final_path}/venv"
+chown -R "$app:" "$final_path"
+
+#run source in a 'sub shell'
+(
+	set +o nounset
+	source "${final_path}/venv/bin/activate"
+	set -o nounset
+	ynh_exec_as $app $final_path/venv/bin/python3 -m ensurepip
+	ynh_exec_as $app $final_path/venv/bin/pip3 install --upgrade wheel pip setuptools
+	ynh_exec_as $app $final_path/venv/bin/pip3 install --no-cache-dir --upgrade -r "$final_path/requirements.txt"
+	ynh_exec_as $app $final_path/venv/bin/pip3 install --no-cache-dir --upgrade -r "$final_path/optional-requirements.txt"
+)
+
 #=================================================
 # RESTORE SYSTEMD
 #=================================================
