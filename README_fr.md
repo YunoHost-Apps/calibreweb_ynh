@@ -5,22 +5,23 @@ It shall NOT be edited by hand.
 
 # Calibre-web pour YunoHost
 
-[![Niveau d'intégration](https://dash.yunohost.org/integration/calibreweb.svg)](https://dash.yunohost.org/appci/app/calibreweb) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/calibreweb.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/calibreweb.maintain.svg)  
+[![Niveau d’intégration](https://dash.yunohost.org/integration/calibreweb.svg)](https://dash.yunohost.org/appci/app/calibreweb) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/calibreweb.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/calibreweb.maintain.svg)
+
 [![Installer Calibre-web avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=calibreweb)
 
 *[Read this readme in english.](./README.md)*
 
-> *Ce package vous permet d'installer Calibre-web rapidement et simplement sur un serveur YunoHost.
-Si vous n'avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour savoir comment l'installer et en profiter.*
+> *Ce package vous permet d’installer Calibre-web rapidement et simplement sur un serveur YunoHost.
+Si vous n’avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) pour savoir comment l’installer et en profiter.*
 
-## Vue d'ensemble
+## Vue d’ensemble
 
 Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre
 
 **Version incluse :** 0.6.19
-## Captures d'écran
+## Captures d’écran
 
-![Capture d'écran de Calibre-web](./doc/screenshots/screenshot.png)
+![Capture d’écran de Calibre-web](./doc/screenshots/screenshot.png)
 
 ## Avertissements / informations importantes
 
@@ -91,8 +92,8 @@ La numérotation est modifiée dans yunohost par rapport à Calibre-web: la vers
 
 ## Documentations et ressources
 
-* Documentation officielle de l'admin : <https://github.com/janeczku/calibre-web/wiki>
-* Dépôt de code officiel de l'app : <https://github.com/janeczku/calibre-web>
+* Documentation officielle de l’admin : <https://github.com/janeczku/calibre-web/wiki>
+* Dépôt de code officiel de l’app : <https://github.com/janeczku/calibre-web>
 * Documentation YunoHost pour cette app : <https://yunohost.org/app_calibreweb>
 * Signaler un bug : <https://github.com/YunoHost-Apps/calibreweb_ynh/issues>
 
@@ -108,4 +109,4 @@ ou
 sudo yunohost app upgrade calibreweb -u https://github.com/YunoHost-Apps/calibreweb_ynh/tree/testing --debug
 ```
 
-**Plus d'infos sur le packaging d'applications :** <https://yunohost.org/packaging_apps>
+**Plus d’infos sur le packaging d’applications :** <https://yunohost.org/packaging_apps>
