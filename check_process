@@ -16,8 +16,7 @@
 		setup_private=1
 		setup_public=1
 		upgrade=1
-#Last version
-		upgrade=1	from_commit=581a4e1de5caa7aa19a64f63348b174b7602753
+		#upgrade=1	from_commit=581a4e1de5caa7aa19a64f63348b174b7602753   # FIXME : this commit doesnt exist ...
 		backup_restore=1
 		multi_instance=1
 		port_already_use=1 (8083)
