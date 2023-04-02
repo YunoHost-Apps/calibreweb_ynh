@@ -18,7 +18,7 @@ Si vous n’avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) po
 
 Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre
 
-**Version incluse :** 0.6.19
+**Version incluse :** 0.6.20~ynh1
 ## Captures d’écran
 
 ![Capture d’écran de Calibre-web](./doc/screenshots/screenshot.png)
