@@ -1,6 +1,6 @@
 #!/bin/bash
 
-==========================================
+#==========================================
 # FETCHING LATEST RELEASE AND ITS ASSETS
 #=================================================
 
@@ -43,6 +43,7 @@ echo "PROCEED=false" >> $GITHUB_ENV
 # Proceed only if the retrieved version is greater than the current one
 update_upstream=1
 update_kepubify=1
+
 if ! dpkg --compare-versions "$current_version" "lt" "$version" ; then
     echo "::warning ::No new version available for upstream app"
     update_upstream=0
@@ -122,6 +123,7 @@ EOT
         fi
 
     done
+fi
 
 if [ "$update_kepubify"=1 ]; then
     for asset_url_kepubify in ${assets_kepubify[@]}; do
