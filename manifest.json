@@ -6,10 +6,10 @@
         "en": "Browsing, reading and downloading eBooks using a Calibre database",
         "fr": "Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre"
     },
-    "version": "0.96.19~ynh8",
+    "version": "0.6.20~ynh1",
     "url": "https://github.com/janeczku/calibre-web",
     "upstream": {
-        "version": "0.6.19",
+        "version": "0.6.20",
         "license": "GPL-3.0-only",
         "admindoc": "https://github.com/janeczku/calibre-web/wiki",
         "code": "https://github.com/janeczku/calibre-web"
@@ -27,7 +27,7 @@
         "nginx"
     ],
     "arguments": {
-        "install" : [
+        "install": [
             {
                 "name": "domain",
                 "type": "domain"
@@ -45,9 +45,9 @@
             {
                 "name": "is_public",
                 "type": "boolean",
-                "help":{
-                	"en":"No will set the library in /home/yunohost.multimedia/admin/eBook, except if you set the library as public",
-                	"fr":"Non parametrera la bibliothèque pour /home/yunohost.multimedia/admin/eBook sauf si la bibliothèque est également publique"
+                "help": {
+                    "en": "No will set the library in /home/yunohost.multimedia/admin/eBook, except if you set the library as public",
+                    "fr": "Non parametrera la bibliothèque pour /home/yunohost.multimedia/admin/eBook sauf si la bibliothèque est également publique"
                 },
                 "default": false
             },
@@ -59,38 +59,43 @@
                     "en": "Select a default language",
                     "fr": "Choisissez une langue par défaut"
                 },
-                "help":{
-                	"en":"You may change it later in the app",
-                	"fr":"Vous pourrez la changer ultérieurement dans l'application"
+                "help": {
+                    "en": "You may change it later in the app",
+                    "fr": "Vous pourrez la changer ultérieurement dans l'application"
                 },
-                "choices": [ "fr", "en", "es", "de"],
+                "choices": [
+                    "fr",
+                    "en",
+                    "es",
+                    "de"
+                ],
                 "default": "fr"
             },
             {
                 "name": "upload",
-                "type":"boolean",
+                "type": "boolean",
                 "optional": true,
                 "ask": {
                     "en": "Do you want to allow uploading of books?",
                     "fr": "Voulez vous autoriser le téléversement de livres?"
                 },
-                "help":{
-                	"en":"You may change it later in the app",
-                	"fr":"Vous pourrez le changer ultérieurement dans l'application"
+                "help": {
+                    "en": "You may change it later in the app",
+                    "fr": "Vous pourrez le changer ultérieurement dans l'application"
                 },
                 "default": false
             },
             {
                 "name": "public_library",
-                "type":"boolean",
+                "type": "boolean",
                 "optional": true,
                 "ask": {
                     "en": "Do you want to allow access to the library to all Yunohost users? ",
                     "fr": "Voulez vous autoriser l'accès à la bibliothèque à tous les utilisateurs Yunohost?"
                 },
-                "help":{
-                	"en":"Yes will set the library in /home/yunohost.multimedia/share/eBook",
-                	"fr":"Oui parametrera la bibliothèque pour /home/yunohost.multimedia/share/eBook"
+                "help": {
+                    "en": "Yes will set the library in /home/yunohost.multimedia/share/eBook",
+                    "fr": "Oui parametrera la bibliothèque pour /home/yunohost.multimedia/share/eBook"
                 },
                 "default": true
             }
