@@ -63,10 +63,12 @@ elif git ls-remote -q --exit-code --heads https://github.com/$GITHUB_REPOSITORY.
 fi
 
 if [ "$update_kepubify"=0 ] && [ "$update_upstream"=0 ]; then
+    echo "::no update : exit"
     exit 0
 fi
 
 if [ "$update_upstream"=1 ]; then
+    echo "Update upstream"
     # Each release can hold multiple assets (e.g. binaries for different architectures, source code, etc.)
     echo "${#assets[@]} available asset(s)"
 
@@ -126,6 +128,7 @@ EOT
 fi
 
 if [ "$update_kepubify"=1 ]; then
+    echo "Update kepubify"
     for asset_url_kepubify in ${assets_kepubify[@]}; do
 
         echo "Handling asset at $asset_url_kepubify"
