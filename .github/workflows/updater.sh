@@ -62,7 +62,7 @@ elif git ls-remote -q --exit-code --heads https://github.com/$GITHUB_REPOSITORY.
     update_kepubify=0
 fi
 
-if [ "$update_kepubify"== 0 ] && [ "$update_upstream"== 0 ]; then
+if [ "$update_kepubify" == 0 ] && [ "$update_upstream" == 0 ]; then
     echo "::no update : exit"
     exit 0
 fi
