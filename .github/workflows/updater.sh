@@ -61,7 +61,7 @@ elif git ls-remote -q --exit-code --heads https://github.com/$GITHUB_REPOSITORY.
     echo "::warning ::A branch already exists for this kepubify update"
     update_kepubify=0
 fi
-
+echo $update_upstream
 if [ "$update_kepubify"=0 ] && [ "$update_upstream"=0 ]; then
     echo "::no update : exit"
     exit 0
