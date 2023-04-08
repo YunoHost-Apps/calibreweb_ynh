@@ -1,6 +1,6 @@
 #!/bin/bash
 
-==========================================
+#==========================================
 # FETCHING LATEST RELEASE AND ITS ASSETS
 #=================================================
 
@@ -35,14 +35,15 @@ echo "VERSION=$version" >> $GITHUB_ENV
 echo "REPO=$repo" >> $GITHUB_ENV
 echo "Current version for kepubify: $current_version_kepubify"
 echo "Latest release from upstream for kepubify: $version_kepubify"
-echo "VERSION=$version" >> $GITHUB_ENV
-echo "REPO=$repo" >> $GITHUB_ENV
+echo "VERSION_KEPUBIFY=$version_kepubify" >> $GITHUB_ENV
+echo "REPO_KEPUBIFY=$repo_kepubify" >> $GITHUB_ENV
 # For the time being, let's assume the script will fail
 echo "PROCEED=false" >> $GITHUB_ENV
 
 # Proceed only if the retrieved version is greater than the current one
 update_upstream=1
 update_kepubify=1
+
 if ! dpkg --compare-versions "$current_version" "lt" "$version" ; then
     echo "::warning ::No new version available for upstream app"
     update_upstream=0
@@ -61,11 +62,13 @@ elif git ls-remote -q --exit-code --heads https://github.com/$GITHUB_REPOSITORY.
     update_kepubify=0
 fi
 
-if [ "$update_kepubify"=0 ] && [ "$update_upstream"=0 ]; then
+if [ "$update_kepubify" == 0 ] && [ "$update_upstream" == 0 ]; then
+    echo "::no update : exit"
     exit 0
 fi
 
-if [ "$update_upstream"=1 ]; then
+if [ "$update_upstream" == 1 ]; then
+    echo "Update upstream"
     # Each release can hold multiple assets (e.g. binaries for different architectures, source code, etc.)
     echo "${#assets[@]} available asset(s)"
 
@@ -122,8 +125,10 @@ EOT
         fi
 
     done
+fi
 
-if [ "$update_kepubify"=1 ]; then
+if [ "$update_kepubify" == 1 ]; then
+    echo "Update kepubify"
     for asset_url_kepubify in ${assets_kepubify[@]}; do
 
         echo "Handling asset at $asset_url_kepubify"
@@ -192,12 +197,12 @@ fi
 #=================================================
 # GENERIC FINALIZATION
 #=================================================
-if [ "$update_upstream"=1 ]; then
+if [ "$update_upstream" == 1 ]; then
 # Replace new version in manifest
     echo "$(jq -s --indent 4 ".[] | .version = \"$version~ynh1\"" manifest.json)" > manifest.json
     echo "$(jq -s --indent 4 ".[] | .upstream.version = \"$version\"" manifest.json)" > manifest.json
 fi
-if [ "$update_kepubify"=1 ] && [ "$update_upstream"=0 ]; then
+if [ "$update_kepubify" == 1 ] && [ "$update_upstream" == 0 ]; then
 new_yunohost_package_version=$(("$current_yunohost_package_version+1"))
     echo "$(jq -s --indent 4 ".[] | .version = \"$version~ynh$new_yunohost_package_version\"" manifest.json)" > manifest.json
 fi
