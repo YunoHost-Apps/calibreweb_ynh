@@ -35,8 +35,8 @@ echo "VERSION=$version" >> $GITHUB_ENV
 echo "REPO=$repo" >> $GITHUB_ENV
 echo "Current version for kepubify: $current_version_kepubify"
 echo "Latest release from upstream for kepubify: $version_kepubify"
-echo "VERSION=$version" >> $GITHUB_ENV
-echo "REPO=$repo" >> $GITHUB_ENV
+echo "VERSION_KEPUBIFY=$version_kepubify" >> $GITHUB_ENV
+echo "REPO_KEPUBIFY=$repo_kepubify" >> $GITHUB_ENV
 # For the time being, let's assume the script will fail
 echo "PROCEED=false" >> $GITHUB_ENV
 
