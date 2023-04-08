@@ -61,13 +61,13 @@ elif git ls-remote -q --exit-code --heads https://github.com/$GITHUB_REPOSITORY.
     echo "::warning ::A branch already exists for this kepubify update"
     update_kepubify=0
 fi
-echo $update_upstream
-if [ "$update_kepubify"=0 ] && [ "$update_upstream"=0 ]; then
+
+if [ "$update_kepubify"== 0 ] && [ "$update_upstream"== 0 ]; then
     echo "::no update : exit"
     exit 0
 fi
 
-if [ "$update_upstream"=1 ]; then
+if [ "$update_upstream" == 1 ]; then
     echo "Update upstream"
     # Each release can hold multiple assets (e.g. binaries for different architectures, source code, etc.)
     echo "${#assets[@]} available asset(s)"
@@ -127,7 +127,7 @@ EOT
     done
 fi
 
-if [ "$update_kepubify"=1 ]; then
+if [ "$update_kepubify" == 1 ]; then
     echo "Update kepubify"
     for asset_url_kepubify in ${assets_kepubify[@]}; do
 
@@ -197,12 +197,12 @@ fi
 #=================================================
 # GENERIC FINALIZATION
 #=================================================
-if [ "$update_upstream"=1 ]; then
+if [ "$update_upstream" == 1 ]; then
 # Replace new version in manifest
     echo "$(jq -s --indent 4 ".[] | .version = \"$version~ynh1\"" manifest.json)" > manifest.json
     echo "$(jq -s --indent 4 ".[] | .upstream.version = \"$version\"" manifest.json)" > manifest.json
 fi
-if [ "$update_kepubify"=1 ] && [ "$update_upstream"=0 ]; then
+if [ "$update_kepubify" == 1 ] && [ "$update_upstream" == 0 ]; then
 new_yunohost_package_version=$(("$current_yunohost_package_version+1"))
     echo "$(jq -s --indent 4 ".[] | .version = \"$version~ynh$new_yunohost_package_version\"" manifest.json)" > manifest.json
 fi
