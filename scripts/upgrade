@@ -22,6 +22,7 @@ domain=$(ynh_app_setting_get $app domain)
 port=$(ynh_app_setting_get $app port)
 path_url=$(ynh_app_setting_get $app path)
 admin=$(ynh_app_setting_get $app admin)
+admin_mail=$(ynh_user_get_info --username="$admin" --key=mail)
 final_path=$(ynh_app_setting_get $app final_path)
 language=$(ynh_app_setting_get $app language)
 
