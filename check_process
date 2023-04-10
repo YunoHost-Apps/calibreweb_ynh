@@ -17,7 +17,7 @@
 		setup_public=1
 		upgrade=1
 #Last version
-		upgrade=1	from_commit=581a4e1de5caa7aa19a64f63348b174b7602753
+		upgrade=1	from_commit=3d6385a2a58984a53c328a4f1aa1b900a84aba1e
 		backup_restore=1
 		multi_instance=1
 		port_already_use=1 (8083)
