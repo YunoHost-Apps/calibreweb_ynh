@@ -59,11 +59,3 @@
      config_converterpath = Column(String, default=None)
      config_calibre = Column(String)
      config_rarfile_location = Column(String, default=None)
-@@ -269,6 +269,7 @@
-     def set_from_dictionary(self, dictionary, field, convertor=None, default=None, encode=None):
-         """Possibly updates a field of this object.
-         The new value, if present, is grabbed from the given dictionary, and optionally passed through a convertor.
-+
-         :returns: `True` if the field has changed value
-         """
-         new_value = dictionary.get(field, default)

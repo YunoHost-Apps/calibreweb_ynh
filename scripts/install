@@ -18,6 +18,7 @@ app=$YNH_APP_INSTANCE_NAME
 domain=$YNH_APP_ARG_DOMAIN
 path_url=$YNH_APP_ARG_PATH
 admin=$YNH_APP_ARG_ADMIN
+admin_mail=$(ynh_user_get_info --username="$admin" --key=mail)
 is_public=$YNH_APP_ARG_IS_PUBLIC
 language=$YNH_APP_ARG_LANGUAGE
 upload=$YNH_APP_ARG_UPLOAD
