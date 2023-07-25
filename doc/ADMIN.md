@@ -1,17 +1,4 @@
-
-### Post install
-
-Users having the calibreweb.main authorization group can be automatically sync from within the app, by using the "Import LDAP user" function.
-Deletion of a Yunohost User will delete the according calibreweb-user.
-
-
 ### Library management
-
-* **Library** will be placed in `/home/yunohost.multimedia/share/eBook` folder except if both :
-  - calibreweb is set as a private application
-  - calibreweb library is set as a public library
-
-In this case the library will be set in `/home/yunohost.multimedia/[admin]/eBook` folder. Library folder can always be changed manually in the application settings by the administrator.
 
 * By default, Yunohost backup process **will backup** Calibreweb library.
 You may deactivate backup of the library with 
@@ -48,17 +35,5 @@ Version number in Yunohost is different from the upstream Calibre-web app : vers
 ### Known Limitations
 
 * Do not use a Nextcloud folder. It's all right if the folder is an external storage in Nextcloud but not if it's an internal one : Changing the data in the library will cause trouble with the sync
-* "Magic link feature is not yet available
 * Change to library made outside Calibreweb are not automatically updated in Calibreweb. It is required to disconnect and reconnect to see the changes : Do not open a database both in Calibre & Calibreweb!
 * Kobo Sync doesn’t work when Calibreweb is installed on a subdomain. This issue is caused by nginx. However, it works great when installed on a path e.g. `https://domain.tld/calibreweb`
-
-### Todo
-- [ ] Update mail settings with yunohost settings
-- [ ] enable magic link
-- [ ] Add cronjob to reload database (for nextcloud integration)
-- [ ] Add config-panel option to trigger do_not_backup_data
-- [ ] Add config-panel to manage max upload size
-- [ ] Add action to restart the server
-- [ ] Add action to synchronize users
-- [ ] Add action to deactivate LDAP et retrieve admin password
-- [ ] Use internal updater to update version?

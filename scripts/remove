@@ -10,18 +10,6 @@ source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
-# LOAD SETTINGS
-#=================================================
-ynh_script_progression --message="Loading installation settings..." --weight=3
-
-app=$YNH_APP_INSTANCE_NAME
-domain=$(ynh_app_setting_get $app domain)
-port=$(ynh_app_setting_get $app port)
-final_path=$(ynh_app_setting_get $app final_path)
-calibre_dir=$(ynh_app_setting_get $app calibre_dir)
-
-
-#=================================================
 # REMOVE SERVICE FROM ADMIN PANEL
 #=================================================
 
@@ -42,24 +30,6 @@ fi
 ynh_script_progression --message="Stopping and removing the systemd service..." --weight=2
 ynh_remove_systemd_config
 
-
-
-#=================================================
-# REMOVE DEPENDENCIES
-#=================================================
-
-# Remove metapackage and its dependencies
-ynh_script_progression --message="Removing Dependencies..." --weight=25
-ynh_remove_app_dependencies
-
-
-#=================================================
-# REMOVE APP MAIN DIR
-#=================================================
-
-# Remove the app directory securely
-ynh_script_progression --message="Removing $final_path..." --weight=1
-ynh_secure_remove --file="$final_path"
 
 #=================================================
 # REMOVE DATA DIR
@@ -124,15 +94,6 @@ fi
 # Remove the log files
 ynh_script_progression --message="Removing log file..." --weight=1
 ynh_secure_remove "/var/log/$app/"
-
-#=================================================
-# GENERIC FINALIZATION
-#=================================================
-# REMOVE DEDICATED USER
-#=================================================
-# Delete a system user
-ynh_script_progression --message="Removing the dedicated system user..." --weight=1
-ynh_system_user_delete --username=$app
 
 #=================================================
 # MESSAGE TO USER

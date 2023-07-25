@@ -9,33 +9,17 @@ version_gt() {
 #=================================================
 # IMPORT GENERIC HELPERS
 #=================================================
-
+source _common.sh
 source /usr/share/yunohost/helpers
 
-#=================================================
-# LOAD SETTINGS
-#=================================================
-ynh_script_progression --message="Loading installation settings..." --weight=2
-
-app=$YNH_APP_INSTANCE_NAME
-domain=$(ynh_app_setting_get $app domain)
-port=$(ynh_app_setting_get $app port)
-path_url=$(ynh_app_setting_get $app path)
-admin=$(ynh_app_setting_get $app admin)
 admin_mail=$(ynh_user_get_info --username="$admin" --key=mail)
-final_path=$(ynh_app_setting_get $app final_path)
-language=$(ynh_app_setting_get $app language)
-
-#Source common.sh required to be after var initialization as some variables are updated in it that are then used in the script
-#when initializing the conf file of the app
-source _common.sh
 
 #Get settings from database in case it has been changed in the app and save it in settings so that it can be used back afterward
-calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
+calibre_dir=$(sqlite3 $install_dir/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
 calibre_dir=${calibre_dir%/}
 ynh_app_setting_set $app calibre_dir $calibre_dir
 
-upload=$(sqlite3 $final_path/app.db "SELECT config_uploading FROM settings WHERE ID=1")
+upload=$(sqlite3 $install_dir/app.db "SELECT config_uploading FROM settings WHERE ID=1")
 ynh_app_setting_set $app upload $upload
 
 #=================================================
@@ -50,31 +34,19 @@ current_upstream_package_version="${current_upstream_package_version/".96"/".6"}
 new_upstream_package_version=$(ynh_app_upstream_version) #0.96.0
 new_upstream_package_version="${new_upstream_package_version/".96"/".6"}" #0.6.0
 
-if [ -f $final_path/cps/constants.py ]; then #on est dans une version postérieur à la 0.6.0
-	current_upstream_app_version=$(cat $final_path/cps/constants.py | grep STABLE_VERSION)
-	current_upstream_app_version="${current_upstream_app_version/STABLE_VERSION = \{\'version\': \'/""}"
-	current_upstream_app_version="${current_upstream_app_version/\'\}/""}"
-else #on est encore en 0.6.0
-	current_upstream_app_version='0.6.0' 
-fi
+#if [ -f $install_dir/cps/constants.py ]; then #on est dans une version postérieur à la 0.6.0
+#	current_upstream_app_version=$(cat $install_dir/cps/constants.py | grep STABLE_VERSION)
+#	current_upstream_app_version="${current_upstream_app_version/STABLE_VERSION = \{\'version\': \'/""}"
+#	current_upstream_app_version="${current_upstream_app_version/\'\}/""}"
+#else #on est encore en 0.6.0
+#	current_upstream_app_version='0.6.0' 
+#fi
 
 
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
-ynh_script_progression --message="Backing up the app before upgrading (may take a while)..." --weight=10
-
-# Backup the current version of the app
-ynh_backup_before_upgrade
-ynh_clean_setup () {
-
-	ynh_clean_check_starting
-
-	# restore it if the upgrade fails
-	ynh_restore_upgradebackup
-}
-# Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
+ynh_clean_check_starting
 
 #Stop the app in case database is updated
 ynh_script_progression --message="Stopping a systemd service..." --weight=2
@@ -92,61 +64,20 @@ then
 	yunohost firewall disallow TCP $port 2>&1
 fi
 
-# If language was set delete it
-if [ ! -z "$language" ]; then
-	ynh_app_setting_delete --app=$app --key=language
-fi
-
-#binaries version is 0.6.0, we need to go throught upgrade to 0.6.6 so that app.db is correctly updated, otherwise database is corrupted
-#set database settings as per conf file : restart server so that app.db is regenerated, then add new ldap & log settings
-if version_gt "0.6.6" "$current_upstream_app_version" && [ "$current_upstream_package_version" == "0.6.0" ] && [ "$upgrade_type" == "UPGRADE_APP" ]; then
-	ynh_script_progression --message="Upgrading from $current_upstream_app_version to 0.6.6..." --weight=50
-	ynh_setup_source --dest_dir="$final_path" --source_id="app066"
-	pip install --no-cache-dir --upgrade --target $final_path/vendor -r $final_path/requirements.txt
-	chown -R $app: $final_path
-	#set database settings as per conf file : restart server so that app.db is regenerated
-	ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server" --log_path="$final_path/calibre-web.log" -t 30
-	#sleep required on low spec like raspberryPi
-	sleep 2s
-	ynh_systemd_action --service_name=$app --action="stop"
-	conf="\"UPDATE settings SET $(. <(echo -E echo $(<../conf/init_calibre_db_settings))), $(. <(echo -E echo $(<../conf/init_calibre_db_ldap_settings))) WHERE ID=1\""
-    eval sqlite3 $final_path/app.db "$conf"
-	current_upstream_app_version="0.6.6"
-fi
-
 #LDAP settings were wrongly set in version prior to 0.6.13 and we could not retrieve LDAP users. This will change the settings to correct values 
-if sqlite3 $final_path/app.db "SELECT config_ldap_group_object_filter FROM settings" \
+if sqlite3 $install_dir/app.db "SELECT config_ldap_group_object_filter FROM settings" \
 	| grep -xq "(&(objectClass=posixGroup)(permission=cn=%s.main,ou=permission,dc=yunohost,dc=org))" ; then 
-	eval sqlite3 $final_path/app.db "\"UPDATE settings SET config_ldap_group_object_filter='(&(objectClass=posixGroup)(cn=%s.main))' WHERE ID=1\""
+	eval sqlite3 $install_dir/app.db "\"UPDATE settings SET config_ldap_group_object_filter='(&(objectClass=posixGroup)(cn=%s.main))' WHERE ID=1\""
 fi
 
-# Cleaning legacy permissions
-if ynh_legacy_permissions_exists; then
-	ynh_legacy_permissions_delete_all
-
-	ynh_app_setting_delete --app=$app --key=is_public
-fi
 
 #Adding kepubify converter
-if [ -z $(sqlite3 $final_path/app.db "SELECT config_kepubifypath FROM settings") ]; then
-	eval sqlite3 $final_path/app.db "\"UPDATE settings SET config_kepubifypath='/opt/kepubify/kepubify-linux-$mach' WHERE ID=1\""
+if [ -z $(sqlite3 $install_dir/app.db "SELECT config_kepubifypath FROM settings") ]; then
+	eval sqlite3 $install_dir/app.db "\"UPDATE settings SET config_kepubifypath='/opt/kepubify/kepubify-linux-$mach' WHERE ID=1\""
 fi
 if [ ! -d /opt/kepubify ]; then
-	ynh_add_config --template="../conf/appkepubify.src.default" --destination="../conf/appkepubify.src"
-	ynh_setup_source --dest_dir="/opt/kepubify" --source_id="appkepubify"
+	ynh_setup_source --dest_dir="/opt/kepubify" --source_id="kepubify"
 	chmod 770 /opt/kepubify/kepubify-linux-$mach
-fi
-
-# Create the permission "kobo_sync" only if it doesn't exist.
-if ! ynh_permission_exists --permission="Kobo sync"
-then
-	# API Authorization with dedicated URL
-	ynh_print_warn --message="This version has now a dedicated Kobo sync authorization, please review group and permission"
-	ynh_permission_create --permission="Kobo sync" --label="Kobo Sync" --url="$domain$path_url/kobo" --allowed="visitors" "all_users" --show_tile="false" --protected="true"
-else
-	##TO BE DELETED - error in testing has led to bad permission settings
-	ynh_permission_delete --permission="Kobo sync"
-	ynh_permission_create --permission="Kobo sync" --label="Kobo Sync" --url="$domain$path_url/kobo" --allowed="visitors" "all_users" --show_tile="false" --protected="true"
 fi
 
 #=================================================
@@ -154,9 +85,6 @@ fi
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-
-
-
 if [ "$upgrade_type" == "UPGRADE_APP" ]
 then
 	ynh_script_progression --message="Upgrading source files from $current_upstream_app_version to $new_upstream_package_version..." --weight=10
@@ -167,7 +95,8 @@ then
 	ynh_add_config --template="../sources/patches/app-constants.py.patch.src" --destination="../sources/patches/app-constants.py.patch"
 	
 	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$final_path"
+	ynh_setup_source --dest_dir="$install_dir"
+	chown -R $app: $install_dir
 fi
 
 #=================================================
@@ -175,21 +104,12 @@ fi
 #=================================================
 
 ynh_script_progression --message="Upgrading nginx web server configuration..." --weight=5
-if [ $path_url = "/" ] ; then
+if [ $path = "/" ] ; then
 	ynh_replace_string "        proxy_set_header	X-Script-Name" "#       proxy_set_header	X-Script-Name" ../conf/nginx.conf
 fi
 # Create a dedicated nginx config
 ynh_add_nginx_config
 
-#=================================================
-# CREATE DEDICATED USER
-#=================================================
-
-# Create a dedicated user (if not existing)
-ynh_script_progression --message="Making sure dedicated system user exists..." --weight=1
-ynh_system_user_create --username="$app" --home_dir="$final_path" --use_shell
-# Set permissions on app files (required to be able to update database)
-chown -R $app: $final_path
 
 
 #=================================================
@@ -198,30 +118,27 @@ chown -R $app: $final_path
 
 if [ "$upgrade_type" == "UPGRADE_APP" ]
 then
-	ynh_script_progression --message="Installing package dependencies..." --weight=15
-	ynh_install_app_dependencies $PKG_DEPENDENCIES
-	
 	#Use venv to install pip requirements - Inspired from https://github.com/YunoHost-Apps/pyinventory_ynh/blob/master/scripts/install
 	ynh_script_progression --message="Installing pip requirements..." --weight=70
 	# Always recreate everything fresh with current python version
-	if [ -d "${final_path}/venv" ] ; then
-		ynh_secure_remove "${final_path}/venv"
+	if [ -d "${install_dir}/venv" ] ; then
+		ynh_secure_remove "${install_dir}/venv"
 	fi
 
 
 	# Skip pip because of: https://github.com/YunoHost/issues/issues/1960
-	python3 -m venv --without-pip "${final_path}/venv"
-	chown -R "$app:" "$final_path"
+	python3 -m venv --without-pip "${install_dir}/venv"
+	chown -R "$app:" "$install_dir"
 
 	#run source in a 'sub shell'
 	(
 		set +o nounset
-		source "${final_path}/venv/bin/activate"
+		source "${install_dir}/venv/bin/activate"
 		set -o nounset
-		ynh_exec_as $app $final_path/venv/bin/python3 -m ensurepip
-		ynh_exec_as $app $final_path/venv/bin/pip3 install --upgrade wheel pip setuptools
-		ynh_exec_as $app $final_path/venv/bin/pip3 install --no-cache-dir --upgrade -r "$final_path/requirements.txt"
-		ynh_exec_as $app $final_path/venv/bin/pip3 install --no-cache-dir --upgrade -r "$final_path/optional-requirements.txt"
+		ynh_exec_as $app $install_dir/venv/bin/python3 -m ensurepip
+		ynh_exec_as $app $install_dir/venv/bin/pip3 install --upgrade wheel pip setuptools
+		ynh_exec_as $app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/requirements.txt"
+		ynh_exec_as $app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/optional-requirements.txt"
 	)
 fi
 
@@ -270,7 +187,7 @@ ynh_add_systemd_config
 #=================================================
 
 # Set permissions on app files
-chown -R $app: $final_path
+chown -R $app: $install_dir
 chown -R $app: /opt/kepubify
 
 #=================================================
@@ -294,13 +211,6 @@ fi
 # Create a dedicated Fail2Ban config
 ynh_add_fail2ban_config --logpath="$log_file" --failregex="^.*LDAP Login failed for user .* IP-address: <HOST>.*$" --max_retry=5
 
-
-#=================================================
-# RELOAD NGINX
-#=================================================
-ynh_script_progression --message="Reloading nginx web server..." --weight=1
-
-ynh_systemd_action --service_name=nginx --action=reload
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================

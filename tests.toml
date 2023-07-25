@@ -1,0 +1,14 @@
+test_format = 1.0
+
+[default]
+
+    args.language = "en"
+    args.upload = true
+    args.public_library = true
+
+    # -------------------------------
+    # Commits to test upgrade from
+    # -------------------------------
+
+    test_upgrade_from.30f2c9d.name = "Upgrade from 0.6.20~ynh1"
+
