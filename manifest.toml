@@ -21,8 +21,8 @@ multi_instance = true
 ldap = true
 sso = true
 disk = "400M"
-ram.build = "50M" # FIXME: replace with an **estimate** minimum ram requirement. e.g. 50M, 400M, 1G, ...
-ram.runtime = "50M" # FIXME: replace with an **estimate** minimum ram requirement. e.g. 50M, 400M, 1G, ...
+ram.build = "200M"
+ram.runtime = "200M"
 
 [install]
     [install.domain]
