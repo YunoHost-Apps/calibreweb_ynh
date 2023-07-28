@@ -77,7 +77,7 @@ if [ -z $(sqlite3 $install_dir/app.db "SELECT config_kepubifypath FROM settings"
 fi
 if [ ! -d /opt/kepubify ]; then
 	ynh_setup_source --dest_dir="/opt/kepubify" --source_id="kepubify"
-	chmod 770 /opt/kepubify/kepubify-linux-$mach
+	chmod 770 /opt/kepubify/kepubify
 fi
 
 #=================================================

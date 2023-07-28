@@ -139,7 +139,7 @@ yunohost service add $app --description="Browse eBook in the web" --log="$log_fi
 chown -R $app: $install_dir
 chmod 740 $install_dir
 chown -R $app: /opt/kepubify
-chmod 770 /opt/kepubify/kepubify-linux-$mach
+chmod 770 /opt/kepubify/kepubify
 
 #=================================================
 # SETUP FAIL2BAN
