@@ -5,7 +5,7 @@ name = "Calibre-web"
 description.en = "Browsing, reading and downloading eBooks using a Calibre database"
 description.fr = "Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre"
 
-version = "0.6.20~ynh1"
+version = "0.6.20~ynh2"
 
 maintainers = ["Krakinou"]
 
