@@ -25,7 +25,7 @@ fi
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_script_progression --message="Downloading sources to $install_dir..." --weight=10
+ynh_script_progression --message="Installing and patching sources to $install_dir..." --weight=10
 #REMOVEME? ynh_app_setting_set $app install_dir $install_dir
 
 #Set settings constant initializer of the app
