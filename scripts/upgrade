@@ -22,6 +22,9 @@ ynh_app_setting_set $app calibre_dir $calibre_dir
 upload=$(sqlite3 $install_dir/app.db "SELECT config_uploading FROM settings WHERE ID=1")
 ynh_app_setting_set $app upload $upload
 
+language=$(sqlite3 $install_dir/app.db "SELECT config_default_locale FROM settings WHERE ID=1")
+ynh_app_setting_set $app language $language
+
 #=================================================
 # CHECK VERSION
 #=================================================
