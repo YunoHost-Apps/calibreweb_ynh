@@ -29,9 +29,9 @@ ynh_script_progression --message="Downloading sources to $install_dir..." --weig
 #REMOVEME? ynh_app_setting_set $app install_dir $install_dir
 
 #Set settings constant initializer of the app
-ynh_add_config --template="../sources/patches/app-config_sql.py.patch.src" --destination="../sources/patches/app-config_sql.py.patch"
-ynh_add_config --template="../sources/patches/app-ub.py.patch.src" --destination="../sources/patches/app-ub.py.patch"
-ynh_add_config --template="../sources/patches/app-constants.py.patch.src" --destination="../sources/patches/app-constants.py.patch"
+ynh_add_config --template="../sources/patches/main-config_sql.py.patch.src" --destination="../sources/patches/main-config_sql.py.patch"
+ynh_add_config --template="../sources/patches/main-ub.py.patch.src" --destination="../sources/patches/main-ub.py.patch"
+ynh_add_config --template="../sources/patches/main-constants.py.patch.src" --destination="../sources/patches/main-constants.py.patch"
 
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir"
@@ -111,7 +111,7 @@ ynh_add_systemd_config
 #=================================================
 # Use logrotate to manage application logfile(s)
 ynh_use_logrotate --logfile="$log_file"
-ynh_use_logrotate --logfile="/var/log/$app/$access_log_file"
+ynh_use_logrotate --logfile="$access_log_file"
 chown -R $app:$app /var/log/$app
 
 

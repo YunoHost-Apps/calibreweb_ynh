@@ -90,9 +90,9 @@ then
 	ynh_script_progression --message="Upgrading source files from $current_upstream_app_version to $new_upstream_package_version..." --weight=10
 
 	#Set settings constant initializer of the app
-	ynh_add_config --template="../sources/patches/app-config_sql.py.patch.src" --destination="../sources/patches/app-config_sql.py.patch"
-	ynh_add_config --template="../sources/patches/app-ub.py.patch.src" --destination="../sources/patches/app-ub.py.patch"
-	ynh_add_config --template="../sources/patches/app-constants.py.patch.src" --destination="../sources/patches/app-constants.py.patch"
+	ynh_add_config --template="../sources/patches/main-config_sql.py.patch.src" --destination="../sources/patches/main-config_sql.py.patch"
+	ynh_add_config --template="../sources/patches/main-ub.py.patch.src" --destination="../sources/patches/main-ub.py.patch"
+	ynh_add_config --template="../sources/patches/main-constants.py.patch.src" --destination="../sources/patches/main-constants.py.patch"
 	
 	# Download, check integrity, uncompress and patch the source from app.src
 	ynh_setup_source --dest_dir="$install_dir"
