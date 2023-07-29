@@ -1,0 +1,19 @@
+#!/bin/bash
+# Source YunoHost helpers
+source /usr/share/yunohost/helpers
+
+app=$1
+users=$2
+permission=$3
+group=$4
+
+#Si le groupe visitors a été affecté à calibreweb
+if echo "$group" | grep visitors ; then
+	if tail /etc/yunohost/apps/$app/conf/nginx.conf | grep "        proxy_set_header	X-Remote-User"; then
+		#app is made public
+		domain=$(ynh_app_setting_get --app=$app --key=domain)
+		ynh_replace_string --match_string="        proxy_set_header	X-Remote-User" --replace_string="#       proxy_set_header	X-Remote-User" --target_file="/etc/yunohost/apps/$app/conf/nginx.conf"
+		ynh_add_config --template="/etc/yunohost/apps/$app/conf/nginx.conf" --destination="/etc/nginx/conf.d/$domain.d/$app.conf"
+		ynh_systemd_action --service_name=nginx --action=reload
+	fi
+fi
