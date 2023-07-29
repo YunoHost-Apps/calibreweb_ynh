@@ -35,6 +35,10 @@ ram.runtime = "200M"
     [install.admin]
     type = "user"
 
+    [install.init_main_permission]
+    type = "group"
+    default = "all_users"
+
     [install.language]
     ask.en = "Select a default language"
     ask.fr = "Choisissez une langue par défaut"
