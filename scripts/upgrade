@@ -31,16 +31,12 @@ upgrade_type=$(ynh_check_app_version_changed)
 current_upstream_package_version=$(ynh_app_upstream_version --manifest="/etc/yunohost/apps/$app/manifest.json") #0.96.0
 current_upstream_package_version="${current_upstream_package_version/".96"/".6"}" #0.6.0
 
-new_upstream_package_version=$(ynh_app_upstream_version) #0.96.0
+new_upstream_package_version=$(ynh_app_upstream_version)
 new_upstream_package_version="${new_upstream_package_version/".96"/".6"}" #0.6.0
 
-#if [ -f $install_dir/cps/constants.py ]; then #on est dans une version postérieur à la 0.6.0
-#	current_upstream_app_version=$(cat $install_dir/cps/constants.py | grep STABLE_VERSION)
-#	current_upstream_app_version="${current_upstream_app_version/STABLE_VERSION = \{\'version\': \'/""}"
-#	current_upstream_app_version="${current_upstream_app_version/\'\}/""}"
-#else #on est encore en 0.6.0
-#	current_upstream_app_version='0.6.0' 
-#fi
+current_upstream_app_version=$(cat $install_dir/cps/constants.py | grep STABLE_VERSION)
+current_upstream_app_version="${current_upstream_app_version/STABLE_VERSION = \{\'version\': \'/""}"
+current_upstream_app_version="${current_upstream_app_version/\'\}/""}"
 
 
 #=================================================
