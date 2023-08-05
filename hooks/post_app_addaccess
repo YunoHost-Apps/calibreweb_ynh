@@ -31,6 +31,8 @@ if echo "$group" | grep visitors ; then
 
 	#Update settings in calibre database
 	sqlite3 $install_dir/app.db "UPDATE settings SET config_reverse_proxy_login_header_name='', config_allow_reverse_proxy_header_login=0 WHERE ID=1;"
-#	ynh_print_info --message="Restarting Calibre-web to take new parameters into account
-#	ynh_systemd_action --service_name=$app --action=restart --line_match="Starting Gevent server on" -t 30
+	#remove logout from web.py
+	patch -u /$install_dir/cps/web.py -i /etc/yunohost/apps/$app/conf/web.py.revert.patch
+	ynh_print_info --message="Restarting Calibre-web to take new parameters into account"
+	ynh_systemd_action --service_name=$app --action=restart --line_match="Starting Gevent server on" -t 30
 fi

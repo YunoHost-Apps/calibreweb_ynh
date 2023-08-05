@@ -87,14 +87,15 @@ ynh_app_setting_set $app calibre_dir $calibre_dir
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-#Cannot use empty string for X-script-name, causes an issue in the python prg
 ynh_script_progression --message="Setting up system configuration..." --weight=5
 
-
+#Cannot use empty string for X-script-name, causes an issue in the python prg
+#https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#nginx
 if [ $path = "/" ] ; then
 	ynh_replace_string "        proxy_set_header	X-Script-Name" "#        proxy_set_header	X-Script-Name" ../conf/nginx.conf
 fi
 
+#
 if [ $(ynh_permission_has_user --permission=main --user=visitors) ]; then
 	ynh_replace_string --match_string="        proxy_set_header	X-Remote-User" \
 	                   --replace_string="#       proxy_set_header	X-Remote-User" \
@@ -170,6 +171,8 @@ ynh_add_fail2ban_config --logpath="$log_file" --failregex="^.*LDAP Login failed 
 ynh_script_progression --message="Start $app..." --weight=5
 ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" -t 30
 
+#Setting the proxy authentication in case calibre is not open to visitor. 
+#https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#login-via-header-from-upstream-authentication-source
 #We need to update the sso login parameter, but for that the app needs to have run at least once to initialize the tables.
 if [ ! $(ynh_permission_has_user --permission=main --user=visitors) ]; then
 	ynh_systemd_action --service_name=$app --action="stop"

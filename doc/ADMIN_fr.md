@@ -1,5 +1,4 @@
 
-
 ### Gestion de la bibliothèque
 
 * Par défaut, le processus de backup de Yunohost **archivera** la bibliothèque Calibreweb.
