@@ -37,7 +37,7 @@ ynh_add_config --template="../sources/patches/main-constants.py.patch.src" --des
 ynh_setup_source --dest_dir="$install_dir"
 
 # Remove the patch for web.py in case visitor are allowed
-if [ $(ynh_permission_has_user --permission=main --user=visitors) ]; then
+if $(ynh_permission_has_user --permission=main --user=visitors); then
 	patch -u /$install_dir/cps/web.py -i ../conf/web.py.revert.patch
 fi
 
@@ -101,7 +101,7 @@ if [ $path = "/" ] ; then
 fi
 
 #
-if [ $(ynh_permission_has_user --permission=main --user=visitors) ]; then
+if $(ynh_permission_has_user --permission=main --user=visitors); then
 	ynh_replace_string --match_string="        proxy_set_header	X-Remote-User" \
 	                   --replace_string="#       proxy_set_header	X-Remote-User" \
 	                   --target_file="../conf/nginx.conf"
@@ -179,7 +179,7 @@ ynh_systemd_action --service_name=$app --action="start" --line_match="Starting G
 #Setting the proxy authentication in case calibre is not open to visitor. 
 #https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#login-via-header-from-upstream-authentication-source
 #We need to update the sso login parameter, but for that the app needs to have run at least once to initialize the tables.
-if [ ! $(ynh_permission_has_user --permission=main --user=visitors) ]; then
+if ! $(ynh_permission_has_user --permission=main --user=visitors); then
 	ynh_systemd_action --service_name=$app --action="stop"
 	sqlite3 $install_dir/app.db "UPDATE settings SET config_reverse_proxy_login_header_name='X-Remote-User', config_allow_reverse_proxy_header_login=1 WHERE ID=1;"
 	ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on"

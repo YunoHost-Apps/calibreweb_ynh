@@ -8,7 +8,7 @@ permission=$3
 group=$4
 
 #Visitor group has been revomed => app is private
-if echo "$group" | grep visitors; then
+if [ $(echo "$group" | grep visitors) ] && [ $permission = "main" ]; then
 
 	#loading settings from the app
 	domain=$(ynh_app_setting_get --app=$app --key=domain)
