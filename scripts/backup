@@ -32,7 +32,7 @@ ynh_backup --src_path="$install_dir"
 # BACKUP THE KEPUBIFY BINARY
 #=================================================
 
-ynh_backup --src_path="/opt/kepubify"
+ynh_backup --src_path="/opt/kepubify/$app"
 
 #=================================================
 # BACKUP THE NGINX CONFIGURATION

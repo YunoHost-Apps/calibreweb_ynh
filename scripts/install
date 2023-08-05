@@ -43,7 +43,7 @@ fi
 
 #install kepubify converter
 ynh_script_progression --message="Installing kepubify..." --weight=1
-ynh_setup_source --dest_dir="/opt/kepubify" --source_id="kepubify"
+ynh_setup_source --dest_dir="/opt/kepubify/$app/" --source_id="kepubify"
 
 
 #=================================================
@@ -152,8 +152,8 @@ yunohost service add $app --description="Browse eBook in the web" --log="$log_fi
 
 chown -R $app: $install_dir
 chmod 740 $install_dir
-chown -R $app: /opt/kepubify
-chmod 770 /opt/kepubify/kepubify
+chown -R $app: /opt/kepubify/$app
+chmod 770 /opt/kepubify/$app/kepubify
 
 #=================================================
 # SETUP FAIL2BAN

@@ -79,11 +79,19 @@ fi
 
 #Adding kepubify converter
 if [ -z $(sqlite3 $install_dir/app.db "SELECT config_kepubifypath FROM settings") ]; then
-	eval sqlite3 $install_dir/app.db "\"UPDATE settings SET config_kepubifypath='/opt/kepubify/kepubify-linux-$mach' WHERE ID=1\""
+	eval sqlite3 $install_dir/app.db "\"UPDATE settings SET config_kepubifypath='/opt/kepubify/$app/kepubify' WHERE ID=1\""
 fi
-if [ ! -d /opt/kepubify ]; then
-	ynh_setup_source --dest_dir="/opt/kepubify" --source_id="kepubify"
-	chmod 770 /opt/kepubify/kepubify
+if [ ! -d /opt/kepubify/$app ]; then
+	ynh_setup_source --dest_dir="/opt/kepubify/$app" --source_id="kepubify"
+	chmod 770 /opt/kepubify/$app/kepubify
+fi
+
+#Change kepubify to new path (for multiinstance
+if [ -f /opt/kepubify/kepubify ]; then
+	rm /opt/kepubify/kepubify
+fi
+if sqlite3 $install_dir/app.db "SELECT config_kepubifypath FROM settings" | grep -xq "/opt/kepubify/kepubify" ; then
+	eval sqlite3 $install_dir/app.db "\"UPDATE settings SET config_kepubifypath='/opt/kepubify/$app/kepubify' WHERE ID=1\""
 fi
 
 #=================================================
@@ -214,7 +222,7 @@ ynh_add_systemd_config
 
 # Set permissions on app files
 chown -R $app: $install_dir
-chown -R $app: /opt/kepubify
+chown -R $app: /opt/kepubify/$app
 
 #=================================================
 # INTEGRATE SERVICE IN YUNOHOST
