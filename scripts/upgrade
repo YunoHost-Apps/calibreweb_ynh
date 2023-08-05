@@ -93,6 +93,12 @@ then
 	# Download, check integrity, uncompress and patch the source from app.src
 	ynh_setup_source --dest_dir="$install_dir"
 	chown -R $app: $install_dir
+	
+	# Remove the patch for web.py in case visitor are allowed
+	if $(ynh_permission_has_user --permission=main --user=visitors); then
+		patch -u /$install_dir/cps/web.py -i ../conf/web.py.revert.patch
+	fi
+	
 fi
 
 #=================================================
@@ -100,9 +106,23 @@ fi
 #=================================================
 
 ynh_script_progression --message="Upgrading nginx web server configuration..." --weight=5
+#Cannot use empty string for X-script-name, causes an issue in the python prg
+#https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#nginx
 if [ $path = "/" ] ; then
 	ynh_replace_string "        proxy_set_header	X-Script-Name" "#       proxy_set_header	X-Script-Name" ../conf/nginx.conf
 fi
+
+#Setting the proxy authentication in case calibre is not open to visitor. 
+#https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#login-via-header-from-upstream-authentication-source
+if $(ynh_permission_has_user --permission=main --user=visitors); then
+	sqlite3 $install_dir/app.db "UPDATE settings SET config_reverse_proxy_login_header_name='', config_allow_reverse_proxy_header_login=0 WHERE ID=1;"
+	ynh_replace_string --match_string="        proxy_set_header	X-Remote-User" \
+	                   --replace_string="#       proxy_set_header	X-Remote-User" \
+	                   --target_file="../conf/nginx.conf"
+else
+	sqlite3 $install_dir/app.db "UPDATE settings SET config_reverse_proxy_login_header_name='X-Remote-User', config_allow_reverse_proxy_header_login=1 WHERE ID=1;"
+fi
+
 # Create a dedicated nginx config
 ynh_add_nginx_config
 
