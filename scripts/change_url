@@ -31,6 +31,19 @@ ynh_script_progression --message="Updating NGINX web server configuration..." --
 #Cannot use empty string for X-script-name, causes an issue in the python prg
 if [ $path_url = "/" ] ; then
 	ynh_replace_string "        proxy_set_header	X-Script-Name" "#       proxy_set_header	X-Script-Name" ../conf/nginx.conf
+else
+	ynh_replace_string "#       proxy_set_header	X-Script-Name" "        proxy_set_header	X-Script-Name" ../conf/nginx.conf
+fi
+
+if $(ynh_permission_has_user --permission=main --user=visitors); then
+	ynh_replace_string --match_string="        proxy_set_header	X-Remote-User" \
+	                   --replace_string="#       proxy_set_header	X-Remote-User" \
+	                   --target_file="../conf/nginx.conf"
+else
+	ynh_replace_string --match_string="#       proxy_set_header	X-Remote-User" \
+	                   --replace_string="        proxy_set_header	X-Remote-User" \
+	                   --target_file="../conf/nginx.conf"
+
 fi
 
 ynh_change_url_nginx_config
