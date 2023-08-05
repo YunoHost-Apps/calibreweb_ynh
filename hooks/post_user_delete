@@ -20,8 +20,10 @@ del_id() {
 }
 
 
-user_id=$(sqlite3 $install_dir/app.db "SELECT id from user WHERE nickname='$username'")
+user_id=$(sqlite3 $install_dir/app.db "SELECT id from user WHERE name='$username'")
 shelf_id=$(sqlite3 $install_dir/app.db "SELECT id from shelf WHERE user_id='$user_id'")
+
+ynh_print_info --message="Suppression de l'utilisateur dans calibreweb"
 
 #Delete all entry with dependencies for user
 #pas de check sur l'existence de l'utilisateur car fonctionne sans
