@@ -106,6 +106,16 @@ ynh_script_progression --message="Upgrading nginx web server configuration..." -
 if [ $path = "/" ] ; then
 	ynh_replace_string "        proxy_set_header	X-Script-Name" "#       proxy_set_header	X-Script-Name" ../conf/nginx.conf
 fi
+
+if [ ynh_permission_has_user --permission=main --user=visitors ]; then
+	sqlite3 $install_dir/app.db "UPDATE settings SET config_reverse_proxy_login_header_name='', config_allow_reverse_proxy_header_login=0 WHERE ID)1;"
+	ynh_replace_string --match_string="        proxy_set_header	X-Remote-User" \
+	                   --replace_string="#       proxy_set_header	X-Remote-User" \
+	                   --target_file="../conf/nginx.conf"
+else
+	sqlite3 $install_dir/app.db "UPDATE settings SET config_reverse_proxy_login_header_name='X-Remote-User', config_allow_reverse_proxy_header_login=1 WHERE ID=1;"
+fi
+
 # Create a dedicated nginx config
 ynh_add_nginx_config
 

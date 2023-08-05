@@ -7,24 +7,30 @@ users=$2
 permission=$3
 group=$4
 
+#Visitor group has been revomed => app is private
 if echo "$group" | grep visitors; then
-	if tail /etc/yunohost/apps/$app/conf/nginx.conf | grep "#       proxy_set_header	X-Remote-User"; then
-		
-		domain = $(ynh_app_setting_get --app=$app --key=domain)
-		path   = $(ynh_app_setting_get --app=$app --key=path)
-		port   = $(ynh_app_setting_get --app=$app --key=port)
-		
-		touch ../manifest.toml
-		
-		ynh_replace_string --match_string="#       proxy_set_header	X-Remote-User" \
-                           --replace_string="        proxy_set_header	X-Remote-User" \
-                           --target_file="/etc/yunohost/apps/$app/conf/nginx.conf"
-		
-		ynh_add_config --template="/etc/yunohost/apps/$app/conf/nginx.conf" \
-		               --destination="/etc/nginx/conf.d/$domain.d/$app.conf"
-		
-		ynh_systemd_action --service_name=nginx --action=reload
-		
-		rm ../manifest.toml
-	fi
+
+	#loading settings from the app
+	domain=$(ynh_app_setting_get --app=$app --key=domain)
+	path=$(ynh_app_setting_get --app=$app --key=path)
+	port=$(ynh_app_setting_get --app=$app --key=port)
+	install_dir=$(ynh_app_setting_get --app=$app --key=install_dir)
+
+	#otherwise ynh_add_config complain about manifest
+	touch ../manifest.toml
+
+	#reset a new conf file and move it to nginx
+	ynh_replace_string --match_string="#       proxy_set_header	X-Remote-User" \
+                       --replace_string="        proxy_set_header	X-Remote-User" \
+                       --target_file="/etc/yunohost/apps/$app/conf/nginx.conf"
+	ynh_add_config --template="/etc/yunohost/apps/$app/conf/nginx.conf" \
+	               --destination="/etc/nginx/conf.d/$domain.d/$app.conf"
+	ynh_systemd_action --service_name=nginx --action=reload
+
+	rm ../manifest.toml
+
+	#Update settings in calibre database
+	sqlite3 $install_dir/app.db "UPDATE settings SET config_reverse_proxy_login_header_name='X-Remote-User', config_allow_reverse_proxy_header_login=1 WHERE ID=1;"
+#	ynh_print_info --message="Restarting Calibre-web to take new parameters into account
+#	ynh_systemd_action --service_name=$app --action=restart --line_match="Starting Gevent server on" -t 30
 fi

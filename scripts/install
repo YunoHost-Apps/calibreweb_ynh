@@ -95,6 +95,12 @@ if [ $path = "/" ] ; then
 	ynh_replace_string "        proxy_set_header	X-Script-Name" "#        proxy_set_header	X-Script-Name" ../conf/nginx.conf
 fi
 
+if [ $(ynh_permission_has_user --permission=main --user=visitors) ]; then
+	ynh_replace_string --match_string="        proxy_set_header	X-Remote-User" \
+	                   --replace_string="#       proxy_set_header	X-Remote-User" \
+	                   --target_file="../conf/nginx.conf"
+fi
+
 # Create a dedicated nginx config
 ynh_add_nginx_config
 
@@ -122,6 +128,8 @@ chown -R $app:$app /var/log/$app
 ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern="PDF" />" \
 		--replace_string="<policy domain="coder" rights="read" pattern="PDF" />" \
 		--target_file="/etc/ImageMagick-6/policy.xml"
+
+
 
 #=================================================
 # INTEGRATE SERVICE IN YUNOHOST
@@ -161,6 +169,13 @@ ynh_add_fail2ban_config --logpath="$log_file" --failregex="^.*LDAP Login failed 
 #=================================================
 ynh_script_progression --message="Start $app..." --weight=5
 ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" -t 30
+
+#We need to update the sso login parameter, but for that the app needs to have run at least once to initialize the tables.
+if [ ! $(ynh_permission_has_user --permission=main --user=visitors) ]; then
+	ynh_systemd_action --service_name=$app --action="stop"
+	sqlite3 $install_dir/app.db "UPDATE settings SET config_reverse_proxy_login_header_name='X-Remote-User', config_allow_reverse_proxy_header_login=1 WHERE ID=1;"
+	ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on"
+fi
 
 #=================================================
 # END OF SCRIPT
