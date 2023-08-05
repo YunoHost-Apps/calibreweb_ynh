@@ -2,13 +2,14 @@
 # Source YunoHost helpers
 source /usr/share/yunohost/helpers
 
-app=$1
+app="${0//.\/50-}"
+app_trigger=$1
 users=$2
 permission=$3
 group=$4
 
 #Visitor group has been revomed => app is public
-if [ $(echo "$group" | grep visitors) ] && [ $permission = "main" ]; then
+if [ $(echo "$group" | grep visitors) ] && [ $permission = "main" ] && [ $app = $app_trigger ]; then
 
 	#loading settings from the app
 	domain=$(ynh_app_setting_get --app=$app --key=domain)
