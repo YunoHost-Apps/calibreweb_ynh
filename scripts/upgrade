@@ -28,11 +28,21 @@ ynh_app_setting_set $app language $language
 
 upgrade_type=$(ynh_check_app_version_changed)
 
-current_upstream_package_version=$(ynh_app_upstream_version --manifest="/etc/yunohost/apps/$app/manifest.json") #0.96.0
+if [ -f /etc/yunohost/apps/$app/manifest.toml ]; then
+	current_upstream_package_version=$(ynh_app_upstream_version --manifest="/etc/yunohost/apps/$app/manifest.toml") #0.96.0
+else
+	current_upstream_package_version=$(ynh_app_upstream_version --manifest="/etc/yunohost/apps/$app/manifest.json") #0.96.0
+fi
 current_upstream_package_version="${current_upstream_package_version/".96"/".6"}" #0.6.0
+current_upstream_package_version="${current_upstream_package_version/".97"/".7"}"
+current_upstream_package_version="${current_upstream_package_version/".98"/".8"}"
+current_upstream_package_version="${current_upstream_package_version/".99"/".9"}"
 
 new_upstream_package_version=$(ynh_app_upstream_version)
 new_upstream_package_version="${new_upstream_package_version/".96"/".6"}" #0.6.0
+new_upstream_package_version="${new_upstream_package_version/".97"/".7"}"
+new_upstream_package_version="${new_upstream_package_version/".98"/".8"}"
+new_upstream_package_version="${new_upstream_package_version/".99"/".9"}"
 
 current_upstream_app_version=$(cat $install_dir/cps/constants.py | grep STABLE_VERSION)
 current_upstream_app_version="${current_upstream_app_version/STABLE_VERSION = \{\'version\': \'/""}"
