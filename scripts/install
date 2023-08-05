@@ -36,6 +36,9 @@ ynh_add_config --template="../sources/patches/main-constants.py.patch.src" --des
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir"
 
+# Remove the patch for web.py in case visitor are allowed
+patch -u /$install_dir/cps/web.py -i ../conf/web.py.revert.patch
+
 #install kepubify converter
 ynh_script_progression --message="Installing kepubify..." --weight=1
 ynh_setup_source --dest_dir="/opt/kepubify" --source_id="kepubify"
