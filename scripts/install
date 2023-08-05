@@ -37,7 +37,9 @@ ynh_add_config --template="../sources/patches/main-constants.py.patch.src" --des
 ynh_setup_source --dest_dir="$install_dir"
 
 # Remove the patch for web.py in case visitor are allowed
-patch -u /$install_dir/cps/web.py -i ../conf/web.py.revert.patch
+if [ $(ynh_permission_has_user --permission=main --user=visitors) ]; then
+	patch -u /$install_dir/cps/web.py -i ../conf/web.py.revert.patch
+fi
 
 #install kepubify converter
 ynh_script_progression --message="Installing kepubify..." --weight=1
