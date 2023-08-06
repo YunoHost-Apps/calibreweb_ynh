@@ -6,8 +6,8 @@ After=network.target
 Type=simple
 User=__APP__
 Group=__APP__
-WorkingDirectory=__FINALPATH__/
-ExecStart=/bin/sh -c '__FINALPATH__/venv/bin/python3 __FINALPATH__/cps.py'
+WorkingDirectory=__INSTALL_DIR__/
+ExecStart=/bin/sh -c '__INSTALL_DIR__/venv/bin/python3 __INSTALL_DIR__/cps.py'
 
 # Sandboxing options to harden security
 # Depending on specificities of your service/app, you may need to tweak these 

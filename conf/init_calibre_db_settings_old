@@ -1,7 +1,0 @@
-#to be deleted in future release
-config_calibre_dir=\'$calibre_dir\',
-config_port=$port,
-config_logfile=\'$LOG_FILE\',
-config_access_log=1,
-config_access_logfile=\'$ACCESS_LOG_FILE\',
-config_uploading=\'$upload\'

@@ -9,26 +9,9 @@
 source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
-#=================================================
-# MANAGE SCRIPT FAILURE
-#=================================================
-
-# Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
-
-#=================================================
-# LOAD SETTINGS
-#=================================================
-ynh_print_info --message="Loading installation settings..."
-
-app=$YNH_APP_INSTANCE_NAME
-final_path=$(ynh_app_setting_get $app final_path)
-path_url=$(ynh_app_setting_get $app path)
-domain=$(ynh_app_setting_get $app domain)
-port=$(ynh_app_setting_get $app port)
 
 #Get settings from database in case it has been changed in the app
-calibre_dir=$(sqlite3 $final_path/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
+calibre_dir=$(sqlite3 $install_dir/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
 #Save it in settings so that it can be used back afterward
 calibre_dir=${calibre_dir%/}
 ynh_app_setting_set $app calibre_dir $calibre_dir
@@ -43,13 +26,13 @@ ynh_print_info --message="Declaring files to be backed up..."
 #=================================================
 
 #This will backup the app.db file at the same time
-ynh_backup --src_path="$final_path"
+ynh_backup --src_path="$install_dir"
 
 #=================================================
 # BACKUP THE KEPUBIFY BINARY
 #=================================================
 
-ynh_backup --src_path="/opt/kepubify"
+ynh_backup --src_path="/opt/kepubify/$app"
 
 #=================================================
 # BACKUP THE NGINX CONFIGURATION
