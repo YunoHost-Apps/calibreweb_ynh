@@ -6,145 +6,105 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
-
+source _common.sh
 source /usr/share/yunohost/helpers
 
-#=================================================
-# RETRIEVE ARGUMENTS FROM THE MANIFEST
-#=================================================
 
-app=$YNH_APP_INSTANCE_NAME
-
-domain=$YNH_APP_ARG_DOMAIN
-path_url=$YNH_APP_ARG_PATH
-admin=$YNH_APP_ARG_ADMIN
 admin_mail=$(ynh_user_get_info --username="$admin" --key=mail)
-is_public=$YNH_APP_ARG_IS_PUBLIC
-language=$YNH_APP_ARG_LANGUAGE
-upload=$YNH_APP_ARG_UPLOAD
-public_library=$YNH_APP_ARG_PUBLIC_LIBRARY
 
-#Source common.sh required to be after var initialization as some variables are updated in it that are then used in the script
-#when initializing the conf file of the app
-source _common.sh
-
-#if app is public, we assume library is public
-if [ $is_public -eq 1 ]; then
-	public_library=1
-fi
-
-if [ $is_public -eq 1 ]; then 						#app is public, library is public
+if  [ $public_library -eq 1 ]; then 
 	calibre_dir=$DOSSIER_MEDIA/share/eBook
-elif [ $is_public -eq 0 ] && [ $public_library -eq 1 ]; then  #app is private, library is public
-	calibre_dir=$DOSSIER_MEDIA/share/eBook
-else 												#app is private, library is private
+else # library is private
 	calibre_dir=$DOSSIER_MEDIA/$admin/eBook
 fi
 
 #=================================================
-# MANAGE SCRIPT FAILURE
-#=================================================
-
-# Exit if an error occurs during the execution of the script
-ynh_abort_if_errors
-
-#=================================================
-# CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
-#=================================================
-ynh_script_progression --message="Validating installation parameters..." --weight=5
-
-final_path=/var/www/$app
-test ! -e "$final_path" || ynh_die "This path already contains a folder"
-
-# Register (book) web path
-ynh_webpath_register --app=$app --domain=$domain --path_url=$path_url
-
-#=================================================
-# STORE SETTINGS FROM MANIFEST
-#=================================================
-ynh_script_progression --message="Storing installation settings..." --weight=5
-
-ynh_app_setting_set $app domain $domain
-ynh_app_setting_set $app path $path_url
-ynh_app_setting_set $app admin $admin
-
-#=================================================
 # STANDARD MODIFICATIONS
 #=================================================
-# FIND AN AVAILABLE PORT
-#=================================================
-
-# Find a free port
-port=$(ynh_find_port 8083)
-ynh_script_progression --message="Setting port $port..." --weight=5
-ynh_app_setting_set $app port $port
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_script_progression --message="Downloading sources to $final_path..." --weight=10
-ynh_app_setting_set $app final_path $final_path
+ynh_script_progression --message="Installing and patching sources to $install_dir..." --weight=10
+#REMOVEME? ynh_app_setting_set $app install_dir $install_dir
 
 #Set settings constant initializer of the app
-ynh_add_config --template="../sources/patches/app-config_sql.py.patch.src" --destination="../sources/patches/app-config_sql.py.patch"
-ynh_add_config --template="../sources/patches/app-ub.py.patch.src" --destination="../sources/patches/app-ub.py.patch"
-ynh_add_config --template="../sources/patches/app-constants.py.patch.src" --destination="../sources/patches/app-constants.py.patch"
+ynh_add_config --template="../sources/patches/main-config_sql.py.patch.src" --destination="../sources/patches/main-config_sql.py.patch"
+ynh_add_config --template="../sources/patches/main-ub.py.patch.src" --destination="../sources/patches/main-ub.py.patch"
+ynh_add_config --template="../sources/patches/main-constants.py.patch.src" --destination="../sources/patches/main-constants.py.patch"
 
 # Download, check integrity, uncompress and patch the source from app.src
-ynh_setup_source "$final_path"
+ynh_setup_source --dest_dir="$install_dir"
+
+# Remove the patch for web.py in case visitor are allowed
+if $(ynh_permission_has_user --permission=main --user=visitors); then
+	patch -u /$install_dir/cps/web.py -i ../conf/web.py.revert.patch
+fi
 
 #install kepubify converter
 ynh_script_progression --message="Installing kepubify..." --weight=1
-ynh_add_config --template="../conf/appkepubify.src.default" --destination="../conf/appkepubify.src"
-ynh_setup_source --dest_dir="/opt/kepubify" --source_id="appkepubify"
-
-#=================================================
-# CREATE DEDICATED USER
-#=================================================
-ynh_script_progression --message="Configuring system user..." --weight=1
-# Create a system user
-ynh_system_user_create --username="$app" --home_dir="$final_path" --use_shell
+ynh_setup_source --dest_dir="/opt/kepubify/$app/" --source_id="kepubify"
 
 
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
 
-ynh_script_progression --message="Installing package dependencies..." --weight=80
-ynh_install_app_dependencies $PKG_DEPENDENCIES
-
 #Use venv to install pip requirements - Inspired from https://github.com/YunoHost-Apps/pyinventory_ynh/blob/master/scripts/install
 ynh_script_progression --message="Installing pip requirements..." --weight=70
 # Always recreate everything fresh with current python version
-if [ -d "${final_path}/venv" ] ; then
-	ynh_secure_remove "${final_path}/venv"
+if [ -d "${install_dir}/venv" ] ; then
+	ynh_secure_remove "${install_dir}/venv"
 fi
 
 # Skip pip because of: https://github.com/YunoHost/issues/issues/1960
-python3 -m venv --without-pip "${final_path}/venv"
-chown -R "$app:" "$final_path"
+python3 -m venv --without-pip "${install_dir}/venv"
+chown -R "$app:" "$install_dir"
 
 #run source in a 'sub shell'
 (
 	set +o nounset
-	source "${final_path}/venv/bin/activate"
+	source "${install_dir}/venv/bin/activate"
 	set -o nounset
-	ynh_exec_as $app $final_path/venv/bin/python3 -m ensurepip
-	ynh_exec_as $app $final_path/venv/bin/pip3 install --upgrade wheel pip setuptools
-	ynh_exec_as $app $final_path/venv/bin/pip3 install --no-cache-dir --upgrade -r "$final_path/requirements.txt"
-	ynh_exec_as $app $final_path/venv/bin/pip3 install --no-cache-dir --upgrade -r "$final_path/optional-requirements.txt"
+	ynh_exec_as $app $install_dir/venv/bin/python3 -m ensurepip
+	ynh_exec_as $app $install_dir/venv/bin/pip3 install --upgrade wheel pip setuptools
+	ynh_exec_as $app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/requirements.txt"
+	ynh_exec_as $app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/optional-requirements.txt"
 )
 
+#=================================================
+# CREATE FILES AND DIRECTORIES
+#=================================================
+ynh_script_progression --message="Creating files and directory..." --weight=5
+
+#build multimedia directory
+ynh_multimedia_build_main_dir
+ynh_multimedia_addaccess $app
+
+#Check if metadata.db file exists. If not create it (empty library)
+if [ ! -e "$calibre_dir"/metadata.db ]; then
+	cp -a ../conf/metadata.db.empty $calibre_dir/metadata.db
+	chown $app:$app $calibre_dir/*
+fi
+
+ynh_app_setting_set $app calibre_dir $calibre_dir
 
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-#Cannot use empty string for X-script-name, causes an issue in the python prg
 ynh_script_progression --message="Setting up system configuration..." --weight=5
 
-
-if [ $path_url = "/" ] ; then
+#Cannot use empty string for X-script-name, causes an issue in the python prg
+#https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#nginx
+if [ $path = "/" ] ; then
 	ynh_replace_string "        proxy_set_header	X-Script-Name" "#        proxy_set_header	X-Script-Name" ../conf/nginx.conf
+fi
+
+#
+if $(ynh_permission_has_user --permission=main --user=visitors); then
+	ynh_replace_string --match_string="        proxy_set_header	X-Remote-User" \
+	                   --replace_string="#       proxy_set_header	X-Remote-User" \
+	                   --target_file="../conf/nginx.conf"
 fi
 
 # Create a dedicated nginx config
@@ -159,54 +119,23 @@ ynh_add_nginx_config
 ynh_add_systemd_config
 
 #=================================================
-# CREATE FILES AND DIRECTORIES
-#=================================================
-ynh_script_progression --message="Creating files and directory..." --weight=5
-#Logic is as follow : if app is set to be publicly accessible, we will assume that the library should be set in "Share" multimedia directory
-# If app is set to be private but access is requested for all user, we will assume the same
-# If app is set to be private but access is limited to the admin user, we will set it inside his own multimedia directory.
-# Access to the app is managed in the SSOwat part of the script.
-
-#build multimedia directory
-ynh_multimedia_build_main_dir
-ynh_multimedia_addaccess $app
-
-
-#Check if metadata.db file exists. If not create it (empty library)
-if [ ! -e "$calibre_dir"/metadata.db ]; then
-	cp -a ../conf/metadata.db.empty $calibre_dir/metadata.db
-	chown $app:$app $calibre_dir/*
-fi
-
-ynh_app_setting_set $app calibre_dir $calibre_dir
-
-#=================================================
 # SETUP LOGROTATE
 #=================================================
-
 # Use logrotate to manage application logfile(s)
 ynh_use_logrotate --logfile="$log_file"
-ynh_use_logrotate --logfile="/var/log/$app/$access_log_file"
+ynh_use_logrotate --logfile="$access_log_file"
 chown -R $app:$app /var/log/$app
 
 
 #=================================================
 # SPECIFIC SETUP
 #=================================================
-
 #Update Imagick policy as per https://github.com/janeczku/calibre-web/wiki/FAQ#what-to-do-if-cover-pictures-are-not-extracted-from-pdf-files
 ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern="PDF" />" \
 		--replace_string="<policy domain="coder" rights="read" pattern="PDF" />" \
 		--target_file="/etc/ImageMagick-6/policy.xml"
 
 
-
-#=================================================
-# STORE THE CHECKSUM OF THE CONFIG FILE
-#=================================================
-
-# Calculate and store the config file checksum into the app settings
-#ynh_store_file_checksum "${final_path}/app.db"
 
 #=================================================
 # INTEGRATE SERVICE IN YUNOHOST
@@ -221,10 +150,10 @@ yunohost service add $app --description="Browse eBook in the web" --log="$log_fi
 # SECURE FILES AND DIRECTORIES
 #=================================================
 
-chown -R $app: $final_path
-chmod 740 $final_path
-chown -R $app: /opt/kepubify
-chmod 770 /opt/kepubify/kepubify-linux-$mach
+chown -R $app: $install_dir
+chmod 740 $install_dir
+chown -R $app: /opt/kepubify/$app
+chmod 770 /opt/kepubify/$app/kepubify
 
 #=================================================
 # SETUP FAIL2BAN
@@ -240,30 +169,21 @@ fi
 # Create a dedicated Fail2Ban config
 ynh_add_fail2ban_config --logpath="$log_file" --failregex="^.*LDAP Login failed for user .* IP-address: <HOST>.*$" --max_retry=5
 
-#=================================================
-# SETUP SSOWAT
-#=================================================
-
-# Make app public if necessary
-if [ $is_public -eq 1 ]
-then
-	# unprotected_uris allows SSO credentials to be passed anyway.
-	#ynh_app_setting_set $app unprotected_uris "/"
-	ynh_permission_update --permission "main" --add visitors
-fi
-if [ $public_library -eq 0 ]; then
-	ynh_permission_update --permission "main" --add $admin
-fi
-
-#Kobo sync permission
-ynh_permission_create --permission="Kobo sync" --label="Kobo Sync" --url="$domain$path_url/kobo" --allowed="visitors" "all_users" --show_tile="false" --protected="true"
 
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_script_progression --message="Reload nginx and start $app..." --weight=5
-ynh_systemd_action --service_name=nginx --action=reload
+ynh_script_progression --message="Start $app..." --weight=5
 ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" -t 30
+
+#Setting the proxy authentication in case calibre is not open to visitor. 
+#https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#login-via-header-from-upstream-authentication-source
+#We need to update the sso login parameter, but for that the app needs to have run at least once to initialize the tables.
+if ! $(ynh_permission_has_user --permission=main --user=visitors); then
+	ynh_systemd_action --service_name=$app --action="stop"
+	sqlite3 $install_dir/app.db "UPDATE settings SET config_reverse_proxy_login_header_name='X-Remote-User', config_allow_reverse_proxy_header_login=1 WHERE ID=1;"
+	ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on"
+fi
 
 #=================================================
 # END OF SCRIPT

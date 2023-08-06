@@ -8,7 +8,7 @@ app=${app:3}
 source /etc/yunohost/apps/$app/scripts/_common.sh
 
 username=$1
-final_path=$(ynh_app_setting_get $app final_path)
+install_dir=$(ynh_app_setting_get $app install_dir)
 del_tables_user="book_read_link remote_auth_token downloads shelf bookmark"
 del_tables_shelf="book_shelf_link"
 
@@ -16,12 +16,14 @@ del_id() {
         #$1=table
         #$2=id_type
         #$3=id
-        sqlite3 $final_path/app.db "DELETE FROM $1 WHERE $2='$3'" 
+        sqlite3 $install_dir/app.db "DELETE FROM $1 WHERE $2='$3'" 
 }
 
 
-user_id=$(sqlite3 $final_path/app.db "SELECT id from user WHERE nickname='$username'")
-shelf_id=$(sqlite3 $final_path/app.db "SELECT id from shelf WHERE user_id='$user_id'")
+user_id=$(sqlite3 $install_dir/app.db "SELECT id from user WHERE name='$username'")
+shelf_id=$(sqlite3 $install_dir/app.db "SELECT id from shelf WHERE user_id='$user_id'")
+
+ynh_print_info --message="Suppression de l'utilisateur dans calibreweb"
 
 #Delete all entry with dependencies for user
 #pas de check sur l'existence de l'utilisateur car fonctionne sans

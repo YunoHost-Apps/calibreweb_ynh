@@ -1,0 +1,105 @@
+packaging_format = 2
+
+id = "calibreweb"
+name = "Calibre-web"
+description.en = "Browsing, reading and downloading eBooks using a Calibre database"
+description.fr = "Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre"
+
+version = "0.96.20~ynh2"
+
+maintainers = ["Krakinou"]
+
+[upstream]
+license = "GPL-3.0-only"
+admindoc = "https://github.com/janeczku/calibre-web/wiki"
+code = "https://github.com/janeczku/calibre-web"
+
+[integration]
+yunohost = ">= 4.3.0"
+architectures = "all"
+multi_instance = true
+ldap = true
+sso = true
+disk = "400M"
+ram.build = "200M"
+ram.runtime = "200M"
+
+[install]
+    [install.domain]
+    type = "domain"
+
+    [install.path]
+    type = "path"
+    default = "/calibre"
+
+    [install.admin]
+    type = "user"
+
+    [install.init_main_permission]
+    type = "group"
+    default = "all_users"
+
+    [install.language]
+    ask.en = "Select a default language"
+    ask.fr = "Choisissez une langue par défaut"
+    help.en = "You may change it later in the app"
+    help.fr = "Vous pourrez la changer ultérieurement dans l'application"
+    type = "select"
+    optional = true
+    choices = ["fr", "en", "es", "de"]
+    default = "fr"
+
+    [install.upload]
+    ask.en = "Do you want to allow uploading of books?"
+    ask.fr = "Voulez vous autoriser le téléversement de livres?"
+    help.en = "You may change it later in the app"
+    help.fr = "Vous pourrez le changer ultérieurement dans l'application"
+    type = "boolean"
+    optional = true
+    default = false
+
+    [install.public_library]
+    ask.en = "Do you want to allow access to the library to all Yunohost users? "
+    ask.fr = "Voulez vous autoriser l'accès à la bibliothèque à tous les utilisateurs Yunohost?"
+    help.en = "Yes will set the library in /home/yunohost.multimedia/share/eBook"
+    help.fr = "Oui parametrera la bibliothèque pour /home/yunohost.multimedia/share/eBook"
+    type = "boolean"
+    optional = true
+    default = true
+
+[resources]
+    [resources.sources]
+        [resources.sources.main]
+        url = "https://github.com/janeczku/calibre-web/releases/download/0.6.20/calibre-web-0.6.20.zip"
+        sha256 = "2f1f8a5ae06f182986193a90796fa96a7b0b5c61fdd29971969b49245b1aaf24"
+
+        autoupdate.strategy = "latest_github_release"
+        autoupdate.asset = "calibre-web-.*.zip"
+        
+        [resources.sources.kepubify]
+        arm64.url = "https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-arm64"
+        arm64.sha256="5a15b8f6f6a96216c69330601bca29638cfee50f7bf48712795cff88ae2d03a3"
+        armhf.url="https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-arm"
+        armhf.sha256="07f23275c4e674093443f01a591aa0980b0b87dbb0a10986d5001e9d56b0e1e7"
+        i386.url="https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-32bit"
+        i386.sha256="3365a848ce06d43fca8f1999eb69c6c8e0e20a56b6b8658a8466b9726adef0f5"
+        amd64.url="https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-64bit"
+        amd64.sha256="37d7628d26c5c906f607f24b36f781f306075e7073a6fe7820a751bb60431fc5"
+
+    [resources.system_user]
+
+    [resources.install_dir]
+
+    [resources.permissions]
+    main.url = "/"
+
+	kobo.url= "/kobo"
+	kobo.show_tile= false
+	kobo.allowed= "visitors"
+	
+    [resources.ports]
+    main.default = 8083
+    
+    [resources.apt]
+    packages = [ "sqlite3", "imagemagick", "libldap2-dev", "libsasl2-dev", "python3-venv", "python3-dev", "python3-lxml", "libjpeg-dev", "zlib1g-dev", "libffi-dev" ]
+    
