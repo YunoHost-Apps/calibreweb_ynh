@@ -5,7 +5,7 @@ name = "Calibre-web"
 description.en = "Browsing, reading and downloading eBooks using a Calibre database"
 description.fr = "Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre"
 
-version = "0.96.20~ynh2"
+version = "0.96.20~ynh3"
 
 maintainers = ["Krakinou"]
 
@@ -96,6 +96,10 @@ ram.runtime = "200M"
 	kobo.url= "/kobo"
 	kobo.show_tile= false
 	kobo.allowed= "visitors"
+	
+	opds.url="/opds"
+	opds.show_tile= false
+	opds.allowed= "visitors"
 	
     [resources.ports]
     main.default = 8083
