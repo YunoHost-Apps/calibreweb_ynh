@@ -73,8 +73,7 @@ ram.runtime = "200M"
         url = "https://github.com/janeczku/calibre-web/releases/download/0.6.20/calibre-web-0.6.20.zip"
         sha256 = "2f1f8a5ae06f182986193a90796fa96a7b0b5c61fdd29971969b49245b1aaf24"
 
-        autoupdate.strategy = "latest_github_release"
-        autoupdate.asset = "calibre-web-.*.zip"
+        autoupdate.strategy = "latest_github_tag"
         
         [resources.sources.kepubify]
         arm64.url = "https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-arm64"
