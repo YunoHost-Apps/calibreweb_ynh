@@ -28,7 +28,6 @@ Browsing, reading and downloading eBooks using a Calibre database
 
 * Official admin documentation: <https://github.com/janeczku/calibre-web/wiki>
 * Upstream app code repository: <https://github.com/janeczku/calibre-web>
-* YunoHost documentation for this app: <https://yunohost.org/app_calibreweb>
 * Report a bug: <https://github.com/YunoHost-Apps/calibreweb_ynh/issues>
 
 ## Developer info
