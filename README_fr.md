@@ -28,7 +28,7 @@ Explorer, lire et télécharger des eBooks à partir d'une base de données Cali
 
 * Documentation officielle de l’admin : <https://github.com/janeczku/calibre-web/wiki>
 * Dépôt de code officiel de l’app : <https://github.com/janeczku/calibre-web>
-* Documentation YunoHost pour cette app : <https://yunohost.org/app_calibreweb>
+* YunoHost Store: <https://apps.yunohost.org/app/calibreweb>
 * Signaler un bug : <https://github.com/YunoHost-Apps/calibreweb_ynh/issues>
 
 ## Informations pour les développeurs
