@@ -15,7 +15,7 @@ admindoc = "https://github.com/janeczku/calibre-web/wiki"
 code = "https://github.com/janeczku/calibre-web"
 
 [integration]
-yunohost = ">= 4.3.0"
+yunohost = ">= 11.2"
 architectures = "all"
 multi_instance = true
 ldap = true
@@ -75,6 +75,7 @@ ram.runtime = "200M"
 
         autoupdate.strategy = "latest_github_release"
         autoupdate.asset = ".*.zip"
+
         
         [resources.sources.kepubify]
         arm64.url = "https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-arm64"
