@@ -5,7 +5,7 @@ name = "Calibre-web"
 description.en = "Browsing, reading and downloading eBooks using a Calibre database"
 description.fr = "Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre"
 
-version = "0.96.20~ynh3"
+version = "0.96.21~ynh1"
 
 maintainers = ["Krakinou"]
 
@@ -70,11 +70,11 @@ ram.runtime = "200M"
 [resources]
     [resources.sources]
         [resources.sources.main]
-        url = "https://github.com/janeczku/calibre-web/releases/download/0.6.20/calibre-web-0.6.20.zip"
-        sha256 = "2f1f8a5ae06f182986193a90796fa96a7b0b5c61fdd29971969b49245b1aaf24"
+        url = "https://github.com/janeczku/calibre-web/archive/refs/tags/0.6.21.zip"
+        sha256 = "570afeb74ec6506380e923244088c656921ffc94a616c9da46d68f5f39237fa4"
 
         autoupdate.strategy = "latest_github_release"
-        autoupdate.asset = "calibre-web-.*.zip"
+        autoupdate.asset = ".*.zip"
         
         [resources.sources.kepubify]
         arm64.url = "https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-arm64"
