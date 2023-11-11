@@ -1,6 +1,6 @@
---- a/cps/config_sql.py	2022-11-10 20:01:25.834187046 +0100
-+++ b/cps/config_sql.py	2022-11-09 23:48:08.351335088 +0100
-@@ -62,7 +62,7 @@
+--- a/cps/config_sql.py	2023-10-21 12:40:32.000000000 +0200
++++ b/cps/config_sql.py	2023-11-09 23:14:23.774051473 +0100
+@@ -67,7 +67,7 @@
      mail_server_type = Column(SmallInteger, default=0)
      mail_gmail_token = Column(JSON, default={})
  
@@ -9,13 +9,13 @@
      config_calibre_uuid = Column(String)
      config_port = Column(Integer, default=constants.DEFAULT_PORT)
      config_external_port = Column(Integer, default=constants.DEFAULT_PORT)
-@@ -79,11 +79,11 @@
+@@ -83,11 +83,11 @@
      config_theme = Column(Integer, default=0)
  
      config_log_level = Column(SmallInteger, default=logger.DEFAULT_LOG_LEVEL)
--    config_logfile = Column(String)
+-    config_logfile = Column(String, default=logger.DEFAULT_LOG_FILE)
 -    config_access_log = Column(SmallInteger, default=0)
--    config_access_logfile = Column(String)
+-    config_access_logfile = Column(String, default=logger.DEFAULT_ACCESS_LOG)
 +    config_logfile = Column(String, default='__LOG_FILE__')
 +    config_access_log = Column(SmallInteger, default=1)
 +    config_access_logfile = Column(String, default='__ACCESS_LOG_FILE__')
@@ -25,8 +25,8 @@
      config_anonbrowse = Column(SmallInteger, default=0)
      config_public_reg = Column(SmallInteger, default=0)
      config_remote_login = Column(Boolean, default=False)
-@@ -109,11 +109,11 @@
-     config_goodreads_api_key = Column(String)
+@@ -114,11 +114,11 @@
+     config_goodreads_api_secret_e = Column(String)
      config_goodreads_api_secret = Column(String)
      config_register_email = Column(Boolean, default=False)
 -    config_login_type = Column(Integer, default=0)
@@ -39,7 +39,7 @@
      config_ldap_port = Column(SmallInteger, default=389)
      config_ldap_authentication = Column(SmallInteger, default=constants.LDAP_AUTH_SIMPLE)
      config_ldap_serv_username = Column(String, default='cn=admin,dc=example,dc=org')
-@@ -122,15 +122,15 @@
+@@ -128,15 +128,15 @@
      config_ldap_cacert_path = Column(String, default="")
      config_ldap_cert_path = Column(String, default="")
      config_ldap_key_path = Column(String, default="")
