@@ -1,5 +1,5 @@
---- ./config_sql.py	2023-10-21 12:40:32.000000000 +0200
-+++ ./config_sql.py.new	2023-11-09 23:14:23.774051473 +0100
+--- a/cps/config_sql.py	2023-10-21 12:40:32.000000000 +0200
++++ b/cps/config_sql.py	2023-11-09 23:14:23.774051473 +0100
 @@ -67,7 +67,7 @@
      mail_server_type = Column(SmallInteger, default=0)
      mail_gmail_token = Column(JSON, default={})
