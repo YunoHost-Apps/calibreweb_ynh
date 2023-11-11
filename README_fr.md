@@ -18,7 +18,7 @@ Si vous n’avez pas YunoHost, regardez [ici](https://yunohost.org/#/install) po
 
 Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre
 
-**Version incluse :** 0.96.20~ynh3
+**Version incluse :** 0.96.21~ynh1
 
 ## Captures d’écran
 
@@ -28,6 +28,7 @@ Explorer, lire et télécharger des eBooks à partir d'une base de données Cali
 
 * Documentation officielle de l’admin : <https://github.com/janeczku/calibre-web/wiki>
 * Dépôt de code officiel de l’app : <https://github.com/janeczku/calibre-web>
+* YunoHost Store: <https://apps.yunohost.org/app/calibreweb>
 * Signaler un bug : <https://github.com/YunoHost-Apps/calibreweb_ynh/issues>
 
 ## Informations pour les développeurs
