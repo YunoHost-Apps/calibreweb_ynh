@@ -97,27 +97,24 @@ ram.runtime = "200M"
     [resources.permissions]
     main.url = "/"
 
-	kobo.url= "/kobo"
-	kobo.show_tile= false
-	kobo.allowed= "visitors"
+    kobo.url= "/kobo"
+    kobo.show_tile= false
+    kobo.allowed= "visitors"
 
-	opds.url="/opds"
-	opds.show_tile= false
-	opds.allowed= "visitors"
+    opds.url="/opds"
+    opds.show_tile= false
+    opds.allowed= "visitors"
 
     [resources.ports]
     main.default = 8083
 
     [resources.apt]
-    #sqlite3      is required to tweak the database in the scripts
-    #imagemagick  is required for cover extraction from EPUBs
-    #python3-venv is required for installing a venv environnement in the scripts
-    #python3-dev  is required for compiling the ldap dependency during pip install
-    #libldap2-dev is required for compiling the ldap dependency during pip install
-    #libsasl2-dev is required for compiling the ldap dependency during pip install
-    #libjpeg-dev  is required for comics and image reading in browser
-    packages = [ "sqlite3", "imagemagick",  "python3-venv", "python3-dev", "libldap2-dev", "libsasl2-dev", "libjpeg-dev" ]
-    #for reference, dependencies that have been removed in 0.96.21~ynh1:
-    #python3-lxml : not required in packages as already part of yunohost dependencies
-    #zlib1g-dev   : is part of python3-dev dependencies : not required anymore
-    #libffi-dev   : usage unknown
+    packages = [
+        "sqlite3",      # to tweak the database in the scripts
+        "imagemagick",  # for cover extraction from EPUBs
+        "python3-venv", # for installing a venv environnement in the scripts
+        "python3-dev",  # for compiling the ldap dependency during pip install
+        "libldap2-dev", # for compiling the ldap dependency during pip install
+        "libsasl2-dev", # for compiling the ldap dependency during pip install
+        "libjpeg-dev"   # for comics and image reading in browser
+    ]
