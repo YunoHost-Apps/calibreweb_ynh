@@ -72,8 +72,7 @@ ram.runtime = "200M"
         [resources.sources.main]
         url = "https://github.com/janeczku/calibre-web/archive/refs/tags/0.6.21.zip"
         sha256 = "570afeb74ec6506380e923244088c656921ffc94a616c9da46d68f5f39237fa4"
-
-
+	autoupdate.strategy = "latest_github_release"
         
         [resources.sources.kepubify]
         arm64.url = "https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-arm64"
@@ -84,6 +83,8 @@ ram.runtime = "200M"
         i386.sha256="3365a848ce06d43fca8f1999eb69c6c8e0e20a56b6b8658a8466b9726adef0f5"
         amd64.url="https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-64bit"
         amd64.sha256="37d7628d26c5c906f607f24b36f781f306075e7073a6fe7820a751bb60431fc5"
+	autoupdate.upstream = "https://github.com/pgaskin/kepubify"
+ 	autoupdate.strategy = "latest_github_release"
 
     [resources.system_user]
 
