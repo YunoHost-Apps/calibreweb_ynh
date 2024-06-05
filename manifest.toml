@@ -68,23 +68,27 @@ ram.runtime = "200M"
     default = true
 
 [resources]
-    [resources.sources]
-        [resources.sources.main]
-        url = "https://github.com/janeczku/calibre-web/archive/refs/tags/0.6.21.zip"
-        sha256 = "570afeb74ec6506380e923244088c656921ffc94a616c9da46d68f5f39237fa4"
-	autoupdate.strategy = "latest_github_release"
-        
-        [resources.sources.kepubify]
-        arm64.url = "https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-arm64"
-        arm64.sha256="5a15b8f6f6a96216c69330601bca29638cfee50f7bf48712795cff88ae2d03a3"
-        armhf.url="https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-arm"
-        armhf.sha256="07f23275c4e674093443f01a591aa0980b0b87dbb0a10986d5001e9d56b0e1e7"
-        i386.url="https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-32bit"
-        i386.sha256="3365a848ce06d43fca8f1999eb69c6c8e0e20a56b6b8658a8466b9726adef0f5"
-        amd64.url="https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-64bit"
-        amd64.sha256="37d7628d26c5c906f607f24b36f781f306075e7073a6fe7820a751bb60431fc5"
-	autoupdate.upstream = "https://github.com/pgaskin/kepubify"
- 	autoupdate.strategy = "latest_github_release"
+    [resources.sources.main]
+    url = "https://github.com/janeczku/calibre-web/archive/refs/tags/0.6.21.zip"
+    sha256 = "570afeb74ec6506380e923244088c656921ffc94a616c9da46d68f5f39237fa4"
+
+    autoupdate.strategy = "latest_github_release"
+
+    [resources.sources.kepubify]
+    arm64.url = "https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-arm64"
+    arm64.sha256="5a15b8f6f6a96216c69330601bca29638cfee50f7bf48712795cff88ae2d03a3"
+
+    armhf.url="https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-arm"
+    armhf.sha256="07f23275c4e674093443f01a591aa0980b0b87dbb0a10986d5001e9d56b0e1e7"
+
+    i386.url="https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-32bit"
+    i386.sha256="3365a848ce06d43fca8f1999eb69c6c8e0e20a56b6b8658a8466b9726adef0f5"
+
+    amd64.url="https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-64bit"
+    amd64.sha256="37d7628d26c5c906f607f24b36f781f306075e7073a6fe7820a751bb60431fc5"
+
+    autoupdate.upstream = "https://github.com/pgaskin/kepubify"
+    autoupdate.strategy = "latest_github_release"
 
     [resources.system_user]
 
@@ -96,14 +100,14 @@ ram.runtime = "200M"
 	kobo.url= "/kobo"
 	kobo.show_tile= false
 	kobo.allowed= "visitors"
-	
+
 	opds.url="/opds"
 	opds.show_tile= false
 	opds.allowed= "visitors"
-	
+
     [resources.ports]
     main.default = 8083
-    
+
     [resources.apt]
     #sqlite3      is required to tweak the database in the scripts
     #imagemagick  is required for cover extraction from EPUBs
@@ -112,7 +116,7 @@ ram.runtime = "200M"
     #libldap2-dev is required for compiling the ldap dependency during pip install
     #libsasl2-dev is required for compiling the ldap dependency during pip install
     #libjpeg-dev  is required for comics and image reading in browser
-    packages = [ "sqlite3", "imagemagick",  "python3-venv", "python3-dev", "libldap2-dev", "libsasl2-dev", "libjpeg-dev" ] 
+    packages = [ "sqlite3", "imagemagick",  "python3-venv", "python3-dev", "libldap2-dev", "libsasl2-dev", "libjpeg-dev" ]
     #for reference, dependencies that have been removed in 0.96.21~ynh1:
     #python3-lxml : not required in packages as already part of yunohost dependencies
     #zlib1g-dev   : is part of python3-dev dependencies : not required anymore
