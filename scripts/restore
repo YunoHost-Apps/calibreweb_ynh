@@ -34,7 +34,7 @@ ynh_restore_file --origin_path="/opt/kepubify/$app"
 #=================================================
 # RESTORE USER RIGHTS
 #=================================================
-chown -R $app: $install_dir
+chown -R "$app:" "$install_dir"
 chmod 740 $install_dir
 
 #Use venv to install pip requirements - Inspired from https://github.com/YunoHost-Apps/pyinventory_ynh/blob/master/scripts/install
@@ -45,21 +45,14 @@ if [ -d "${install_dir}/venv" ] ; then
 	ynh_secure_remove "${install_dir}/venv"
 fi
 
+pushd "$install_dir"
 # Skip pip because of: https://github.com/YunoHost/issues/issues/1960
-python3 -m venv --without-pip "${install_dir}/venv"
-chown -R "$app:" "$install_dir"
-
-#run source in a 'sub shell'
-(
-	cd "$install_dir"
-	set +o nounset
-	source "venv/bin/activate"
-	set -o nounset
-	ynh_exec_as $app venv/bin/python3 -m ensurepip
-	ynh_exec_as $app venv/bin/pip3 install --upgrade wheel pip setuptools
-	ynh_exec_as $app venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/requirements.txt"
-	ynh_exec_as $app venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/optional-requirements.txt"
-)
+ynh_exec_as "$app" python3 -m venv --without-pip "$install_dir/venv"
+ynh_exec_as "$app" venv/bin/python3 -m ensurepip
+ynh_exec_as "$app" venv/bin/pip3 install --upgrade wheel pip setuptools
+ynh_exec_as "$app" venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/requirements.txt"
+ynh_exec_as "$app" venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/optional-requirements.txt"
+popd
 
 #=================================================
 # RESTORE SYSTEMD
