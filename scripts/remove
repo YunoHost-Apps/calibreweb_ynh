@@ -91,7 +91,6 @@ if [ -z /etc/ImageMagick-6/policy.xml ]; then
 			--target_file="/etc/ImageMagick-6/policy.xml"
 fi
 
-# Remove the log files
 ynh_script_progression --message="Removing log file..." --weight=1
 ynh_secure_remove "$log_file"
 ynh_secure_remove "$access_log_file"
