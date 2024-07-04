@@ -5,7 +5,7 @@ EZ editatu eskuz.
 
 # Calibre-web YunoHost-erako
 
-[![Integrazio maila](https://dash.yunohost.org/integration/calibreweb.svg)](https://dash.yunohost.org/appci/app/calibreweb) ![Funtzionamendu egoera](https://ci-apps.yunohost.org/ci/badges/calibreweb.status.svg) ![Mantentze egoera](https://ci-apps.yunohost.org/ci/badges/calibreweb.maintain.svg)
+[![Integrazio maila](https://dash.yunohost.org/integration/calibreweb.svg)](https://ci-apps.yunohost.org/ci/apps/calibreweb/) ![Funtzionamendu egoera](https://ci-apps.yunohost.org/ci/badges/calibreweb.status.svg) ![Mantentze egoera](https://ci-apps.yunohost.org/ci/badges/calibreweb.maintain.svg)
 
 [![Instalatu Calibre-web YunoHost-ekin](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=calibreweb)
 
