@@ -5,7 +5,7 @@
 
 # YunoHost 上的 Calibre-web
 
-[![集成程度](https://dash.yunohost.org/integration/calibreweb.svg)](https://dash.yunohost.org/appci/app/calibreweb) ![工作状态](https://ci-apps.yunohost.org/ci/badges/calibreweb.status.svg) ![维护状态](https://ci-apps.yunohost.org/ci/badges/calibreweb.maintain.svg)
+[![集成程度](https://dash.yunohost.org/integration/calibreweb.svg)](https://ci-apps.yunohost.org/ci/apps/calibreweb/) ![工作状态](https://ci-apps.yunohost.org/ci/badges/calibreweb.status.svg) ![维护状态](https://ci-apps.yunohost.org/ci/badges/calibreweb.maintain.svg)
 
 [![使用 YunoHost 安装 Calibre-web](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=calibreweb)
 
