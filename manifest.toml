@@ -93,7 +93,7 @@ ram.runtime = "200M"
     autoupdate.strategy = "latest_github_release"
     autoupdate.asset.amd64 = "kepubify-linux-64bit"
     autoupdate.asset.i386 = "kepubify-linux-32bit"
-    autoupdate.asset.armhf = "kepubify-linux-arm"
+    autoupdate.asset.armhf = "kepubify-linux-arm$"
     autoupdate.asset.arm64 = "kepubify-linux-arm64"
 
     [resources.system_user]
