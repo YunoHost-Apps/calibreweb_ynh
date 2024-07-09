@@ -18,7 +18,7 @@
 
 Browsing, reading and downloading eBooks using a Calibre database
 
-**分发版本：** 0.96.21~ynh2
+**分发版本：** 0.96.22~ynh1
 
 ## 截图
 
