@@ -12,7 +12,7 @@ source /usr/share/yunohost/helpers
 
 admin_mail=$(ynh_user_get_info --username="$admin" --key=mail)
 
-if  [ $public_library -eq 1 ]; then 
+if  [ $public_library -eq 1 ]; then
 	calibre_dir=$DOSSIER_MEDIA/share/eBook
 else # library is private
 	calibre_dir=$DOSSIER_MEDIA/$admin/eBook
@@ -26,7 +26,6 @@ fi
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_script_progression --message="Installing and patching sources to $install_dir..." --weight=10
-#REMOVEME? ynh_app_setting_set $app install_dir $install_dir
 
 #Set settings constant initializer of the app
 ynh_add_config --template="../sources/patches/main-config_sql.py.patch.src" --destination="../sources/patches/main-config_sql.py.patch"
@@ -176,7 +175,7 @@ ynh_add_fail2ban_config --logpath="$log_file" --failregex="^.*LDAP Login failed 
 ynh_script_progression --message="Start $app..." --weight=5
 ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" -t 30
 
-#Setting the proxy authentication in case calibre is not open to visitor. 
+#Setting the proxy authentication in case calibre is not open to visitor.
 #https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#login-via-header-from-upstream-authentication-source
 #We need to update the sso login parameter, but for that the app needs to have run at least once to initialize the tables.
 if ! $(ynh_permission_has_user --permission=main --user=visitors); then
