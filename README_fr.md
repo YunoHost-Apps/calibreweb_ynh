@@ -18,7 +18,7 @@ Il NE doit PAS être modifié à la main.
 
 Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre
 
-**Version incluse :** 0.96.21~ynh2
+**Version incluse :** 0.96.22~ynh1
 
 ## Captures d’écran
 

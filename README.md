@@ -18,7 +18,7 @@ It shall NOT be edited by hand.
 
 Browsing, reading and downloading eBooks using a Calibre database
 
-**Shipped version:** 0.96.21~ynh2
+**Shipped version:** 0.96.22~ynh1
 
 ## Screenshots
 
