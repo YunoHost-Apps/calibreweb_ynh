@@ -5,7 +5,7 @@ Il NE doit PAS être modifié à la main.
 
 # Calibre-web pour YunoHost
 
-[![Niveau d’intégration](https://dash.yunohost.org/integration/calibreweb.svg)](https://dash.yunohost.org/appci/app/calibreweb) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/calibreweb.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/calibreweb.maintain.svg)
+[![Niveau d’intégration](https://dash.yunohost.org/integration/calibreweb.svg)](https://ci-apps.yunohost.org/ci/apps/calibreweb/) ![Statut du fonctionnement](https://ci-apps.yunohost.org/ci/badges/calibreweb.status.svg) ![Statut de maintenance](https://ci-apps.yunohost.org/ci/badges/calibreweb.maintain.svg)
 
 [![Installer Calibre-web avec YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=calibreweb)
 
@@ -18,7 +18,7 @@ Il NE doit PAS être modifié à la main.
 
 Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre
 
-**Version incluse :** 0.96.21~ynh2
+**Version incluse :** 0.96.22~ynh1
 
 ## Captures d’écran
 

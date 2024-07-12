@@ -5,7 +5,7 @@ It shall NOT be edited by hand.
 
 # Calibre-web for YunoHost
 
-[![Integration level](https://dash.yunohost.org/integration/calibreweb.svg)](https://dash.yunohost.org/appci/app/calibreweb) ![Working status](https://ci-apps.yunohost.org/ci/badges/calibreweb.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/calibreweb.maintain.svg)
+[![Integration level](https://dash.yunohost.org/integration/calibreweb.svg)](https://ci-apps.yunohost.org/ci/apps/calibreweb/) ![Working status](https://ci-apps.yunohost.org/ci/badges/calibreweb.status.svg) ![Maintenance status](https://ci-apps.yunohost.org/ci/badges/calibreweb.maintain.svg)
 
 [![Install Calibre-web with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=calibreweb)
 
@@ -18,7 +18,7 @@ It shall NOT be edited by hand.
 
 Browsing, reading and downloading eBooks using a Calibre database
 
-**Shipped version:** 0.96.21~ynh2
+**Shipped version:** 0.96.22~ynh1
 
 ## Screenshots
 
