@@ -1,11 +1,5 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC START
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 source _common.sh
 source /usr/share/yunohost/helpers
 
@@ -14,9 +8,9 @@ source /usr/share/yunohost/helpers
 #=================================================
 
 # Remove the service from the list of services known by Yunohost (added from `yunohost service add`)
-if ynh_exec_warn_less yunohost service status $app >/dev/null
+if ynh_hide_warnings yunohost service status $app >/dev/null
 then
-	ynh_script_progression --message="Removing $app service..." --weight=1
+	ynh_script_progression "Removing $app service..."
 	yunohost service remove $app
 fi
 
@@ -27,9 +21,8 @@ fi
 #=================================================
 
 # Remove the dedicated systemd config
-ynh_script_progression --message="Stopping and removing the systemd service..." --weight=2
-ynh_remove_systemd_config
-
+ynh_script_progression "Stopping and removing the systemd service..."
+ynh_config_remove_systemd
 
 #=================================================
 # REMOVE DATA DIR
@@ -38,8 +31,8 @@ ynh_remove_systemd_config
 # Remove the data directory if --purge option is used
 if [ "${YNH_APP_PURGE:-0}" -eq 1 ]
 then
-	ynh_script_progression --message="Removing app data directory..." --weight=1
-	ynh_secure_remove --file="$calibre_dir"
+	ynh_script_progression "Removing app data directory..."
+	ynh_safe_rm "$calibre_dir"
 fi
 
 #=================================================
@@ -47,32 +40,32 @@ fi
 #=================================================
 
 # Remove the data directory if --purge option is used
-ynh_script_progression --message="Removing kepubify directory..." --weight=1
-ynh_secure_remove --file="/opt/kepubify/$app"
+ynh_script_progression "Removing kepubify directory..."
+ynh_safe_rm "/opt/kepubify/$app"
 
 #=================================================
 # REMOVE NGINX CONFIGURATION
 #=================================================
 
 # Remove the dedicated nginx config
-ynh_script_progression --message="Removing nginx web server configuration..." --weight=1
-ynh_remove_nginx_config
+ynh_script_progression "Removing nginx web server configuration..."
+ynh_config_remove_nginx
 
 #=================================================
 # REMOVE LOGROTATE CONFIGURATION
 #=================================================
 
 # Remove the app-specific logrotate config
-ynh_script_progression --message="Removing logrotate configuration..." --weight=1
-ynh_remove_logrotate
+ynh_script_progression "Removing logrotate configuration..."
+ynh_config_remove_logrotate
 
 #=================================================
 # REMOVE FAIL2BAN CONFIGURATION
 #=================================================
-ynh_script_progression --message="Removing Fail2Ban configuration..." --weight=8
+ynh_script_progression "Removing Fail2Ban configuration..."
 
 # Remove the dedicated Fail2Ban config
-ynh_remove_fail2ban_config
+ynh_config_remove_fail2ban
 
 #=================================================
 # CLOSE A PORT
@@ -80,25 +73,26 @@ ynh_remove_fail2ban_config
 
 if yunohost firewall list | grep -q "\- $port$"
 then
-	ynh_script_progression --message="Closing port $port..." --weight=10
+	ynh_script_progression "Closing port $port..."
 	yunohost firewall disallow TCP $port 2>&1
 fi
 
 #Restore Imagick policy
 if [ -z /etc/ImageMagick-6/policy.xml ]; then
-	ynh_replace_string --match_string="<policy domain="coder" rights="read" pattern="PDF" />" \
-			--replace_string="<policy domain="coder" rights="none" pattern="PDF" />" \
-			--target_file="/etc/ImageMagick-6/policy.xml"
+	ynh_replace --match="<policy domain="coder" rights="read" pattern="PDF" />" \
+			--replace="<policy domain="coder" rights="none" pattern="PDF" />" \
+			--file="/etc/ImageMagick-6/policy.xml"
 fi
 
-ynh_script_progression --message="Removing log file..." --weight=1
-ynh_secure_remove "$log_file"
-ynh_secure_remove "$access_log_file"
+ynh_script_progression "Removing log file..."
+ynh_safe_rm "$log_file"
+ynh_safe_rm "$access_log_file"
 
 #=================================================
 # MESSAGE TO USER
 #=================================================
-ynh_script_progression --message="Removal of $app completed" --last
+ynh_script_progression "Removal of $app completed"
+
 # Remove the data directory if --purge option is used
 if [ "${YNH_APP_PURGE:-0}" -eq 0 ]
 then

@@ -1,11 +1,5 @@
 #!/bin/bash
 
-
-#=================================================
-# GENERIC START
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
 source _common.sh
 source /usr/share/yunohost/helpers
 
@@ -21,12 +15,6 @@ ynh_app_setting_set $app upload $upload
 
 language=$(sqlite3 $install_dir/app.db "SELECT config_default_locale FROM settings WHERE ID=1")
 ynh_app_setting_set $app language $language
-
-#=================================================
-# CHECK VERSION
-#=================================================
-
-upgrade_type=$(ynh_check_app_version_changed)
 
 if [ -f /etc/yunohost/apps/$app/manifest.toml ]; then
 	current_upstream_package_version=$(ynh_app_upstream_version --manifest="/etc/yunohost/apps/$app/manifest.toml") #0.96.0
@@ -48,34 +36,34 @@ current_upstream_app_version=$(cat $install_dir/cps/constants.py | grep STABLE_V
 current_upstream_app_version="${current_upstream_app_version/STABLE_VERSION = \{\'version\': \'/""}"
 current_upstream_app_version="${current_upstream_app_version/\'\}/""}"
 
-
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
 ynh_clean_check_starting
 
 #Stop the app in case database is updated
-ynh_script_progression --message="Stopping a systemd service..." --weight=2
+ynh_script_progression "Stopping $app's systemd service..."
 
-ynh_systemd_action --service_name=$app --action="stop"
+ynh_systemctl --service=$app --action="stop"
 
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
-ynh_script_progression --message="Downward Compatibility checks..." --weight=1
+ynh_script_progression "Downward Compatibility checks..."
 #Close unwanted open port in firewall
 if yunohost firewall list | grep -q "\- $port$"
 then
-	ynh_script_progression --message="Closing port $port as it shouldn't be open..."
+	ynh_script_progression "Closing port $port as it shouldn't be open..."
 	yunohost firewall disallow TCP $port 2>&1
 fi
 
-#LDAP settings were wrongly set in version prior to 0.6.13 and we could not retrieve LDAP users. This will change the settings to correct values 
+#LDAP settings were wrongly set in version prior to 0.6.13 and we could not retrieve LDAP users. This will change the settings to correct values
+
 if sqlite3 $install_dir/app.db "SELECT config_ldap_group_object_filter FROM settings" \
-	| grep -xq "(&(objectClass=posixGroup)(permission=cn=%s.main,ou=permission,dc=yunohost,dc=org))" ; then 
+	| grep -xq "(&(objectClass=posixGroup)(permission=cn=%s.main,ou=permission,dc=yunohost,dc=org))" ; then
+
 	eval sqlite3 $install_dir/app.db "\"UPDATE settings SET config_ldap_group_object_filter='(&(objectClass=posixGroup)(cn=%s.main))' WHERE ID=1\""
 fi
-
 
 #Adding kepubify converter
 if [ -z $(sqlite3 $install_dir/app.db "SELECT config_kepubifypath FROM settings") ]; then
@@ -95,133 +83,122 @@ if sqlite3 $install_dir/app.db "SELECT config_kepubifypath FROM settings" | grep
 fi
 
 #=================================================
-# STANDARD UPGRADE STEPS
-#=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-if [ "$upgrade_type" == "UPGRADE_APP" ]
+# FIXME: this is still supported but the recommendation is now to *always* re-setup the app sources wether or not the upstream sources changed
+if ynh_app_upstream_version_changed
 then
-	ynh_script_progression --message="Upgrading source files from $current_upstream_app_version to $new_upstream_package_version..." --weight=10
+	ynh_script_progression "Upgrading source files from $current_upstream_app_version to $new_upstream_package_version..."
 
 	#Set settings constant initializer of the app
-	ynh_add_config --template="../sources/patches/main-config_sql.py.patch.src" --destination="../sources/patches/main-config_sql.py.patch"
-	ynh_add_config --template="../sources/patches/main-ub.py.patch.src" --destination="../sources/patches/main-ub.py.patch"
-	ynh_add_config --template="../sources/patches/main-constants.py.patch.src" --destination="../sources/patches/main-constants.py.patch"
-	
+	ynh_config_add --template="../patches/main-config_sql.py.patch.src" --destination="../patches/main-config_sql.py.patch"
+	ynh_config_add --template="../patches/main-ub.py.patch.src" --destination="../patches/main-ub.py.patch"
+	ynh_config_add --template="../patches/main-constants.py.patch.src" --destination="../patches/main-constants.py.patch"
+
 	# Download, check integrity, uncompress and patch the source from app.src
 	ynh_setup_source --dest_dir="$install_dir"
-	chown -R $app: $install_dir
-	
+	#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R $app: $install_dir
 	# Remove the patch for web.py in case visitor are allowed
 	if $(ynh_permission_has_user --permission=main --user=visitors); then
 		patch -u /$install_dir/cps/web.py -i ../conf/web.py.revert.patch
 	fi
-	
+
 fi
 
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
 
-ynh_script_progression --message="Upgrading nginx web server configuration..." --weight=5
+ynh_script_progression "Upgrading nginx web server configuration..."
 #Cannot use empty string for X-script-name, causes an issue in the python prg
 #https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#nginx
 if [ $path = "/" ] ; then
-	ynh_replace_string "        proxy_set_header	X-Script-Name" "#       proxy_set_header	X-Script-Name" ../conf/nginx.conf
+	# FIXMEhelpers2.1: ynh_replace used with positional args. Please add the keywords: --match=, --replace=, --file=
+ynh_replace "        proxy_set_header	X-Script-Name" "#       proxy_set_header	X-Script-Name" ../conf/nginx.conf
 fi
 
-#Setting the proxy authentication in case calibre is not open to visitor. 
+#Setting the proxy authentication in case calibre is not open to visitor.
+
 #https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#login-via-header-from-upstream-authentication-source
 if $(ynh_permission_has_user --permission=main --user=visitors); then
 	sqlite3 $install_dir/app.db "UPDATE settings SET config_reverse_proxy_login_header_name='', config_allow_reverse_proxy_header_login=0 WHERE ID=1;"
-	ynh_replace_string --match_string="        proxy_set_header	X-Remote-User" \
-	                   --replace_string="#       proxy_set_header	X-Remote-User" \
-	                   --target_file="../conf/nginx.conf"
+	ynh_replace --match="        proxy_set_header	X-Remote-User" \
+	                   --replace="#       proxy_set_header	X-Remote-User" \
+	                   --file="../conf/nginx.conf"
 else
 	sqlite3 $install_dir/app.db "UPDATE settings SET config_reverse_proxy_login_header_name='X-Remote-User', config_allow_reverse_proxy_header_login=1 WHERE ID=1;"
 fi
 
 # Create a dedicated nginx config
-ynh_add_nginx_config
-
-
+ynh_config_add_nginx
 
 #=================================================
 # UPGRADE DEPENDENCIES
 #=================================================
 
-if [ "$upgrade_type" == "UPGRADE_APP" ]
+# FIXME: this is still supported but the recommendation is now to *always* re-setup the app sources wether or not the upstream sources changed
+if ynh_app_upstream_version_changed
 then
 	#Use venv to install pip requirements - Inspired from https://github.com/YunoHost-Apps/pyinventory_ynh/blob/master/scripts/install
-	ynh_script_progression --message="Installing pip requirements..." --weight=70
+	ynh_script_progression "Installing pip requirements..."
 	# Always recreate everything fresh with current python version
 	if [ -d "${install_dir}/venv" ] ; then
-		ynh_secure_remove "${install_dir}/venv"
+		ynh_safe_rm "${install_dir}/venv"
 	fi
-
 
 	# Skip pip because of: https://github.com/YunoHost/issues/issues/1960
 	python3 -m venv --without-pip "${install_dir}/venv"
-	chown -R "$app:" "$install_dir"
-
+	#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R "$app:" "$install_dir"
 	#run source in a 'sub shell'
 	(
 		set +o nounset
 		source "${install_dir}/venv/bin/activate"
 		set -o nounset
-		ynh_exec_as $app $install_dir/venv/bin/python3 -m ensurepip
-		ynh_exec_as $app $install_dir/venv/bin/pip3 install --upgrade wheel pip setuptools
-		ynh_exec_as $app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/requirements.txt"
-		ynh_exec_as $app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/optional-requirements.txt"
+		ynh_exec_as_app $install_dir/venv/bin/python3 -m ensurepip
+		ynh_exec_as_app $install_dir/venv/bin/pip3 install --upgrade wheel pip setuptools
+		ynh_exec_as_app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/requirements.txt"
+		ynh_exec_as_app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/optional-requirements.txt"
 	)
 fi
 
-
-#=================================================
-# SPECIFIC UPGRADE
 #=================================================
 #build multimedia directory
 #=================================================
-ynh_script_progression --message="Create Multimedia dir..." --weight=1
+ynh_script_progression "Create Multimedia dir..."
 #Create multimedia directory but we do not change the calibre_dir : It's the user to make this choice.
 ynh_multimedia_build_main_dir
 ynh_multimedia_addaccess $app
 
 #Update Imagick policy as per https://github.com/janeczku/calibre-web/wiki/FAQ#what-to-do-if-cover-pictures-are-not-extracted-from-pdf-files
-ynh_script_progression --message="Update Imagick policy..." --weight=1
+ynh_script_progression "Update Imagick policy..."
 
-ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern="PDF" />" \
-		--replace_string="<policy domain="coder" rights="read" pattern="PDF" />" \
-		--target_file="/etc/ImageMagick-6/policy.xml"
-
+ynh_replace --match="<policy domain="coder" rights="none" pattern="PDF" />" \
+		--replace="<policy domain="coder" rights="read" pattern="PDF" />" \
+		--file="/etc/ImageMagick-6/policy.xml"
 
 #=================================================
 # SETUP LOGROTATE
 #=================================================
 
 # Use logrotate to manage app-specific logfile(s)
-ynh_script_progression --message="Upgrading logrotate configuration..." --weight=1
-ynh_use_logrotate --logfile="$log_file" --nonappend
-ynh_use_logrotate --logfile="$access_log_file" --nonappend
-
-
+ynh_script_progression "Upgrading logrotate configuration..."
+ynh_config_add_logrotate "$log_file"
+ynh_config_add_logrotate "$access_log_file"
 
 #=================================================
 # SETUP SYSTEMD
 #=================================================
 
 # Create a dedicated systemd config
-ynh_script_progression --message="Upgrading systemd configuration..." --weight=1
-ynh_add_systemd_config
+ynh_script_progression "Upgrading systemd configuration..."
+ynh_config_add_systemd
 
-#=================================================
-# GENERIC FINALIZATION
 #=================================================
 # SECURE FILES AND DIRECTORIES
 #=================================================
 
 # Set permissions on app files
-chown -R $app: $install_dir
+#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R $app: $install_dir
 chown -R $app: /opt/kepubify/$app
 
 #=================================================
@@ -233,8 +210,7 @@ yunohost service add $app --description="Browse eBook in the web" --log="$log_fi
 #=================================================
 # SETUP FAIL2BAN
 #=================================================
-ynh_script_progression --message="Configuring Fail2Ban..." --weight=8
-
+ynh_script_progression "Configuring Fail2Ban..."
 
 # Make sure a log file exists (mostly for CI tests)
 if [ ! -f "$log_file" ]; then
@@ -243,17 +219,17 @@ if [ ! -f "$log_file" ]; then
 fi
 
 # Create a dedicated Fail2Ban config
-ynh_add_fail2ban_config --logpath="$log_file" --failregex="^.*LDAP Login failed for user .* IP-address: <HOST>.*$" --max_retry=5
+ynh_config_add_fail2ban --logpath="$log_file" --failregex="^.*LDAP Login failed for user .* IP-address: <HOST>.*$"
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..." --weight=2
+ynh_script_progression "Starting $app's systemd service..."
 
-ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" -t 30
+ynh_systemctl --service=$app --action="start" --wait_until="Starting Gevent server on" -t 30
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Upgrade of $app completed" --last
+ynh_script_progression "Upgrade of $app completed"
