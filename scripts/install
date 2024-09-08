@@ -12,8 +12,6 @@ else # library is private
 fi
 
 #=================================================
-
-#=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
 ynh_script_progression "Installing and patching sources to $install_dir..."

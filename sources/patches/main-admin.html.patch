@@ -1,0 +1,14 @@
+--- a/cps/templates/admin.html	2022-03-06 16:10:41.000000000 +0100
++++ b/cps/templates/admin.html	2022-03-08 20:59:38.344889625 +0100
+@@ -189,11 +189,6 @@
+         </tbody>
+       </table>
+       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+-      {%  if feature_support['updater'] %}
+-      <div class="hidden" id="update_error"> <span>{{update_error}}</span></div>
+-      <div class="btn btn-primary" id="check_for_update">{{_('Check for Update')}}</div>
+-      <div class="btn btn-primary hidden" id="perform_update" data-toggle="modal" data-target="#StatusDialog">{{_('Perform Update')}}</div>
+-      {%  endif %}
+     </div>
+   </div>
+ </div>
