@@ -33,7 +33,7 @@ Browsing, reading and downloading eBooks using a Calibre database
 
 ## Información para desarrolladores
 
-Por favor enviar sus correcciones a la [`branch testing`](https://github.com/YunoHost-Apps/calibreweb_ynh/tree/testing
+Por favor enviar sus correcciones a la [rama `testing`](https://github.com/YunoHost-Apps/calibreweb_ynh/tree/testing).
 
 Para probar la rama `testing`, sigue asÍ:
 
