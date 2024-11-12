@@ -116,11 +116,12 @@ ram.runtime = "200M"
 
     [resources.apt]
     packages = [
-        "sqlite3",      # to tweak the database in the scripts
-        "imagemagick",  # for cover extraction from EPUBs
-        "python3-venv", # for installing a venv environnement in the scripts
-        "python3-dev",  # for compiling the ldap dependency during pip install
-        "libldap2-dev", # for compiling the ldap dependency during pip install
-        "libsasl2-dev", # for compiling the ldap dependency during pip install
-        "libjpeg-dev"   # for comics and image reading in browser
+        "sqlite3",        # to tweak the database in the scripts
+        "imagemagick",    # for cover extraction from EPUBs
+        "python3-venv",   # for installing a venv environnement in the scripts
+        "python3-dev",    # for compiling the ldap dependency during pip install
+        "libldap2-dev",   # for compiling the ldap dependency during pip install
+        "libsasl2-dev",   # for compiling the ldap dependency during pip install
+        "libjpeg-dev",    # for comics and image reading in browser
+        "build-essential" # for building lol
     ]
