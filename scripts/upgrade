@@ -85,24 +85,19 @@ fi
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-# FIXME: this is still supported but the recommendation is now to *always* re-setup the app sources wether or not the upstream sources changed
-if ynh_app_upstream_version_changed
-then
-	ynh_script_progression "Upgrading source files from $current_upstream_app_version to $new_upstream_package_version..."
+ynh_script_progression "Upgrading source files from $current_upstream_app_version to $new_upstream_package_version..."
 
-	#Set settings constant initializer of the app
-	ynh_config_add --template="../patches/main-config_sql.py.patch.src" --destination="../patches/main-config_sql.py.patch"
-	ynh_config_add --template="../patches/main-ub.py.patch.src" --destination="../patches/main-ub.py.patch"
-	ynh_config_add --template="../patches/main-constants.py.patch.src" --destination="../patches/main-constants.py.patch"
+#Set settings constant initializer of the app
+ynh_config_add --template="../patches/main-config_sql.py.patch.src" --destination="../patches/main-config_sql.py.patch"
+ynh_config_add --template="../patches/main-ub.py.patch.src" --destination="../patches/main-ub.py.patch"
+ynh_config_add --template="../patches/main-constants.py.patch.src" --destination="../patches/main-constants.py.patch"
 
-	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$install_dir"
-	#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R $app: $install_dir
-	# Remove the patch for web.py in case visitor are allowed
-	if $(ynh_permission_has_user --permission=main --user=visitors); then
-		patch -u /$install_dir/cps/web.py -i ../conf/web.py.revert.patch
-	fi
-
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source --dest_dir="$install_dir"
+chown -R $app: $install_dir
+# Remove the patch for web.py in case visitor are allowed
+if $(ynh_permission_has_user --permission=main --user=visitors); then
+	patch -u /$install_dir/cps/web.py -i ../conf/web.py.revert.patch
 fi
 
 #=================================================
@@ -113,8 +108,7 @@ ynh_script_progression "Upgrading nginx web server configuration..."
 #Cannot use empty string for X-script-name, causes an issue in the python prg
 #https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#nginx
 if [ $path = "/" ] ; then
-	# FIXMEhelpers2.1: ynh_replace used with positional args. Please add the keywords: --match=, --replace=, --file=
-ynh_replace "        proxy_set_header	X-Script-Name" "#       proxy_set_header	X-Script-Name" ../conf/nginx.conf
+ynh_replace --match="        proxy_set_header	X-Script-Name" --replace="#       proxy_set_header	X-Script-Name" --file="../conf/nginx.conf"
 fi
 
 #Setting the proxy authentication in case calibre is not open to visitor.
@@ -135,36 +129,32 @@ ynh_config_add_nginx
 #=================================================
 # UPGRADE DEPENDENCIES
 #=================================================
+ynh_script_progression "Installing pip requirements..."
 
-# FIXME: this is still supported but the recommendation is now to *always* re-setup the app sources wether or not the upstream sources changed
-if ynh_app_upstream_version_changed
-then
-	#Use venv to install pip requirements - Inspired from https://github.com/YunoHost-Apps/pyinventory_ynh/blob/master/scripts/install
-	ynh_script_progression "Installing pip requirements..."
-	# Always recreate everything fresh with current python version
-	if [ -d "${install_dir}/venv" ] ; then
-		ynh_safe_rm "${install_dir}/venv"
-	fi
-
-	# Skip pip because of: https://github.com/YunoHost/issues/issues/1960
-	python3 -m venv --without-pip "${install_dir}/venv"
-	#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R "$app:" "$install_dir"
-	#run source in a 'sub shell'
-	(
-		set +o nounset
-		source "${install_dir}/venv/bin/activate"
-		set -o nounset
-		ynh_exec_as_app $install_dir/venv/bin/python3 -m ensurepip
-		ynh_exec_as_app $install_dir/venv/bin/pip3 install --upgrade wheel pip setuptools
-		ynh_exec_as_app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/requirements.txt"
-		ynh_exec_as_app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/optional-requirements.txt"
-	)
+# Always recreate everything fresh with current python version
+if [ -d "${install_dir}/venv" ] ; then
+	ynh_safe_rm "${install_dir}/venv"
 fi
+
+# Skip pip because of: https://github.com/YunoHost/issues/issues/1960
+python3 -m venv --without-pip "${install_dir}/venv"
+chown -R "$app:" "$install_dir"
+#run source in a 'sub shell'
+(
+	set +o nounset
+	source "${install_dir}/venv/bin/activate"
+	set -o nounset
+	ynh_exec_as_app $install_dir/venv/bin/python3 -m ensurepip
+	ynh_exec_as_app $install_dir/venv/bin/pip3 install --upgrade wheel pip setuptools
+	ynh_exec_as_app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/requirements.txt"
+	ynh_exec_as_app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/optional-requirements.txt"
+)
 
 #=================================================
 #build multimedia directory
 #=================================================
 ynh_script_progression "Create Multimedia dir..."
+
 #Create multimedia directory but we do not change the calibre_dir : It's the user to make this choice.
 ynh_multimedia_build_main_dir
 ynh_multimedia_addaccess $app
@@ -179,18 +169,16 @@ ynh_replace --match="<policy domain="coder" rights="none" pattern="PDF" />" \
 #=================================================
 # SETUP LOGROTATE
 #=================================================
-
-# Use logrotate to manage app-specific logfile(s)
 ynh_script_progression "Upgrading logrotate configuration..."
+
 ynh_config_add_logrotate "$log_file"
 ynh_config_add_logrotate "$access_log_file"
 
 #=================================================
 # SETUP SYSTEMD
 #=================================================
-
-# Create a dedicated systemd config
 ynh_script_progression "Upgrading systemd configuration..."
+
 ynh_config_add_systemd
 
 #=================================================
@@ -198,7 +186,7 @@ ynh_config_add_systemd
 #=================================================
 
 # Set permissions on app files
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R $app: $install_dir
+chown -R $app: $install_dir
 chown -R $app: /opt/kepubify/$app
 
 #=================================================

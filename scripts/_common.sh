@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#=================================================
+# COMMON VARIABLES AND CUSTOM HELPERS
+#=================================================
+
 DOSSIER_MEDIA=/home/yunohost.multimedia
 log_file=/var/log/$app/$app.log
 access_log_file=/var/log/$app/$app-access.log

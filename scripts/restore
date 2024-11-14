@@ -4,30 +4,32 @@ source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
-# STANDARD RESTORATION STEPS
-#=================================================
 # RESTORE THE NGINX CONFIGURATION
 #=================================================
 ynh_script_progression "Restoring nginx configuration..."
+
 ynh_restore "/etc/nginx/conf.d/$domain.d/$app.conf"
 
 #=================================================
 # RESTORE THE APP MAIN DIR
 #=================================================
 ynh_script_progression "Restoring the app main directory..."
+
 ynh_restore "$install_dir"
 
 #=================================================
 # RESTORE THE KEPUBIFY BINARIES
 #=================================================
 ynh_script_progression "Restoring Kepubify..."
+
 ynh_restore "/opt/kepubify/$app"
 
 #=================================================
 # RESTORE USER RIGHTS
 #=================================================
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R $app: $install_dir
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chmod 740 $install_dir
+
+chown -R $app: $install_dir
+chmod 740 $install_dir
 #Use venv to install pip requirements - Inspired from https://github.com/YunoHost-Apps/pyinventory_ynh/blob/master/scripts/install
 ynh_script_progression "Reinstalling pip requirements..."
 # Always recreate everything fresh with current python version
@@ -38,7 +40,7 @@ fi
 
 # Skip pip because of: https://github.com/YunoHost/issues/issues/1960
 python3 -m venv --without-pip "${install_dir}/venv"
-#REMOVEME? Assuming the install dir is setup using ynh_setup_source, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R "$app:" "$install_dir"
+chown -R "$app:" "$install_dir"
 #run source in a 'sub shell'
 (
 	cd "$install_dir"
@@ -74,20 +76,22 @@ ynh_restore "/etc/logrotate.d/$app"
 #=================================================
 # RESTORE THE LOG FILE DIRECTORY
 #=================================================
+
 mkdir -p /var/log/$app
-#REMOVEME? Assuming ynh_config_add_logrotate is called, the proper chmod/chowns are now already applied and it shouldn't be necessary to tweak perms | chown -R $app:$app /var/log/$app
+chown -R $app:$app /var/log/$app
 
 #=================================================
 # RESTORE THE DATA DIRECTORY
 #=================================================
-
 ynh_script_progression "Restoring data directory if required..."
+
 ynh_restore "$calibre_dir" || true
 
 #=================================================
 # RESTORE THE MULTIMEDIA DIR IF NOT EXISTING
 #=================================================
 ynh_script_progression "Restoring the multimedia directory..."
+
 ynh_multimedia_build_main_dir
 ynh_multimedia_addaccess $app
 
@@ -136,6 +140,7 @@ ynh_systemctl --action=restart --service=fail2ban
 # RELOAD NGINX
 #=================================================
 ynh_script_progression "Reloading nginx web server..."
+
 ynh_systemctl --service=nginx --action=reload
 
 #=================================================

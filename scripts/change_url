@@ -19,6 +19,7 @@ ynh_systemctl --service=$app --action="stop"
 # MODIFY URL IN NGINX CONF
 #=================================================
 ynh_script_progression "Updating NGINX web server configuration..."
+
 #Cannot use empty string for X-script-name, causes an issue in the python prg
 if [ $new_path = "/" ] ; then
 	# FIXMEhelpers2.1: ynh_replace used with positional args. Please add the keywords: --match=, --replace=, --file=
