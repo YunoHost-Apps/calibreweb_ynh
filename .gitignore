@@ -1,3 +1,4 @@
 *~
 *.sw[op]
 /check_process
+.DS_Store
