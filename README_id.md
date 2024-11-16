@@ -18,7 +18,7 @@ Ini TIDAK boleh diedit dengan tangan.
 
 Browsing, reading and downloading eBooks using a Calibre database
 
-**Versi terkirim:** 0.96.22~ynh1
+**Versi terkirim:** 0.96.24~ynh1
 
 ## Tangkapan Layar
 
