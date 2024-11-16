@@ -82,7 +82,7 @@ ynh_multimedia_addaccess $app
 
 #Check if metadata.db file exists. If not create it (empty library)
 if [ ! -e "$calibre_dir"/metadata.db ]; then
-	cp -a ../conf/metadata.db.empty $calibre_dir/metadata.db
+	cp -a ../sources/metadata.db.empty $calibre_dir/metadata.db
 	chown $app:$app $calibre_dir/*
 fi
 
