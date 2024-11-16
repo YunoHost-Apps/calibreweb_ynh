@@ -18,7 +18,7 @@ No se debe editar a mano.
 
 Browsing, reading and downloading eBooks using a Calibre database
 
-**Versión actual:** 0.96.22~ynh1
+**Versión actual:** 0.96.24~ynh1
 
 ## Capturas
 

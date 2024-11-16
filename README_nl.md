@@ -18,7 +18,7 @@ Hij mag NIET handmatig aangepast worden.
 
 Browsing, reading and downloading eBooks using a Calibre database
 
-**Geleverde versie:** 0.96.22~ynh1
+**Geleverde versie:** 0.96.24~ynh1
 
 ## Schermafdrukken
 
