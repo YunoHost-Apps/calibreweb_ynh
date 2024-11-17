@@ -70,9 +70,9 @@ then
 	yunohost firewall disallow TCP $port 2>&1
 fi
 
-#LDAP settings were wrongly set in version prior to 0.6.13 and we could not retrieve LDAP users. This will change the settings to correct values 
+#LDAP settings were wrongly set in version prior to 0.6.13 and we could not retrieve LDAP users. This will change the settings to correct values
 if sqlite3 $install_dir/app.db "SELECT config_ldap_group_object_filter FROM settings" \
-	| grep -xq "(&(objectClass=posixGroup)(permission=cn=%s.main,ou=permission,dc=yunohost,dc=org))" ; then 
+	| grep -xq "(&(objectClass=posixGroup)(permission=cn=%s.main,ou=permission,dc=yunohost,dc=org))" ; then
 	eval sqlite3 $install_dir/app.db "\"UPDATE settings SET config_ldap_group_object_filter='(&(objectClass=posixGroup)(cn=%s.main))' WHERE ID=1\""
 fi
 
@@ -107,16 +107,16 @@ then
 	ynh_add_config --template="../sources/patches/main-config_sql.py.patch.src" --destination="../sources/patches/main-config_sql.py.patch"
 	ynh_add_config --template="../sources/patches/main-ub.py.patch.src" --destination="../sources/patches/main-ub.py.patch"
 	ynh_add_config --template="../sources/patches/main-constants.py.patch.src" --destination="../sources/patches/main-constants.py.patch"
-	
+
 	# Download, check integrity, uncompress and patch the source from app.src
 	ynh_setup_source --dest_dir="$install_dir"
 	chown -R $app: $install_dir
-	
+
 	# Remove the patch for web.py in case visitor are allowed
 	if $(ynh_permission_has_user --permission=main --user=visitors); then
-		patch -u /$install_dir/cps/web.py -i ../conf/web.py.revert.patch
+		patch -u /$install_dir/cps/web.py -i ../conf/main-web.py.revert.patch
 	fi
-	
+
 fi
 
 #=================================================
@@ -130,7 +130,7 @@ if [ $path = "/" ] ; then
 	ynh_replace_string "        proxy_set_header	X-Script-Name" "#       proxy_set_header	X-Script-Name" ../conf/nginx.conf
 fi
 
-#Setting the proxy authentication in case calibre is not open to visitor. 
+#Setting the proxy authentication in case calibre is not open to visitor.
 #https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#login-via-header-from-upstream-authentication-source
 if $(ynh_permission_has_user --permission=main --user=visitors); then
 	sqlite3 $install_dir/app.db "UPDATE settings SET config_reverse_proxy_login_header_name='', config_allow_reverse_proxy_header_login=0 WHERE ID=1;"

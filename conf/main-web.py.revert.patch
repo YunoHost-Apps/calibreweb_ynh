@@ -1,0 +1,15 @@
+--- ./web.py	2024-11-16 12:40:19.687380023 +0100
++++ ./web.py	2024-11-02 07:59:58.000000000 +0100
+@@ -1464,11 +1464,7 @@
+     if location:
+         return redirect(location)
+     else:
+-#       return redirect(url_for('web.login'))
+-        if config.config_login_type == constants.LOGIN_LDAP:
+-            return redirect(request.host_url + '/yunohost/sso/?action=logout')
+-        else:
+-            return redirect(url_for('web.login'))
++        return redirect(url_for('web.login'))
+
+
+ # ################################### Users own configuration #########################################################

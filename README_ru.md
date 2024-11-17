@@ -18,7 +18,7 @@
 
 Browsing, reading and downloading eBooks using a Calibre database
 
-**Поставляемая версия:** 0.96.22~ynh1
+**Поставляемая версия:** 0.96.24~ynh1
 
 ## Снимки экрана
 
