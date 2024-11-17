@@ -18,7 +18,7 @@ EZ editatu eskuz.
 
 Browsing, reading and downloading eBooks using a Calibre database
 
-**Paketatutako bertsioa:** 0.96.22~ynh1
+**Paketatutako bertsioa:** 0.96.24~ynh1
 
 ## Pantaila-argazkiak
 

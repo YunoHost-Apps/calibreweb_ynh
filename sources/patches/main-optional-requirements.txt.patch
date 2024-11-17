@@ -1,5 +1,5 @@
---- a/optional-requirements.txt	2024-07-06 04:29:16.000000000 +0200
-+++ b/optional-requirements.txt	2024-07-09 23:27:11.250122853 +0200
+--- a/optional-requirements.txt	2024-11-02 07:24:59.000000000 +0100
++++ b/optional-requirements.txt	2024-11-16 12:36:47.855012055 +0100
 @@ -1,19 +1,5 @@
  # GDrive Integration
 -google-api-python-client>=1.7.11,<2.200.0
@@ -17,23 +17,17 @@
 -# Gmail
 -google-auth-oauthlib>=0.4.3,<1.3.0
 -google-api-python-client>=1.7.11,<2.200.0
- 
+
  # goodreads
  goodreads>=0.3.2,<0.4.0
-@@ -23,9 +9,6 @@
+@@ -23,10 +9,6 @@
  python-ldap>=3.0.0,<3.5.0
  Flask-SimpleLDAP>=1.4.0,<2.1.0
- 
+
 -# oauth
 -Flask-Dance>=2.0.0,<7.1.0
 -SQLAlchemy-Utils>=0.33.5,<0.42.0
- 
+-
  # metadata extraction
  rarfile>=3.2,<5.0
-@@ -43,6 +26,3 @@
- 
- # Kobo integration
- jsonschema>=3.2.0,<4.23.0
--
--# Hide console Window on Windows
--pywin32>=220,<310 ; sys_platform == 'win32'
+ scholarly>=1.2.0,<1.8
