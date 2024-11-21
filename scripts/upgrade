@@ -82,7 +82,7 @@ if [ -z $(sqlite3 $install_dir/app.db "SELECT config_kepubifypath FROM settings"
 	eval sqlite3 $install_dir/app.db "\"UPDATE settings SET config_kepubifypath='/opt/kepubify/$app/kepubify' WHERE ID=1\""
 fi
 if [ ! -d /opt/kepubify/$app ]; then
-	ynh_setup_source --dest_dir="/opt/kepubify/$app" --source_id="kepubify"
+	ynh_setup_source --dest_dir="/opt/kepubify/$app" --source_id="kepubify" --full_replace=1
 	chmod 770 /opt/kepubify/$app/kepubify
 fi
 
@@ -109,7 +109,7 @@ then
 	ynh_add_config --template="../sources/patches/main-constants.py.patch.src" --destination="../sources/patches/main-constants.py.patch"
 
 	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$install_dir"
+	ynh_setup_source --dest_dir="$install_dir" --full_replace=1
 	chown -R $app: $install_dir
 
 	# Remove the patch for web.py in case visitor are allowed
