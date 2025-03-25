@@ -30,7 +30,7 @@ ynh_systemd_action --service_name=$app --action="stop"
 ynh_script_progression --message="Updating NGINX web server configuration..." --weight=1
 #Cannot use empty string for X-script-name, causes an issue in the python prg
 if [ $new_path = "/" ] ; then
-	ynh_replace_string "        proxy_set_header	X-Script-Name" "#       proxy_set_header	X-Script-Name" ../conf/nginx.conf
+	ynh_replace_string "        proxy_set_header	X-Script-Name		__PATH__;" "proxy_set_header	X-Script-Name		__PATH__/;" ../conf/nginx.conf
 else
 	ynh_replace_string "#       proxy_set_header	X-Script-Name" "        proxy_set_header	X-Script-Name" ../conf/nginx.conf
 fi
