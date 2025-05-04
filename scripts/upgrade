@@ -111,8 +111,8 @@ ynh_script_progression "Upgrading nginx web server configuration..."
 #Cannot use empty string for X-script-name, causes an issue in the python prg
 #https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#nginx
 if [ $path = "/" ] ; then
-	ynh_replace --match="        proxy_set_header	X-Script-Name		__PATH__;"
-	            --replace="        proxy_set_header	X-Script-Name		/__PATH__;"
+	ynh_replace --match="        proxy_set_header	X-Script-Name		__PATH__;" \
+	            --replace="        proxy_set_header	X-Script-Name		/__PATH__;" \
 	            --file="../conf/nginx.conf"
 fi
 

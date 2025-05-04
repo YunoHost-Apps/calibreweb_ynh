@@ -22,12 +22,12 @@ ynh_script_progression "Updating NGINX web server configuration..."
 
 #
 if [ $new_path = "/" ] ; then
-	ynh_replace --match="        proxy_set_header	X-Script-Name		__PATH__;"
-	            --replace="        proxy_set_header	X-Script-Name		/__PATH__;"
+	ynh_replace --match="        proxy_set_header	X-Script-Name		__PATH__;" \
+	            --replace="        proxy_set_header	X-Script-Name		/__PATH__;" \
 	            --file=../conf/nginx.conf
 else
-	ynh_replace --match="        proxy_set_header	X-Script-Name		/__PATH__;"
-	            --replace="        proxy_set_header	X-Script-Name		__PATH__;"
+	ynh_replace --match="        proxy_set_header	X-Script-Name		/__PATH__;" \
+	            --replace="        proxy_set_header	X-Script-Name		__PATH__;" \
 	            --file="../conf/nginx.conf"
 fi
 
