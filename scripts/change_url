@@ -1,63 +1,57 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC STARTING
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
-
 source /usr/share/yunohost/helpers
 source _common.sh
 
 #=================================================
 # BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
 #=================================================
-ynh_script_progression --message="Backing up the app before changing its url (may take a while)..." --weight=10
+ynh_script_progression "Backing up the app before changing its url (may take a while)..."
 
-#=================================================
-# STANDARD MODIFICATIONS
 #=================================================
 # STOP SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Stopping a systemd service..." --weight=1
+ynh_script_progression "Stopping $app's systemd service..."
 
-ynh_systemd_action --service_name=$app --action="stop"
+ynh_systemctl --service=$app --action="stop"
 
 #=================================================
 # MODIFY URL IN NGINX CONF
 #=================================================
-ynh_script_progression --message="Updating NGINX web server configuration..." --weight=1
-#Cannot use empty string for X-script-name, causes an issue in the python prg
+ynh_script_progression "Updating NGINX web server configuration..."
+
+#
 if [ $new_path = "/" ] ; then
-	ynh_replace_string "        proxy_set_header	X-Script-Name" "#       proxy_set_header	X-Script-Name" ../conf/nginx.conf
+	ynh_replace --match="        proxy_set_header	X-Script-Name		__PATH__;" \
+	            --replace="        proxy_set_header	X-Script-Name		/__PATH__;" \
+	            --file=../conf/nginx.conf
 else
-	ynh_replace_string "#       proxy_set_header	X-Script-Name" "        proxy_set_header	X-Script-Name" ../conf/nginx.conf
+	ynh_replace --match="        proxy_set_header	X-Script-Name		/__PATH__;" \
+	            --replace="        proxy_set_header	X-Script-Name		__PATH__;" \
+	            --file="../conf/nginx.conf"
 fi
 
 if $(ynh_permission_has_user --permission=main --user=visitors); then
-	ynh_replace_string --match_string="        proxy_set_header	X-Remote-User" \
-	                   --replace_string="#       proxy_set_header	X-Remote-User" \
-	                   --target_file="../conf/nginx.conf"
+	ynh_replace --match="        proxy_set_header	X-Remote-User" \
+	            --replace="#       proxy_set_header	X-Remote-User" \
+	            --file="../conf/nginx.conf"
 else
-	ynh_replace_string --match_string="#       proxy_set_header	X-Remote-User" \
-	                   --replace_string="        proxy_set_header	X-Remote-User" \
-	                   --target_file="../conf/nginx.conf"
+	ynh_replace --match="#       proxy_set_header	X-Remote-User" \
+	            --replace="        proxy_set_header	X-Remote-User" \
+	            --file="../conf/nginx.conf"
 fi
 
-ynh_change_url_nginx_config
+ynh_config_change_url_nginx
 
-#=================================================
-# GENERIC FINALISATION
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..." --weight=2
+ynh_script_progression "Starting $app's systemd service..."
 
-ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" -t 30
+ynh_systemctl --service=$app --action="start" --wait_until="Starting Gevent server on" -t 30
 
 #=================================================
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Change of URL completed for $app" --last
+ynh_script_progression "Change of URL completed for $app"
