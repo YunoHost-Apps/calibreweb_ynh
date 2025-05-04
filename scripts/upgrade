@@ -38,11 +38,6 @@ current_upstream_app_version=$(cat $install_dir/cps/constants.py | grep STABLE_V
 current_upstream_app_version="${current_upstream_app_version/STABLE_VERSION = \{\'version\': \'/""}"
 current_upstream_app_version="${current_upstream_app_version/\'\}/""}"
 
-#=================================================
-# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
-#=================================================
-ynh_clean_check_starting
-
 #Stop the app in case database is updated
 ynh_script_progression "Stopping $app's systemd service..."
 
