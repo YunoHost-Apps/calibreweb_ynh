@@ -9,13 +9,13 @@ admin_mail=$(ynh_user_get_info --username="$admin" --key=mail)
 #Get settings from database in case it has been changed in the app and save it in settings so that it can be used back afterward
 calibre_dir=$(sqlite3 $install_dir/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
 calibre_dir=${calibre_dir%/}
-ynh_app_setting_set $app calibre_dir $calibre_dir
+ynh_app_setting_set --key="calibre_dir" --value="$calibre_dir"
 
 upload=$(sqlite3 $install_dir/app.db "SELECT config_uploading FROM settings WHERE ID=1")
-ynh_app_setting_set $app upload $upload
+ynh_app_setting_set --key="upload" --value="$upload"
 
 language=$(sqlite3 $install_dir/app.db "SELECT config_default_locale FROM settings WHERE ID=1")
-ynh_app_setting_set $app language $language
+ynh_app_setting_set --key="language" --value="$language"
 
 
 if [ -f /etc/yunohost/apps/$app/manifest.toml ]; then

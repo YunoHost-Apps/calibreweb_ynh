@@ -7,7 +7,7 @@ source /usr/share/yunohost/helpers
 calibre_dir=$(sqlite3 $install_dir/app.db "SELECT config_calibre_dir FROM settings WHERE ID=1")
 #Save it in settings so that it can be used back afterward
 calibre_dir=${calibre_dir%/}
-ynh_app_setting_set $app calibre_dir $calibre_dir
+ynh_app_setting_set --key="calibre_dir" --value="$calibre_dir"
 
 #=================================================
 # BACKUP THE APP MAIN DIR
