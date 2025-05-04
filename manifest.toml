@@ -7,7 +7,7 @@ name = "Calibre-web"
 description.en = "Browsing, reading and downloading eBooks using a Calibre database"
 description.fr = "Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre"
 
-version = "0.96.24~ynh1"
+version = "0.96.24~ynh2"
 
 maintainers = ["Krakinou"]
 
@@ -17,7 +17,8 @@ admindoc = "https://github.com/janeczku/calibre-web/wiki"
 code = "https://github.com/janeczku/calibre-web"
 
 [integration]
-yunohost = ">= 11.2"
+yunohost = ">= 11.2.30"
+helpers_version = "2.1"
 architectures = "all"
 multi_instance = true
 ldap = true

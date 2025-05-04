@@ -1,14 +1,7 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC START
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
 source _common.sh
 source /usr/share/yunohost/helpers
-
 
 admin_mail=$(ynh_user_get_info --username="$admin" --key=mail)
 
@@ -19,18 +12,14 @@ else # library is private
 fi
 
 #=================================================
-# STANDARD MODIFICATIONS
-#=================================================
-
-#=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_script_progression --message="Installing and patching sources to $install_dir..." --weight=10
+ynh_script_progression "Installing and patching sources to $install_dir..."
 
 #Set settings constant initializer of the app
-ynh_add_config --template="../sources/patches/main-config_sql.py.patch.src" --destination="../sources/patches/main-config_sql.py.patch"
-ynh_add_config --template="../sources/patches/main-ub.py.patch.src" --destination="../sources/patches/main-ub.py.patch"
-ynh_add_config --template="../sources/patches/main-constants.py.patch.src" --destination="../sources/patches/main-constants.py.patch"
+ynh_config_add --template="../patches/main/config_sql.py.patch.src" --destination="../patches/main/config_sql.py.patch"
+ynh_config_add --template="../patches/main/ub.py.patch.src" --destination="../patches/main/ub.py.patch"
+ynh_config_add --template="../patches/main/constants.py.patch.src" --destination="../patches/main/constants.py.patch"
 
 # Download, check integrity, uncompress and patch the source from app.src
 ynh_setup_source --dest_dir="$install_dir"
@@ -41,7 +30,7 @@ if $(ynh_permission_has_user --permission=main --user=visitors); then
 fi
 
 #install kepubify converter
-ynh_script_progression --message="Installing kepubify..." --weight=1
+ynh_script_progression "Installing kepubify..."
 ynh_setup_source --dest_dir="/opt/kepubify/$app/" --source_id="kepubify"
 
 
@@ -50,10 +39,10 @@ ynh_setup_source --dest_dir="/opt/kepubify/$app/" --source_id="kepubify"
 #=================================================
 
 #Use venv to install pip requirements - Inspired from https://github.com/YunoHost-Apps/pyinventory_ynh/blob/master/scripts/install
-ynh_script_progression --message="Installing pip requirements..." --weight=70
+ynh_script_progression "Installing pip requirements..."
 # Always recreate everything fresh with current python version
 if [ -d "${install_dir}/venv" ] ; then
-	ynh_secure_remove "${install_dir}/venv"
+	ynh_safe_rm "${install_dir}/venv"
 fi
 
 # Skip pip because of: https://github.com/YunoHost/issues/issues/1960
@@ -65,16 +54,16 @@ chown -R "$app:" "$install_dir"
 	set +o nounset
 	source "${install_dir}/venv/bin/activate"
 	set -o nounset
-	ynh_exec_as $app $install_dir/venv/bin/python3 -m ensurepip
-	ynh_exec_as $app $install_dir/venv/bin/pip3 install --upgrade wheel pip setuptools
-	ynh_exec_as $app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/requirements.txt"
-	ynh_exec_as $app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade -r "$install_dir/optional-requirements.txt"
+	ynh_exec_as_app $install_dir/venv/bin/python3 -m ensurepip
+	ynh_exec_as_app $install_dir/venv/bin/pip3 install --upgrade wheel pip setuptools
+	ynh_exec_as_app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade --use-pep517 -r "$install_dir/requirements.txt"
+	ynh_exec_as_app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade --use-pep517 -r "$install_dir/optional-requirements.txt"
 )
 
 #=================================================
 # CREATE FILES AND DIRECTORIES
 #=================================================
-ynh_script_progression --message="Creating files and directory..." --weight=5
+ynh_script_progression "Creating files and directory..."
 
 #build multimedia directory
 ynh_multimedia_build_main_dir
@@ -86,28 +75,30 @@ if [ ! -e "$calibre_dir"/metadata.db ]; then
 	chown $app:$app $calibre_dir/*
 fi
 
-ynh_app_setting_set $app calibre_dir $calibre_dir
+ynh_app_setting_set --key="calibre_dir" --value="$calibre_dir"
 
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
-ynh_script_progression --message="Setting up system configuration..." --weight=5
+ynh_script_progression "Setting up system configuration..."
 
 #Cannot use empty string for X-script-name, causes an issue in the python prg
 #https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#nginx
 if [ $path = "/" ] ; then
-	ynh_replace_string "        proxy_set_header	X-Script-Name" "#        proxy_set_header	X-Script-Name" ../conf/nginx.conf
+	ynh_replace --match="        proxy_set_header	X-Script-Name		__PATH__;"
+	            --replace="        proxy_set_header	X-Script-Name		/__PATH__;"
+	            --file="../conf/nginx.conf"
 fi
 
 #
 if $(ynh_permission_has_user --permission=main --user=visitors); then
-	ynh_replace_string --match_string="        proxy_set_header	X-Remote-User" \
-	                   --replace_string="#       proxy_set_header	X-Remote-User" \
-	                   --target_file="../conf/nginx.conf"
+	ynh_replace --match="        proxy_set_header	X-Remote-User" \
+	            --replace="#       proxy_set_header	X-Remote-User" \
+	            --file="../conf/nginx.conf"
 fi
 
 # Create a dedicated nginx config
-ynh_add_nginx_config
+ynh_config_add_nginx
 
 
 #=================================================
@@ -115,24 +106,23 @@ ynh_add_nginx_config
 #=================================================
 
 # Create a dedicated systemd config
-ynh_add_systemd_config
+ynh_config_add_systemd
 
 #=================================================
 # SETUP LOGROTATE
 #=================================================
 # Use logrotate to manage application logfile(s)
-ynh_use_logrotate --logfile="$log_file"
-ynh_use_logrotate --logfile="$access_log_file"
-chown -R $app:$app /var/log/$app
+ynh_config_add_logrotate "$log_file"
+ynh_config_add_logrotate "$access_log_file"
 
 
 #=================================================
 # SPECIFIC SETUP
 #=================================================
 #Update Imagick policy as per https://github.com/janeczku/calibre-web/wiki/FAQ#what-to-do-if-cover-pictures-are-not-extracted-from-pdf-files
-ynh_replace_string --match_string="<policy domain="coder" rights="none" pattern="PDF" />" \
-		--replace_string="<policy domain="coder" rights="read" pattern="PDF" />" \
-		--target_file="/etc/ImageMagick-6/policy.xml"
+ynh_replace --match="<policy domain="coder" rights="none" pattern="PDF" />" \
+            --replace="<policy domain="coder" rights="read" pattern="PDF" />" \
+            --file="/etc/ImageMagick-6/policy.xml"
 
 
 
@@ -144,20 +134,16 @@ yunohost service add $app --description="Browse eBook in the web" --log="$log_fi
 
 
 #=================================================
-# GENERIC FINALIZATION
-#=================================================
 # SECURE FILES AND DIRECTORIES
 #=================================================
 
-chown -R $app: $install_dir
-chmod 740 $install_dir
 chown -R $app: /opt/kepubify/$app
 chmod 770 /opt/kepubify/$app/kepubify
 
 #=================================================
 # SETUP FAIL2BAN
 #=================================================
-ynh_script_progression --message="Configuring Fail2Ban..." --weight=8
+ynh_script_progression "Configuring Fail2Ban..."
 
 # Make sure a log file exists (mostly for CI tests)
 if [ ! -f "$log_file" ]; then
@@ -166,25 +152,24 @@ if [ ! -f "$log_file" ]; then
 fi
 
 # Create a dedicated Fail2Ban config
-ynh_add_fail2ban_config --logpath="$log_file" --failregex="^.*LDAP Login failed for user .* IP-address: <HOST>.*$" --max_retry=5
-
+ynh_config_add_fail2ban --logpath="$log_file" --failregex="^.*LDAP Login failed for user .* IP-address: <HOST>.*$"
 
 #=================================================
 # RELOAD NGINX
 #=================================================
-ynh_script_progression --message="Start $app..." --weight=5
-ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on" -t 30
+ynh_script_progression "Start $app..."
+ynh_systemctl --service=$app --action="start" --wait_until="Starting Gevent server on" -t 30
 
 #Setting the proxy authentication in case calibre is not open to visitor.
 #https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#login-via-header-from-upstream-authentication-source
 #We need to update the sso login parameter, but for that the app needs to have run at least once to initialize the tables.
 if ! $(ynh_permission_has_user --permission=main --user=visitors); then
-	ynh_systemd_action --service_name=$app --action="stop"
+	ynh_systemctl --service=$app --action="stop"
 	sqlite3 $install_dir/app.db "UPDATE settings SET config_reverse_proxy_login_header_name='X-Remote-User', config_allow_reverse_proxy_header_login=1 WHERE ID=1;"
-	ynh_systemd_action --service_name=$app --action="start" --line_match="Starting Gevent server on"
+	ynh_systemctl --service=$app --action="start" --wait_until="Starting Gevent server on"
 fi
 
 #=================================================
 # END OF SCRIPT
 #=================================================
-ynh_script_progression --message="Installation of $app completed" --last
+ynh_script_progression "Installation of $app completed"
