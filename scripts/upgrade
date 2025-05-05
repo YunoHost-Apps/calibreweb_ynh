@@ -137,19 +137,15 @@ if [ -d "${install_dir}/venv" ] ; then
 	ynh_safe_rm "${install_dir}/venv"
 fi
 
+
+pushd "$install_dir"
 # Skip pip because of: https://github.com/YunoHost/issues/issues/1960
-python3 -m venv --without-pip "${install_dir}/venv"
-chown -R "$app:" "$install_dir"
-#run source in a 'sub shell'
-(
-	set +o nounset
-	source "${install_dir}/venv/bin/activate"
-	set -o nounset
+	ynh_exec_as_app python3 -m venv --without-pip "$install_dir/venv"
 	ynh_exec_as_app $install_dir/venv/bin/python3 -m ensurepip
 	ynh_exec_as_app $install_dir/venv/bin/pip3 install --upgrade wheel pip setuptools
 	ynh_exec_as_app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade --use-pep517 -r "$install_dir/requirements.txt"
 	ynh_exec_as_app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade --use-pep517 -r "$install_dir/optional-requirements.txt"
-)
+popd
 
 #=================================================
 #build multimedia directory
@@ -218,7 +214,7 @@ ynh_config_add_fail2ban --logpath="$log_file" --failregex="^.*LDAP Login failed 
 #=================================================
 ynh_script_progression "Starting $app's systemd service..."
 
-ynh_systemctl --service=$app --action="start" --wait_until="Starting Gevent server on" -t 30
+ynh_systemctl --service=$app --action="start" --wait_until="Starting Gevent server on" -t 60
 
 #=================================================
 # END OF SCRIPT
