@@ -36,3 +36,4 @@ Version number in Yunohost is different from the upstream Calibre-web app : vers
 
 * Do not use a Nextcloud folder. It's all right if the folder is an external storage in Nextcloud but not if it's an internal one : Changing the data in the library will cause trouble with the sync
 * Change to library made outside Calibreweb are not automatically updated in Calibreweb. It is required to disconnect and reconnect to see the changes : Do not open a database both in Calibre & Calibreweb!
+* Kobo Sync doesn’t work when Calibreweb is installed on a subdomain. This issue is caused by nginx. However, it works great when installed on a path e.g. `https://domain.tld/calibreweb`
