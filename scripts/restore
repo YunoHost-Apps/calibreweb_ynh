@@ -30,8 +30,13 @@ ynh_restore "/opt/kepubify/$app"
 # RESTORE USER RIGHTS
 #=================================================
 
-chown -R $app: $install_dir
-chmod 740 $install_dir
+chown -R "$app": "$install_dir"
+chmod 740 "$install_dir"
+
+#=================================================
+# RESTORE PIP DEPENDENCIES
+#=================================================
+
 #Use venv to install pip requirements - Inspired from https://github.com/YunoHost-Apps/pyinventory_ynh/blob/master/scripts/install
 ynh_script_progression "Reinstalling pip requirements..."
 # Always recreate everything fresh with current python version
@@ -40,21 +45,15 @@ if [ -d "${install_dir}/venv" ] ; then
 	ynh_safe_rm "${install_dir}/venv"
 fi
 
-# Skip pip because of: https://github.com/YunoHost/issues/issues/1960
-python3 -m venv --without-pip "${install_dir}/venv"
-chown -R "$app:" "$install_dir"
 
-#run source in a 'sub shell'
-(
-	cd "$install_dir"
-	set +o nounset
-	source "venv/bin/activate"
-	set -o nounset
-	ynh_exec_as_app venv/bin/python3 -m ensurepip
-	ynh_exec_as_app venv/bin/pip3 install --upgrade wheel pip setuptools
-	ynh_exec_as_app venv/bin/pip3 install --no-cache-dir --upgrade --use-pep517 -r "$install_dir/requirements.txt"
-	ynh_exec_as_app venv/bin/pip3 install --no-cache-dir --upgrade --use-pep517 -r "$install_dir/optional-requirements.txt"
-)
+pushd "$install_dir"
+# Skip pip because of: https://github.com/YunoHost/issues/issues/1960
+	ynh_exec_as_app python3 -m venv --without-pip "$install_dir/venv"
+	ynh_exec_as_app $install_dir/venv/bin/python3 -m ensurepip
+	ynh_exec_as_app $install_dir/venv/bin/pip3 install --upgrade wheel pip setuptools
+	ynh_exec_as_app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade --use-pep517 -r "$install_dir/requirements.txt"
+	ynh_exec_as_app $install_dir/venv/bin/pip3 install --no-cache-dir --upgrade --use-pep517 -r "$install_dir/optional-requirements.txt"
+popd
 
 #=================================================
 # RESTORE SYSTEMD
@@ -155,7 +154,7 @@ ynh_systemctl --service=nginx --action=reload
 #=================================================
 ynh_script_progression "Starting a systemd service..."
 
-ynh_systemctl --service=$app --action="start" --wait_until="Starting Gevent server on" -t 30
+ynh_systemctl --service=$app --action="start" --wait_until="Starting Gevent server on" -t 60
 
 #=================================================
 # END OF SCRIPT

@@ -15,7 +15,7 @@ yunohost app setting calibreweb do_not_backup_data -v 1
 chown -R calibreweb: chemin/vers/bibliothèque
 ou
 chmod o+rw chemin/vers/bibliothèque
-``` 
+```
 
 ### Synchronisation Kobo
 
@@ -37,4 +37,3 @@ La numérotation est modifiée dans yunohost par rapport à Calibre-web: la vers
 
 * Ne pas utiliser un répertoire Nextcloud pour y installer la bibliothèque: Cela fonctionnera s'il s'agit d'un stockage externe à Nextcloud, mais pas dans le cas d'un répertoire interne qui causerait des problèmes lors des synchronisations.
 * Les changements fait à la bibliothèque en dehors de Calibreweb ne sont pas automatiquement vu par Calibreweb : Il est nécessaire de se déconnecter puis reconnecter ou redémarrer le service pour que les modifications soient visibles : N'utilisez donc pas simultanément Calibre et Calibreweb sur la même bibliothèque!
-* La synchronisation Kobo ne fonctionne pas quand Calibreweb est installée dans un sous-domaine. Ce problème est causé par nginx. Par contre, cela fonctionne très bien quand installé dans un répertoire, par exemple `https://domain.tld/calibreweb`
