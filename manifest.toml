@@ -126,3 +126,10 @@ ram.runtime = "200M"
         "libjpeg-dev",    # for comics and image reading in browser
         "build-essential" # for building lol
     ]
+    packages_from_raw_bash = """
+    if [[ $YNH_DEBIAN_VERSION == "bookworm" ]]; then
+        echo "";
+    elif [[ $YNH_DEBIAN_VERSION == "trixie" ]]; then
+        echo "libxml2-dev, libxslt1-dev";
+    fi
+    """
