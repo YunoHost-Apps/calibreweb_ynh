@@ -7,7 +7,7 @@ name = "Calibre-web"
 description.en = "Browsing, reading and downloading eBooks using a Calibre database"
 description.fr = "Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre"
 
-version = "0.96.24~ynh3"
+version = "0.96.25~ynh1"
 
 maintainers = ["Krakinou"]
 
@@ -72,8 +72,8 @@ ram.runtime = "200M"
 
 [resources]
     [resources.sources.main]
-    url = "https://github.com/janeczku/calibre-web/archive/refs/tags/0.6.24.zip"
-    sha256 = "08849d1772f45e56991c4a69721fc4fb49e73d0588ccb2e0dc63764e38bcf17d"
+    url = "https://github.com/janeczku/calibre-web/archive/refs/tags/0.6.25.zip"
+    sha256 = "f257811519c662c9911cb98bd0c969cb0e3047ba7c80f8ba2e3a6bf7837cb107"
 
     autoupdate.strategy = "latest_github_release"
 
