@@ -70,11 +70,7 @@ then
 fi
 
 #Restore Imagick policy
-if [ -z /etc/ImageMagick-6/policy.xml ]; then
-	ynh_replace --match="<policy domain="coder" rights="read" pattern="PDF" />" \
-                --replace="<policy domain="coder" rights="none" pattern="PDF" />" \
-                --target="/etc/ImageMagick-6/policy.xml"
-fi
+_ynh_unpatch_policy_xml
 
 ynh_script_progression "Removing log file..."
 

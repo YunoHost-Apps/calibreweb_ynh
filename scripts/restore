@@ -115,11 +115,8 @@ fi
 #===================================================
 # SPECIFIC SETUP
 #===================================================
-#Update Imagick policy as per https://github.com/janeczku/calibre-web/wiki/FAQ#what-to-do-if-cover-pictures-are-not-extracted-from-pdf-files
-ynh_replace --match="<policy domain="coder" rights="none" pattern="PDF" />" \
-            --replace="<policy domain="coder" rights="read" pattern="PDF" />" \
-            --file="/etc/ImageMagick-6/policy.xml"
 
+_ynh_patch_policy_xml
 
 # Remove the option backup_core_only if it's in the settings.yml file
 ynh_app_setting_delete --key=backup_core_only

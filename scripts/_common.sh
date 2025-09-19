@@ -27,3 +27,37 @@ case "$mach" in
  * ) mach="32bit"
  			;;
 esac
+
+
+_ynh_patch_policy_xml() {
+    # Update Imagick policy as per
+    # https://github.com/janeczku/calibre-web/wiki/FAQ#what-to-do-if-cover-pictures-are-not-extracted-from-pdf-files
+
+    if [[ $YNH_DEBIAN_VERSION == "bookworm" ]]; then
+        local policy=/etc/ImageMagick-6/policy.xml
+        local match='<policy domain="coder" rights="none" pattern="PDF" />'
+        local replace='<policy domain="coder" rights="read" pattern="PDF" />'
+    elif [[ $YNH_DEBIAN_VERSION == "trixie" ]]; then
+        local policy=/etc/ImageMagick-7/policy.xml
+        local match='<policy domain="coder" rights="none" pattern="*" />'
+        local replace='<policy domain="coder" rights="read" pattern="*" />'
+    fi
+
+    ynh_replace --file="$policy" --match="$match" --replace="$replace"
+}
+
+_ynh_unpatch_policy_xml() {
+    if [[ $YNH_DEBIAN_VERSION == "bookworm" ]]; then
+        local policy=/etc/ImageMagick-6/policy.xml
+        local match='<policy domain="coder" rights="none" pattern="PDF" />'
+        local replace='<policy domain="coder" rights="read" pattern="PDF" />'
+    elif [[ $YNH_DEBIAN_VERSION == "trixie" ]]; then
+        local policy=/etc/ImageMagick-7/policy.xml
+        local match='<policy domain="coder" rights="none" pattern="*" />'
+        local replace='<policy domain="coder" rights="read" pattern="*" />'
+    fi
+
+    if [[ -f "$policy" ]]; then
+        ynh_replace --file="$policy" --match="$replace" --replace="$match"
+    fi
+}
