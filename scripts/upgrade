@@ -156,13 +156,8 @@ ynh_script_progression "Create Multimedia dir..."
 ynh_multimedia_build_main_dir
 ynh_multimedia_addaccess $app
 
-#Update Imagick policy as per https://github.com/janeczku/calibre-web/wiki/FAQ#what-to-do-if-cover-pictures-are-not-extracted-from-pdf-files
 ynh_script_progression "Update Imagick policy..."
-
-ynh_replace --match="<policy domain="coder" rights="none" pattern="PDF" />" \
-            --replace="<policy domain="coder" rights="read" pattern="PDF" />" \
-            --file="/etc/ImageMagick-6/policy.xml"
-
+_ynh_patch_policy_xml
 
 #=================================================
 # SETUP LOGROTATE

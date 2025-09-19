@@ -114,12 +114,8 @@ ynh_config_add_logrotate "$access_log_file"
 #=================================================
 # SPECIFIC SETUP
 #=================================================
-#Update Imagick policy as per https://github.com/janeczku/calibre-web/wiki/FAQ#what-to-do-if-cover-pictures-are-not-extracted-from-pdf-files
-ynh_replace --match="<policy domain="coder" rights="none" pattern="PDF" />" \
-            --replace="<policy domain="coder" rights="read" pattern="PDF" />" \
-            --file="/etc/ImageMagick-6/policy.xml"
 
-
+_ynh_patch_policy_xml
 
 #=================================================
 # INTEGRATE SERVICE IN YUNOHOST
