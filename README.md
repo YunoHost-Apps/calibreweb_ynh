@@ -10,7 +10,7 @@ It shall NOT be edited by hand.
 
 Browsing, reading and downloading eBooks using a Calibre database
 
-[![Version: 0.96.25~ynh1](https://img.shields.io/badge/Version-0.96.25~ynh1-rgb(18,138,11)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/calibreweb/)
+[![Version: 0.96.25~ynh2](https://img.shields.io/badge/Version-0.96.25~ynh2-rgb(18,138,11)?style=for-the-badge)](https://ci-apps.yunohost.org/ci/apps/calibreweb/)
 
 <div align="center">
 <a href="https://apps.yunohost.org/app/calibreweb"><img height="100px" src="https://github.com/YunoHost/yunohost-artwork/raw/refs/heads/main/badges/neopossum-badges/badge_more_info_on_the_appstore.svg"/></a>
