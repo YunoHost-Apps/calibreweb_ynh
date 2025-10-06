@@ -7,7 +7,7 @@
 -        return redirect(url_for('web.login'))
 +#       return redirect(url_for('web.login'))
 +        if config.config_login_type == constants.LOGIN_LDAP:
-+            return redirect(request.host_url + '/yunohost/sso/?action=logout')
++            return redirect(request.host_url + 'yunohost/sso/?action=logout')
 +        else:
 +            return redirect(url_for('web.login'))
 
