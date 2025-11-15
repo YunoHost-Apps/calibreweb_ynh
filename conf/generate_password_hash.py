@@ -6,4 +6,4 @@ path=sys.argv[2]
 sys.path.append(path)
 from werkzeug.security import generate_password_hash
 password=sys.argv[1]
-print generate_password_hash(password)
+print(generate_password_hash(password))
