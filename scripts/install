@@ -82,7 +82,7 @@ sqlite3 $install_dir/app.db "UPDATE settings SET mail_server='$domain'"
 sqlite3 $install_dir/app.db "UPDATE settings SET mail_port='587'"
 sqlite3 $install_dir/app.db "UPDATE settings SET mail_use_ssl='1'"
 sqlite3 $install_dir/app.db "UPDATE settings SET mail_login='$app'"
-sqlite3 $install_dir/app.db "UPDATE settings SET mail_password='$mail_pwd'"
+sqlite3 $install_dir/app.db "UPDATE settings SET mail_password_e='$(python ../conf/generate_password_hash.py "$mail_pwd" $install_dir/vendor)' WHERE ID=1"
 sqlite3 $install_dir/app.db "UPDATE settings SET mail_from='$app@$domain'"
 
 #=================================================
