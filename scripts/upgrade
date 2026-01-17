@@ -78,6 +78,17 @@ if sqlite3 $install_dir/app.db "SELECT config_kepubifypath FROM settings" | grep
 	eval sqlite3 $install_dir/app.db "\"UPDATE settings SET config_kepubifypath='/opt/kepubify/$app/kepubify' WHERE ID=1\""
 fi
 
+if ynh_app_upgrading_from_version_before 0.96.25~ynh4; then
+   	ynh_script_progression "Adjusting mail configuration..."
+
+	sqlite3 $install_dir/app.db "UPDATE settings SET mail_server='$domain'"
+	sqlite3 $install_dir/app.db "UPDATE settings SET mail_port='587'"
+	sqlite3 $install_dir/app.db "UPDATE settings SET mail_use_ssl='1'"
+	sqlite3 $install_dir/app.db "UPDATE settings SET mail_login='$app'"
+	sqlite3 $install_dir/app.db "UPDATE settings SET mail_password_e='$(python ../conf/generate_password_hash.py "$mail_pwd" $install_dir/vendor)' WHERE ID=1"
+	sqlite3 $install_dir/app.db "UPDATE settings SET mail_from='$app@$domain'"
+fi
+
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================

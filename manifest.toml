@@ -7,7 +7,7 @@ name = "Calibre-web"
 description.en = "Browsing, reading and downloading eBooks using a Calibre database"
 description.fr = "Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre"
 
-version = "0.96.25~ynh3"
+version = "0.96.25~ynh4"
 
 maintainers = ["Krakinou"]
 
@@ -98,6 +98,7 @@ ram.runtime = "200M"
     autoupdate.asset.arm64 = "kepubify-linux-arm64"
 
     [resources.system_user]
+    allow_email = true
 
     [resources.install_dir]
 
