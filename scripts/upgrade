@@ -204,6 +204,12 @@ fi
 # Create a dedicated Fail2Ban config
 ynh_config_add_fail2ban --logpath="$log_file" --failregex="^.*LDAP Login failed for user .* IP-address: <HOST>.*$"
 
+
+#=================================================
+# SET SSOWAT BASIC AUTH HEADER HANDLING FOR OPDS
+#=================================================
+ynh_app_setting_set --key=protect_against_basic_auth_spoofing --value=false
+
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
