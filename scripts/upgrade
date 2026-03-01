@@ -210,6 +210,8 @@ ynh_config_add_fail2ban --logpath="$log_file" --failregex="^.*LDAP Login failed 
 #=================================================
 ynh_app_setting_set --key=protect_against_basic_auth_spoofing --value=false
 
+yunohost app ssowatconf
+
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
