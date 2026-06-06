@@ -154,7 +154,7 @@ ynh_app_setting_set --key=protect_against_basic_auth_spoofing --value=false
 # RELOAD NGINX
 #=================================================
 ynh_script_progression "Start $app..."
-ynh_systemctl --service=$app --action="start" --wait_until="Starting Gevent server on" -t 60
+ynh_systemctl --service=$app --action="start" --wait_until="Starting Gevent server on" -t 120
 
 #Setting the proxy authentication in case calibre is not open to visitor.
 #https://github.com/janeczku/calibre-web/wiki/Setup-Reverse-Proxy#login-via-header-from-upstream-authentication-source
