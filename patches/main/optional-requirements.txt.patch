@@ -1,11 +1,11 @@
---- a/optional-requirements.txt	2026-02-08 10:59:14.149342556 +0100
-+++ b/optional-requirements.txt	2026-02-08 11:00:13.074248523 +0100
+--- a/optional-requirements.txt	2026-08-23 15:17:25.662592112 +0200
++++ b/optional-requirements.txt	2026-08-23 15:19:51.874702067 +0200
 @@ -1,19 +1,5 @@
  # GDrive Integration
 -google-api-python-client>=2.73.00,<2.200.0
- gevent>20.6.0,<24.12.0
--greenlet>=0.4.17,<3.3.0
--httplib2>=0.9.2,<0.23.0
+ gevent>20.6.0,<25.9.2
+-greenlet>=0.4.17,<3.6.0
+-httplib2>=0.9.2,<0.33.0
 -oauth2client>=4.0.0,<4.1.4
 -uritemplate>=3.0.0,<4.3.0
 -pyasn1-modules>=0.0.8,<0.7.0
@@ -22,11 +22,11 @@
  goodreads>=0.3.2,<0.4.0
 @@ -23,10 +9,6 @@
  python-ldap>=3.0.0,<3.5.0
- Flask-SimpleLDAP>=1.4.0,<2.1.0
+ Flask-SimpleLDAP>=1.4.0,<2.2.0
  
 -# oauth
 -Flask-Dance>=2.0.0,<7.2.0
--SQLAlchemy-Utils>=0.33.5,<0.42.0
+-SQLAlchemy-Utils>=0.33.5,<0.43.0
 -
  # metadata extraction
  rarfile>=3.2,<5.0
