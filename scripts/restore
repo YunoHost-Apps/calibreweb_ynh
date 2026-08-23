@@ -151,7 +151,7 @@ ynh_systemctl --service=nginx --action=reload
 #=================================================
 ynh_script_progression "Starting a systemd service..."
 
-ynh_systemctl --service=$app --action="start" --wait_until="Starting Gevent server on" -t 60
+ynh_systemctl --service=$app --action="start" --wait_until="Starting Gevent server on" -t 120
 
 #=================================================
 # END OF SCRIPT
