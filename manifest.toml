@@ -7,7 +7,7 @@ name = "Calibre-web"
 description.en = "Browsing, reading and downloading eBooks using a Calibre database"
 description.fr = "Explorer, lire et télécharger des eBooks à partir d'une base de données Calibre"
 
-version = "0.96.27~ynh1"
+version = "0.96.27~ynh2"
 
 maintainers = ["Krakinou"]
 
@@ -78,17 +78,17 @@ ram.runtime = "200M"
     autoupdate.strategy = "latest_github_release"
 
     [resources.sources.kepubify]
-    arm64.url = "https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-arm64"
-    arm64.sha256="5a15b8f6f6a96216c69330601bca29638cfee50f7bf48712795cff88ae2d03a3"
+    arm64.url = "https://github.com/pgaskin/kepubify/releases/download/v5.0.0/kepubify-linux-arm64"
+    arm64.sha256="6d6b44725f3161f3fa9f364c3c7cabd810a67e90420e18c84fe9f366c80d6782"
 
-    armhf.url="https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-arm"
-    armhf.sha256="07f23275c4e674093443f01a591aa0980b0b87dbb0a10986d5001e9d56b0e1e7"
+    armhf.url="https://github.com/pgaskin/kepubify/releases/download/v5.0.0/kepubify-linux-arm"
+    armhf.sha256="57aa3e1a2d8e30af2ebce70e4c203889ee2b66d4b97c9d88a24b6f40b0de26a5"
 
-    i386.url="https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-32bit"
-    i386.sha256="3365a848ce06d43fca8f1999eb69c6c8e0e20a56b6b8658a8466b9726adef0f5"
+    i386.url="https://github.com/pgaskin/kepubify/releases/download/v5.0.0/kepubify-linux-32bit"
+    i386.sha256="ebcc4d70b45d4995fc4022880ccfa11dc28f0c826953f814737a2d8f59570ddf"
 
-    amd64.url="https://github.com/pgaskin/kepubify/releases/download/v4.0.4/kepubify-linux-64bit"
-    amd64.sha256="37d7628d26c5c906f607f24b36f781f306075e7073a6fe7820a751bb60431fc5"
+    amd64.url="https://github.com/pgaskin/kepubify/releases/download/v5.0.0/kepubify-linux-64bit"
+    amd64.sha256="cb77fe364f780feea8de4586600f7160c7516586c21d9a80b1504c6630389069"
 
     autoupdate.upstream = "https://github.com/pgaskin/kepubify"
     autoupdate.strategy = "latest_github_release"
