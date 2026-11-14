@@ -65,16 +65,12 @@ fi
 if [ -z $(sqlite3 $install_dir/app.db "SELECT config_kepubifypath FROM settings") ]; then
 	eval sqlite3 $install_dir/app.db "\"UPDATE settings SET config_kepubifypath='/opt/kepubify/$app/kepubify' WHERE ID=1\""
 fi
-if [ ! -d /opt/kepubify/$app ]; then
-	ynh_setup_source --dest_dir="/opt/kepubify/$app" --source_id="kepubify"
-	chmod 770 /opt/kepubify/$app/kepubify
-fi
 
 #Change kepubify to new path (for multiinstance
-if [ -f /opt/kepubify/kepubify ]; then
-	rm /opt/kepubify/kepubify
+if [ -f /opt/kepubify/kepubify* ]; then
+	rm /opt/kepubify/kepubify*
 fi
-if sqlite3 $install_dir/app.db "SELECT config_kepubifypath FROM settings" | grep -xq "/opt/kepubify/kepubify" ; then
+if sqlite3 $install_dir/app.db "SELECT config_kepubifypath FROM settings" | grep -q "/opt/kepubify/kepubify" ; then
 	eval sqlite3 $install_dir/app.db "\"UPDATE settings SET config_kepubifypath='/opt/kepubify/$app/kepubify' WHERE ID=1\""
 fi
 
@@ -97,6 +93,9 @@ if $(ynh_permission_has_user --permission=main --user=visitors); then
 	patch -u /$install_dir/cps/web.py -i ../conf/main-web.py.revert.patch
 fi
 
+ynh_script_progression "Upgrading kepubify..."
+ynh_setup_source --dest_dir="/opt/kepubify/$app" --source_id="kepubify"
+chmod 770 /opt/kepubify/$app/kepubify
 
 #=================================================
 # NGINX CONFIGURATION
