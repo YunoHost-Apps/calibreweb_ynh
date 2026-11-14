@@ -74,7 +74,7 @@ fi
 if [ -f /opt/kepubify/kepubify* ]; then
 	rm /opt/kepubify/kepubify*
 fi
-if sqlite3 $install_dir/app.db "SELECT config_kepubifypath FROM settings" | grep -xq "/opt/kepubify/kepubify" ; then
+if sqlite3 $install_dir/app.db "SELECT config_kepubifypath FROM settings" | grep -q "/opt/kepubify/kepubify" ; then
 	eval sqlite3 $install_dir/app.db "\"UPDATE settings SET config_kepubifypath='/opt/kepubify/$app/kepubify' WHERE ID=1\""
 fi
 
